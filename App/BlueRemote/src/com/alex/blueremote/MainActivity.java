@@ -1,7 +1,10 @@
 package com.alex.blueremote;
 
+import java.util.Set;
+
 import android.support.v7.app.AppCompatActivity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -25,12 +28,15 @@ public class MainActivity extends AppCompatActivity {
 		//*/
 		
 		//*
+		//Direct Turn On BT by App 
 		BtAdapter.enable();
 	    Log.d(BLUETOOTH_SERVICE, "Bluetooth turned On.");
 	    //*/
 	    
 		/*
-		if (!BtAdapter.isEnabled()) 
+		//Request User to turn on BT 
+	    //Can not to turned off
+	    if (!BtAdapter.isEnabled()) 
 		{
 			Log.d(BLUETOOTH_SERVICE, "Bluetooth is Off.");
 			Log.d(BLUETOOTH_SERVICE, "Turning on Bluetoooth.");
@@ -44,7 +50,16 @@ public class MainActivity extends AppCompatActivity {
 			Log.d(BLUETOOTH_SERVICE, "Bluetooth is On.");
 		}
 		//*/
+	    
+	    Set<BluetoothDevice> pairedDevices = BtAdapter.getBondedDevices();
 		
+	    if (pairedDevices.size() > 0) 
+	    {
+	    	for (BluetoothDevice device : pairedDevices) 
+	    	{
+	    		Log.d(BLUETOOTH_SERVICE,device.getName()+" "+device.getAddress());
+	    	}
+	    }		
 	}
 
 	@Override
@@ -69,6 +84,9 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onDestroy ()
 	{
+		super.onDestroy();
+	    
+		//Direct Turn Off BT by App 
 		BtAdapter.disable();
 	    Log.d(BLUETOOTH_SERVICE, "Bluetooth turned Off.");
 	}
