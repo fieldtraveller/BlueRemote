@@ -12,5 +12,7 @@
 	<string name="channel_down">CH-</string>
 	<string name="send">Send</string>
 	<string name="select">Select</string>
+	
+	<string name="discovery">Discovery</string>
 		
 </resources>
