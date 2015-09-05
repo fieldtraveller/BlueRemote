@@ -16,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.ParcelUuid;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,12 +31,20 @@ public class MainActivity extends AppCompatActivity {
 
 	BluetoothAdapter BtAdapter;
 	final int BT_turn_on_fragment_request_code=2;
+	
 	BroadcastReceiver bt_device_found_receiver;
 	BroadcastReceiver bt_discovery_started_receiver;
 	BroadcastReceiver bt_discovery_finished_receiver;
 	
+	BluetoothDevice BT_device;
+	
 	Set<BluetoothDevice> pairedDevices;
 	Set<BluetoothDevice> unpairedDevices = new HashSet<BluetoothDevice>();
+	
+	BluetoothServerSocket BT_s_socket;
+    UUID BT_module_uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    BluetoothSocket BT_socket;
+    
 	String BT_module_mac="20:13:05:27:09:64";
 
 	Button channel_up,channel_down,volume_up,volume_down,select,send;
@@ -203,10 +212,6 @@ public class MainActivity extends AppCompatActivity {
 	    startActivity(discoverableIntent);
 	    //*/
 	    
-	    BluetoothServerSocket BT_s_socket = null;
-	    UUID BT_module_uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-	    BluetoothSocket BT_socket=null;
-	    
 	    /*
 	    try 
 	    {
@@ -225,8 +230,10 @@ public class MainActivity extends AppCompatActivity {
 		}
 	    //*/
 	    
-	    BluetoothDevice BT_device = BtAdapter.getRemoteDevice(BT_module_mac);
+	    //*
+	    BT_device = BtAdapter.getRemoteDevice(BT_module_mac);
 	    
+	    //*
 	    if(BT_device!=null)
    	 	{
 	    	Log.d(BLUETOOTH_SERVICE,"BT Device Obtained.");
@@ -236,32 +243,46 @@ public class MainActivity extends AppCompatActivity {
 	    	Log.d(BLUETOOTH_SERVICE,"BT Device:Null.");
 	    }
 	    
+	    //*
 	    try 
 	    {
-			BT_socket = BT_device.createRfcommSocketToServiceRecord(BT_module_uuid);
-			
+			//BT_socket = BT_device.createRfcommSocketToServiceRecord(BT_module_uuid);
+			BT_socket = BT_device.createInsecureRfcommSocketToServiceRecord(BT_module_uuid); 
+			BT_device.
 			if(BT_socket!=null)
 	   	 	{
-		    	Log.d(BLUETOOTH_SERVICE,"Connection Sucessful.");
+		    	Log.d(BLUETOOTH_SERVICE,"Socket Created.");
 	   	 	}
 		    else
 		    {
-		    	Log.d(BLUETOOTH_SERVICE,"Connection Failure.");
+		    	Log.d(BLUETOOTH_SERVICE,"Socket:Null.");
 		    }
 			
 			BT_socket.connect();
 			
+			Log.d(BLUETOOTH_SERVICE,"isConnected():"+BT_socket.isConnected());
+			
 			OutputStream BT_outStream = BT_socket.getOutputStream();
-			BT_outStream.write(15);
+			BT_outStream.write(0);
+			BT_outStream.write(1);
+			BT_outStream.write(2);
+			BT_outStream.write(4);
+			BT_outStream.write(8);
+			BT_outStream.write(16);
+			BT_outStream.write(32);
+			BT_outStream.write(64);
+			BT_outStream.write(128);
+			BT_outStream.write(255);
+			BT_outStream.close();
 			
 			BT_socket.close();
 			
 		} 
 	    catch (IOException e) 
 	    {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	    //*/
 	    
 	    channel_up.setOnClickListener(new View.OnClickListener() {
 	    	
@@ -406,6 +427,18 @@ public class MainActivity extends AppCompatActivity {
 	{
 		super.onDestroy();
 	    
+		if(BT_socket.isConnected())
+		{
+			try 
+			{
+				BT_socket.close();
+			}
+			catch (IOException e) 
+			{
+				e.printStackTrace();
+			}
+		}
+		
 		//Direct Turn Off BT by App 
 		if (BtAdapter.isEnabled()) 
 		{
