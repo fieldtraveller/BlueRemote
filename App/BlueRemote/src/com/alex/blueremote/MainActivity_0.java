@@ -1,5 +1,7 @@
 package com.alex.blueremote;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -7,6 +9,8 @@ import java.util.UUID;
 import android.support.v7.app.AppCompatActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,7 +27,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Switch;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity_0 extends AppCompatActivity {
 
 	BluetoothAdapter BtAdapter;
 	final int BT_turn_on_fragment_request_code=2;
@@ -32,25 +36,22 @@ public class MainActivity extends AppCompatActivity {
 	BroadcastReceiver bt_discovery_started_receiver;
 	BroadcastReceiver bt_discovery_finished_receiver;
 	
+	BluetoothDevice BT_device;
+	
 	Set<BluetoothDevice> pairedDevices;
 	Set<BluetoothDevice> unpairedDevices = new HashSet<BluetoothDevice>();
 	
+	BluetoothServerSocket BT_s_socket;
+    UUID BT_module_uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    BluetoothSocket BT_socket;
+    
 //	String BT_module_mac="20:13:05:27:09:64";
 	String BT_module_mac="98:D3:31:80:18:29";
-	
-	BT_spp BT_serial; 
+
 	
 	Button channel_up,channel_down,volume_up,volume_down,select,send;
 	Switch power,mute;
 	EditText data;
-	
-	byte channel_up_command=0;
-	byte channel_down_command=1;
-	byte volume_up_command=2;
-	byte volume_down_command=4;
-	byte select_command=8;
-	byte power_command=32;
-	byte mute_command=64;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -207,21 +208,95 @@ public class MainActivity extends AppCompatActivity {
 	    //*/
 	    
 	    /*
-	    //Make Device Discoverable
 	    Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
 	    discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
 	    startActivity(discoverableIntent);
 	    //*/
 	    
-	    BT_serial=new BT_spp(BtAdapter, BT_module_mac);
-	    BT_serial.connect();
+	    /*
+	    try 
+	    {
+	    	BT_s_socket = BtAdapter.listenUsingRfcommWithServiceRecord("BlueRemote", BT_module_uuid);
+	    	
+	    	 BT_socket=BT_s_socket.accept();
+	    	 
+	    	 if(socket!=null)
+	    	 {
+	    		 Log.d(BLUETOOTH_SERVICE,"Connection Succesful.");
+	    	 }
+		}
+	    catch (IOException e) 
+	    {
+			e.printStackTrace();
+		}
+	    //*/
+	    
+	    //*
+	    BT_device = BtAdapter.getRemoteDevice(BT_module_mac);
+	    
+	    //*
+	    if(BT_device!=null)
+   	 	{
+	    	Log.d(BLUETOOTH_SERVICE,"BT Device Obtained.");
+   	 	}
+	    else
+	    {
+	    	Log.d(BLUETOOTH_SERVICE,"BT Device:Null.");
+	    }
+	    
+	    //*
+	    try 
+	    {
+//			BT_socket = BT_device.createRfcommSocketToServiceRecord(BT_module_uuid);
+			BT_socket = BT_device.createInsecureRfcommSocketToServiceRecord(BT_module_uuid); 
+			//BT_device.
+			if(BT_socket!=null)
+	   	 	{
+		    	Log.d(BLUETOOTH_SERVICE,"Socket Created.");
+	   	 	}
+		    else
+		    {
+		    	Log.d(BLUETOOTH_SERVICE,"Socket:Null.");
+		    }
+			
+			BT_socket.connect();
+			
+//			while(BT_socket.isConnected()==false)
+//			{
+//				Log.d(BLUETOOTH_SERVICE,"isConnected():"+BT_socket.isConnected());
+//			}
+			
+			Log.d(BLUETOOTH_SERVICE,"isConnected():"+BT_socket.isConnected());
+			
+			final OutputStream BT_outStream = BT_socket.getOutputStream();
+//			BT_outStream.write(0);
+//			BT_outStream.write(1);
+//			BT_outStream.write(2);
+//			BT_outStream.write(4);
+//			BT_outStream.write(8);
+//			BT_outStream.write(16);
+//			BT_outStream.write(32);
+//			BT_outStream.write(64);
+//			BT_outStream.write(128);
+			
+			BT_outStream.write(255);
+		    
+		    
+		    BT_outStream.close();
+			BT_socket.close();
+			
+		} 
+	    catch (IOException e) 
+	    {
+			e.printStackTrace();
+		}
+	    //*/
 	    
 	    channel_up.setOnClickListener(new View.OnClickListener() {
 	    	
 	    	@Override
 			public void onClick(View v) {
 	    		
-	    		BT_serial.write(channel_up_command);
 	    		
 	    	}
 	    	
@@ -232,8 +307,6 @@ public class MainActivity extends AppCompatActivity {
 	    	@Override
 			public void onClick(View v) {
 	    		
-	    		BT_serial.write(channel_down_command);
-	    		
 	    	}
 	    	
 		});
@@ -242,8 +315,6 @@ public class MainActivity extends AppCompatActivity {
 	    	
 	    	@Override
 			public void onClick(View v) {
-	    		
-	    		BT_serial.write(volume_down_command);
 	    		
 	    	}
 	    	
@@ -254,8 +325,6 @@ public class MainActivity extends AppCompatActivity {
 	    	@Override
 			public void onClick(View v) {
 	    		
-	    		BT_serial.write(volume_down_command);
-	    		
 	    	}
 	    	
 		});
@@ -265,8 +334,6 @@ public class MainActivity extends AppCompatActivity {
 	    	@Override
 			public void onClick(View v) {
 	    		
-	    		BT_serial.write(select_command);
-	    		
 	    	}
 	    	
 		});
@@ -275,7 +342,7 @@ public class MainActivity extends AppCompatActivity {
 	    	
 	    	@Override
 			public void onClick(View v) {
-	    			    		
+	    		
 	    	}
 	    	
 		});
@@ -286,9 +353,8 @@ public class MainActivity extends AppCompatActivity {
 	    power.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 	   
 		    @Override
-			public void onCheckedChanged(CompoundButton buttonView,	boolean isChecked) {
-		    	
-		    	BT_serial.write(power_command);
+			public void onCheckedChanged(CompoundButton buttonView,
+					boolean isChecked) {
 				
 		    	if(isChecked)
 				{
@@ -305,9 +371,8 @@ public class MainActivity extends AppCompatActivity {
 	    mute.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 	   
 		    @Override
-			public void onCheckedChanged(CompoundButton buttonView,	boolean isChecked) {
-		    	
-		    	BT_serial.write(mute_command);
+			public void onCheckedChanged(CompoundButton buttonView,
+					boolean isChecked) {
 		    	
 		    	if(isChecked)
 				{
@@ -371,7 +436,17 @@ public class MainActivity extends AppCompatActivity {
 	{
 		super.onDestroy();
 	    
-		BT_serial.disconnect();
+		if(BT_socket.isConnected())
+		{
+			try 
+			{
+				BT_socket.close();
+			}
+			catch (IOException e) 
+			{
+				e.printStackTrace();
+			}
+		}
 		
 		//Direct Turn Off BT by App 
 		if (BtAdapter.isEnabled()) 
