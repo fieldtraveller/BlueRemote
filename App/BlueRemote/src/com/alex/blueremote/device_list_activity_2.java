@@ -1,6 +1,9 @@
 package com.alex.blueremote;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -17,18 +20,25 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleExpandableListAdapter;
 import android.widget.Switch;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
-	
+public class device_list_activity_2 extends AppCompatActivity {
+
 	BluetoothAdapter BtAdapter;
-	BT_global_variables BT_global_variables_1;
 	
-	final int BT_turn_on_fragment_request_code=2;
+	BT_global_variables BT_global_variables_1;
 	
 	BroadcastReceiver bt_device_found_receiver;
 	BroadcastReceiver bt_discovery_started_receiver;
@@ -37,103 +47,110 @@ public class MainActivity extends AppCompatActivity {
 	Set<BluetoothDevice> pairedDevices;
 	Set<BluetoothDevice> unpairedDevices = new HashSet<BluetoothDevice>();
 	
-//	String BT_module_mac="20:13:05:27:09:64";
-	String BT_module_mac="98:D3:31:80:18:29";
+	ExpandableListView elv_1;
 	
-	BT_spp BT_serial;
-	
-	Button channel_up,channel_down,volume_up,volume_down,select,send,discovery;
-	Switch power,mute;
-	EditText data;
-	
-	byte channel_up_command=0;
-	byte channel_down_command=1;
-	byte volume_up_command=2;
-	byte volume_down_command=4;
-	byte select_command=8;
-	byte power_command=32;
-	byte mute_command=64;
-	
+	private List<HashMap<String, String>> createGroupList() 
+	{
+          ArrayList<HashMap<String, String>> result = new ArrayList<HashMap<String, String>>();
+          
+          for( int i = 0 ; i < 5 ; ++i ) 
+          {
+	           HashMap<String, String> m = new HashMap<String, String>();
+	           m.put( "group_item","group_item" + i ); // the key and it's value.
+	           result.add( m );
+          }
+          
+          return (List<HashMap<String, String>>)result;
+    }
+ 
+    private List<ArrayList<HashMap<String, String>>> createChildList() 
+    {
+        ArrayList<ArrayList<HashMap<String, String>>> result = new ArrayList<ArrayList<HashMap<String, String>>>();
+        
+        for( int i = 0 ; i < 5 ; ++i ) 
+        {
+        	ArrayList<HashMap<String, String>> secList = new ArrayList<HashMap<String, String>>();
+         
+        	for( int n = 0 ; n < 3 ; n++ ) 
+        	{
+	            HashMap<String, String> child = new HashMap<String, String>();
+	            child.put( "group_child_item", "group_child_item" + n );
+	            secList.add( child );
+        	}
+        	
+        	result.add( secList );
+        }
+        
+        return result;
+    }
+    
+    List<HashMap<String, String>>[] group_list;
+    
+    List<ArrayList<HashMap<String, String>>> group_child_list; 
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.dl_layout_2);
 		
-		channel_up=(Button)findViewById(R.id.button1);
-		channel_down=(Button)findViewById(R.id.button5);
-		volume_up=(Button)findViewById(R.id.button4);
-		volume_down=(Button)findViewById(R.id.button2);
-		select=(Button)findViewById(R.id.button3);
-		send=(Button)findViewById(R.id.button6);
-		discovery=(Button)findViewById(R.id.button7);
-		
-		power=(Switch)findViewById(R.id.switch1);
-		mute=(Switch)findViewById(R.id.switch2);
-		
-		data=(EditText)findViewById(R.id.editText1);
+		elv_1=(ExpandableListView)findViewById(R.id.eList_1);
 		
 		BT_global_variables_1 = (BT_global_variables)getApplicationContext();
 		
-		BtAdapter = BluetoothAdapter.getDefaultAdapter();
-		/*
-		if (BtAdapter != null) 
-		{
-		    Log.d(BLUETOOTH_SERVICE, "Bluetooth HW exist.");
-		}
-		//*/
+		BtAdapter=BT_global_variables_1.getBtAdapter();
+		
+		Log.d(BLUETOOTH_SERVICE, "Bluetooth On? "+(BtAdapter.getState()==BluetoothAdapter.STATE_ON));
 		
 		//*
-		//Direct Turn On BT by App 
-		if (!BtAdapter.isEnabled()) 
-		{
-			BtAdapter.enable();
-			
-			while(BtAdapter.getState()==BluetoothAdapter.STATE_TURNING_ON)
-			{
-				//Log.d(BLUETOOTH_SERVICE, "Bluetooth turning On.");
-			}
-		}
-	    Log.d(BLUETOOTH_SERVICE, "Bluetooth turned On.");
-	    //*/
-	    
-		/*
-		//Request User to turn on BT 
-	    //Can not turned off
-	    if (!BtAdapter.isEnabled()) 
-		{
-			Log.d(BLUETOOTH_SERVICE, "Bluetooth is Off.");
-			Log.d(BLUETOOTH_SERVICE, "Turning on Bluetoooth.");
-		    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-		    startActivityForResult(enableBtIntent, BT_turn_on_fragment_request_code);
-		    //startActivity(enableBtIntent);
-		    
-		    
-		    while(BtAdapter.getState()==BluetoothAdapter.STATE_TURNING_ON)
-			{
-				//Log.d(BLUETOOTH_SERVICE, "Bluetooth turning On.");
-			}
-				
-		}
-		else
-		{
-			Log.d(BLUETOOTH_SERVICE, "Bluetooth is On.");
-		}
-		//*/
-	    
-	    BT_global_variables_1.setBtAdapter(BtAdapter);
-	    	    
-	    /*
 	    pairedDevices = BtAdapter.getBondedDevices();
+	    
 	    Log.d(BLUETOOTH_SERVICE,"Paired Devices: "+pairedDevices.size());
 	    
+	    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,R.layout.lv_textview);
+
 	    if (pairedDevices.size() > 0) 
 	    {
 	    	for (BluetoothDevice device : pairedDevices) 
 	    	{
 	    		Log.d(BLUETOOTH_SERVICE,device.getName()+" "+device.getAddress());
+	    		adapter.add(device.getName()+"\n"+device.getAddress());
 	    	}
 	    }
+	   
+	    SimpleExpandableListAdapter expListAdapter =
+	            new SimpleExpandableListAdapter(
+	                    this,										// context
+	                    createGroupList(),              			// Creating group List.
+	                    R.layout.elv_textview_group,             	// Group item layout XML.
+	                    new String[] {"group_item"},  				// the key of group item.
+	                    new int[] { R.id.elv_group },    			// ID of each group item.-Data under the key goes into this TextView.
+	                    createChildList(),             				// childData describes second-level entries.
+	                    R.layout.elv_textview_group_child,          // Layout for sub-level entries(second level).
+	                    new String[] {"group_child_item"},      			// Keys in childData maps to display.
+	                    new int[] { R.id.elv_group_child}     		// Data under the keys above go into these TextViews.
+	                );
 	    
+	    elv_1.setAdapter(expListAdapter);
+	    
+//	    lv_1.setAdapter(adapter);
+//	    
+//	    lv_1.setOnItemClickListener(new OnItemClickListener() {
+//
+//			@Override
+//			public void onItemClick(AdapterView<?> parent, View view,
+//					int position, long id) {
+//				
+//	               String mac_address=((String) lv_1.getItemAtPosition(position)).substring((((String) lv_1.getItemAtPosition(position)).length())-17);
+//	               
+////	               Toast.makeText(getApplicationContext(),""+mac_address , Toast.LENGTH_LONG).show();
+//			}
+//
+//         });
+	    
+ 
+	    //*/
+	    
+	    /*
 	    bt_device_found_receiver = new BroadcastReceiver() {
 	        
 			@Override
@@ -211,130 +228,7 @@ public class MainActivity extends AppCompatActivity {
 	    Log.d(BLUETOOTH_SERVICE,"BT Discovery Started:"+BtAdapter.startDiscovery());
 	    //Log.d(BLUETOOTH_SERVICE,"BT isDiscovering:"+BtAdapter.isDiscovering());
 	    //*/
-	    
-	    /*
-	    //Make Device Discoverable
-	    Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-	    discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-	    startActivity(discoverableIntent);
-	    //*/
-	    
-//	    Intent device_list= new Intent(this, device_list_activity.class);
-//	    startActivity(device_list);
-	    
-	    Intent device_list= new Intent(this, device_list_activity_2.class);
-	    startActivity(device_list);
-	    
-//	    
-//	    BT_serial=new BT_spp(BtAdapter, BT_module_mac);
-//	    BT_serial.connect();
-	    	    
-	    channel_up.setOnClickListener(new View.OnClickListener() {
-	    	
-	    	@Override
-			public void onClick(View v) {
-	    		
-//	    		getFragmentManager().beginTransaction().add(R.id.main_layout, new device_list()).addToBackStack(null).commit();
-	    		BT_serial.write(channel_up_command);
-	    		
-	    	}
-	    	
-		});
-	    
-	    channel_down.setOnClickListener(new View.OnClickListener() {
-	    	
-	    	@Override
-			public void onClick(View v) {
-	    		
-	    		BT_serial.write(channel_down_command);
-	    		
-	    	}
-	    	
-		});
-	    
-	    volume_up.setOnClickListener(new View.OnClickListener() {
-	    	
-	    	@Override
-			public void onClick(View v) {
-	    		
-	    		BT_serial.write(volume_down_command);
-	    		
-	    	}
-	    	
-		});
-	    
-	    volume_down.setOnClickListener(new View.OnClickListener() {
-	    	
-	    	@Override
-			public void onClick(View v) {
-	    		
-	    		BT_serial.write(volume_down_command);
-	    		
-	    	}
-	    	
-		});
-	    
-	    select.setOnClickListener(new View.OnClickListener() {
-	    	
-	    	@Override
-			public void onClick(View v) {
-	    		
-	    		BT_serial.write(select_command);
-	    		
-	    	}
-	    	
-		});
-	    
-	    send.setOnClickListener(new View.OnClickListener() {
-	    	
-	    	@Override
-			public void onClick(View v) {
-	    			    		
-	    	}
-	    	
-		});
-	    
-	    power.setChecked(false);
-	    mute.setChecked(false);
-	    
-	    power.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-	   
-		    @Override
-			public void onCheckedChanged(CompoundButton buttonView,	boolean isChecked) {
-		    	
-		    	BT_serial.write(power_command);
-				
-		    	if(isChecked)
-				{
-					
-				}
-				else
-				{
-					mute.setChecked(false);
-				}
-				
-			}
-	    });
-	    
-	    mute.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-	   
-		    @Override
-			public void onCheckedChanged(CompoundButton buttonView,	boolean isChecked) {
-		    	
-		    	BT_serial.write(mute_command);
-		    	
-		    	if(isChecked)
-				{
-					
-				}
-				else
-				{
-					
-				}
-		    	
-			}
-	    });
-	    	    
+
 	}
 	
 	/*
@@ -384,21 +278,11 @@ public class MainActivity extends AppCompatActivity {
 	protected void onDestroy ()
 	{
 		super.onDestroy();
-	    
-//		BT_serial.disconnect();
-		
-		//Direct Turn Off BT by App 
-		if (BtAdapter.isEnabled()) 
-		{
-			BtAdapter.disable();
-		}
 		
 		//unregister receivers
 //		unregisterReceiver(bt_device_found_receiver);
 //		unregisterReceiver(bt_discovery_started_receiver);
 //		unregisterReceiver(bt_discovery_finished_receiver);
-		
-			
-		Log.d(BLUETOOTH_SERVICE, "Bluetooth turned Off.");
-	}
+
+	}	
 }

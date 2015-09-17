@@ -14,5 +14,8 @@
 	<string name="select">Select</string>
 	
 	<string name="discovery">Discovery</string>
+	
+	<string name="dl_activity">Device List</string>
+	
 		
 </resources>
