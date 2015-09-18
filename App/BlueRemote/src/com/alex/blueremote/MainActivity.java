@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
 	BT_global_variables BT_global_variables_1;
 	
 	final int BT_turn_on_fragment_request_code=2;
+	final int BT_device_list_request_code=3;
 	
 	BroadcastReceiver bt_device_found_receiver;
 	BroadcastReceiver bt_discovery_started_receiver;
@@ -37,8 +38,10 @@ public class MainActivity extends AppCompatActivity {
 	Set<BluetoothDevice> pairedDevices;
 	Set<BluetoothDevice> unpairedDevices = new HashSet<BluetoothDevice>();
 	
-//	String BT_module_mac="20:13:05:27:09:64";
-	String BT_module_mac="98:D3:31:80:18:29";
+//	String BT_mac_address="20:13:05:27:09:64";	//ALEXBT
+//	String BT_mac_address="98:D3:31:80:18:29";	//BURZO
+	
+	String BT_mac_address;
 	
 	BT_spp BT_serial;
 	
@@ -223,10 +226,10 @@ public class MainActivity extends AppCompatActivity {
 //	    startActivity(device_list);
 	    
 	    Intent device_list= new Intent(this, device_list_activity_2.class);
-	    startActivity(device_list);
+	    startActivityForResult(device_list, BT_device_list_request_code);
 	    
 //	    
-//	    BT_serial=new BT_spp(BtAdapter, BT_module_mac);
+//	    BT_serial=new BT_spp(BtAdapter, BT_mac_address);
 //	    BT_serial.connect();
 	    	    
 	    channel_up.setOnClickListener(new View.OnClickListener() {
@@ -235,7 +238,9 @@ public class MainActivity extends AppCompatActivity {
 			public void onClick(View v) {
 	    		
 //	    		getFragmentManager().beginTransaction().add(R.id.main_layout, new device_list()).addToBackStack(null).commit();
-	    		BT_serial.write(channel_up_command);
+//	    		BT_serial.write(channel_up_command);
+	    		
+//	    		finish();
 	    		
 	    	}
 	    	
@@ -337,23 +342,38 @@ public class MainActivity extends AppCompatActivity {
 	    	    
 	}
 	
-	/*
+	//*
 	@Override  
     protected void onActivityResult(int requestCode, int resultCode, Intent data)  
     {
 		super.onActivityResult(requestCode, resultCode, data);
 		
-		if(requestCode==BT_turn_on_fragment_request_code)
+//		if(requestCode==BT_turn_on_fragment_request_code)
+//		{
+//			Log.d(BLUETOOTH_SERVICE,"resultCode:"+resultCode);
+//			
+//			if(resultCode==RESULT_OK)
+//			{
+//				Log.d(BLUETOOTH_SERVICE, "Bluetooth is On.");
+//			}
+//			else if(resultCode==RESULT_CANCELED)
+//			{
+//				Log.d(BLUETOOTH_SERVICE, "Bluetooth is Off.");
+//			}
+//			
+//		}
+		
+		if(requestCode==BT_device_list_request_code)
 		{
-			Log.d(BLUETOOTH_SERVICE,"resultCode:"+resultCode);
-			
-			if(resultCode==RESULT_OK)
+			if(data.getBooleanExtra("closeApp",false) == true)
 			{
-				Log.d(BLUETOOTH_SERVICE, "Bluetooth is On.");
+				this.finish();
+				
+				Log.e("Quit", "Bye-Bye");
 			}
-			else if(resultCode==RESULT_CANCELED)
+			else
 			{
-				Log.d(BLUETOOTH_SERVICE, "Bluetooth is Off.");
+				BT_mac_address=data.getStringExtra("mac_address");
 			}
 			
 		}

@@ -27,7 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.view.ViewGroup;
 
-public class device_list_activity_2 extends AppCompatActivity {
+public class device_list_activity_2_1 extends AppCompatActivity {
 
 	BT_global_variables BT_global_variables_1;
 	
@@ -43,9 +43,9 @@ public class device_list_activity_2 extends AppCompatActivity {
 	    
     ArrayList<HashMap<String, String>> group_list=new ArrayList<HashMap<String, String>>();
     
-    ArrayList<ArrayList<HashMap<String, BT_spp>>> group_child_list=new ArrayList<ArrayList<HashMap<String, BT_spp>>>(); 
-    ArrayList<HashMap<String, BT_spp>> paired_device_list = new ArrayList<HashMap<String, BT_spp>>();
-    ArrayList<HashMap<String, BT_spp>> unpaired_device_list = new ArrayList<HashMap<String, BT_spp>>();
+    ArrayList<ArrayList<HashMap<String, custom_BluetoothDevice>>> group_child_list=new ArrayList<ArrayList<HashMap<String, custom_BluetoothDevice>>>(); 
+    ArrayList<HashMap<String, custom_BluetoothDevice>> paired_device_list = new ArrayList<HashMap<String, custom_BluetoothDevice>>();
+    ArrayList<HashMap<String, custom_BluetoothDevice>> unpaired_device_list = new ArrayList<HashMap<String, custom_BluetoothDevice>>();
     
     String[] mGroupFrom;
     int[] mGroupTo;
@@ -82,8 +82,8 @@ public class device_list_activity_2 extends AppCompatActivity {
 	    	{
 //	    		Log.d(BLUETOOTH_SERVICE,device.getName()+" "+device.getAddress());
 
-	    		HashMap<String, BT_spp> temp = new HashMap<String, BT_spp>();
-	        	temp.put("group_child_item", new BT_spp(device,false));
+	    		HashMap<String, custom_BluetoothDevice> temp = new HashMap<String, custom_BluetoothDevice>();
+	        	temp.put("group_child_item", new custom_BluetoothDevice(device,false));
 	        	paired_device_list.add(temp);
 	    	}
 	    }
@@ -117,7 +117,7 @@ public class device_list_activity_2 extends AppCompatActivity {
 	                    mGroupFrom,  			
 	                    mGroupTo,    		
 	                    
-	                    (List<ArrayList<HashMap<String, BT_spp>>>)group_child_list,
+	                    (List<ArrayList<HashMap<String, custom_BluetoothDevice>>>)group_child_list,
 	                    R.layout.elv_textview_group_child,        
 	                    mChildFrom,      	
 	                    mChildTo     		
@@ -185,15 +185,16 @@ public class device_list_activity_2 extends AppCompatActivity {
 	    		
 	    		if(group_child_list.get(groupPosition).get(childPosition).get("group_child_item").isDiscovered == true)
 	    		{
-	    			mac_address=((BT_spp)group_child_list.get(groupPosition).get(childPosition).get("group_child_item"))
+	    			mac_address=((custom_BluetoothDevice)group_child_list.get(groupPosition).get(childPosition).get("group_child_item"))
 							.BT_Device.getAddress();
 	    			
-	    			close_intent.putExtra("mac_address",mac_address);
-	    			close_intent.putExtra("closeApp", false);
-	    			setResult(RESULT_OK, close_intent);        
-	    			finish();
+//	    			Intent close_intent = new Intent();
+//	    			close_intent.putExtra("mac_address",mac_address);
+//	    			close_intent.putExtra("closeApp", false);
+//	    			setResult(RESULT_OK, close_intent);        
+//	    			finish();
 	    			
-//	    			Log.e("MAC Address",mac_address);
+	    			Log.e("MAC Address",mac_address);
 	    		}
 	    		else
 	    		{
@@ -222,7 +223,7 @@ public class device_list_activity_2 extends AppCompatActivity {
 	                {	                	
 	                	for(int count_0=0;count_0<pairedDevices.size();count_0++)
 	                	{
-	                		if(group_child_list.get(0).get(count_0).get("group_child_item").equals(new BT_spp(device)))
+	                		if(group_child_list.get(0).get(count_0).get("group_child_item").equals(new custom_BluetoothDevice(device)))
 	                		{
 	                			group_child_list.get(0).get(count_0).get("group_child_item").setDiscovered(true);
 	                			break;
@@ -232,8 +233,8 @@ public class device_list_activity_2 extends AppCompatActivity {
 	                }
 	                else
 	                {
-	                	HashMap<String, BT_spp> temp = new HashMap<String, BT_spp>();
-			        	temp.put("group_child_item", new BT_spp(device,true));
+	                	HashMap<String, custom_BluetoothDevice> temp = new HashMap<String, custom_BluetoothDevice>();
+			        	temp.put("group_child_item", new custom_BluetoothDevice(device,true));
 			        	unpaired_device_list.add(temp);
 			        	
 			        	elv_adapter.notifyDataSetChanged();

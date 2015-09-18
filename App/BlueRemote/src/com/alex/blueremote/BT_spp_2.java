@@ -10,11 +10,10 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
-public class BT_spp 
+public class BT_spp_2 
 {
 	BluetoothAdapter BtAdapter;
-	BluetoothDevice BT_Device;
-	boolean isDiscovered;
+	BluetoothDevice BT_device;
 	
 	//SPP UUID
     UUID BT_spp_uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -26,40 +25,29 @@ public class BT_spp
     String BT_mac_address;
 //    String BT_mac_address="98:D3:31:80:18:29";
     
-    BT_spp(BluetoothDevice BT_Device)
-	{
-		this.BT_Device=BT_Device;
-		this.isDiscovered = false;
-	}
-	
-    BT_spp(BluetoothDevice BT_Device,boolean isDiscovered)
-	{
-		this.BT_Device=BT_Device;
-		this.isDiscovered = isDiscovered;
-	}
-    
-    BT_spp(BluetoothAdapter BtAdapter,String BT_mac_address)
+    BT_spp_2(BluetoothAdapter BtAdapter,String BT_mac_address)
     {
     	this.BtAdapter=BtAdapter;
     	this.BT_mac_address=BT_mac_address;
     	
-    	BT_Device = BtAdapter.getRemoteDevice(BT_mac_address);
+    	BT_device = BtAdapter.getRemoteDevice(BT_mac_address);
 
-    	if(BT_Device!=null)
+    	if(BT_device!=null)
     	{
     		Log.d("Bluetooth","BT Device Obtained.");
     	}
     	else
     	{
     		Log.d("Bluetooth","BT Device:Null.");
-    	}	
+    	}
+    	
     }
     
     public void connect()
     {
     	try 
     	{
-			BT_socket = BT_Device.createInsecureRfcommSocketToServiceRecord(BT_spp_uuid);
+			BT_socket = BT_device.createInsecureRfcommSocketToServiceRecord(BT_spp_uuid);
 			
 			if(BT_socket!=null)
 	    	{
@@ -145,55 +133,5 @@ public class BT_spp
 		}
     	
     }
-    
-	public boolean isDiscovered() 
-	{
-		 if (BT_Device == null) 
-	     {
-				throw new NullPointerException("No BlueTooth Device Assigned."); 
-	     }
-		 
-		 return isDiscovered;
-	 }
-
-	public void setDiscovered(boolean isDiscovered) 
-	{
-		if (BT_Device == null) 
-        {
-			throw new NullPointerException("No BlueTooth Device Assigned."); 
-        }
-		
-		this.isDiscovered = isDiscovered;
-	}
-
-	public String toString()  
-	 {
-         if (BT_Device != null) 
-         {
-            return (BT_Device.getName()+"\n"+BT_Device.getAddress());
-         }
-         else
-         {
-        	throw new NullPointerException("No BlueTooth Device Assigned."); 
-         }
-    }
-	 
-	public boolean equals(BT_spp newDevice)
-	{
-		if (BT_Device == null) 
-        {
-			throw new NullPointerException("No BlueTooth Device Assigned."); 
-        }
-		
-		if((this.BT_Device.getAddress().compareTo(newDevice.BT_Device.getAddress()))==0)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
     
 }

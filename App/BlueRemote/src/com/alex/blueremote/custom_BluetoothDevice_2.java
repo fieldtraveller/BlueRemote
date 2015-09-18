@@ -3,18 +3,18 @@ package com.alex.blueremote;
 import android.bluetooth.BluetoothDevice;
 import android.util.Log;
 
-public class custom_BluetoothDevice {
+public class custom_BluetoothDevice_2 {
 	
 	BluetoothDevice BT_Device;
 	boolean isDiscovered;
 	
-	custom_BluetoothDevice(BluetoothDevice BT_Device)
+	custom_BluetoothDevice_2(BluetoothDevice BT_Device)
 	{
 		this.BT_Device=BT_Device;
 		this.isDiscovered = false;
 	}
 	
-	custom_BluetoothDevice(BluetoothDevice BT_Device,boolean isDiscovered)
+	custom_BluetoothDevice_2(BluetoothDevice BT_Device,boolean isDiscovered)
 	{
 		this.BT_Device=BT_Device;
 		this.isDiscovered = isDiscovered;
@@ -52,7 +52,7 @@ public class custom_BluetoothDevice {
          }
     }
 	 
-	public boolean equals(custom_BluetoothDevice newDevice)
+	public boolean equals(custom_BluetoothDevice_2 newDevice)
 	{
 		if (BT_Device == null) 
         {
