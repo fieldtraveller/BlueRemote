@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 	
 	BT_spp BT_serial;
 	
-	Button channel_up,channel_down,volume_up,volume_down,select,send,discovery;
+	Button channel_up,channel_down,volume_up,volume_down,select,send;
 	Switch power,mute;
 	EditText data;
 	
@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
 		volume_down=(Button)findViewById(R.id.button2);
 		select=(Button)findViewById(R.id.button3);
 		send=(Button)findViewById(R.id.button6);
-		discovery=(Button)findViewById(R.id.button7);
 		
 		power=(Switch)findViewById(R.id.switch1);
 		mute=(Switch)findViewById(R.id.switch2);
@@ -232,35 +231,39 @@ public class MainActivity extends AppCompatActivity {
 	}
 	
 	@Override
-	protected void onRestart ()
+	protected void onRestart()
 	{
+		super.onRestart();
 		Log.e("Where?", "OnRestart");
 	}
 	
 	@Override
-	protected void onStart ()
+	protected void onStart()
 	{
+		super.onStart();
 		Log.e("Where?", "OnStart");
 	}
 	
 	@Override
-	protected void onResume ()
+	protected void onResume()
 	{
+		super.onResume();
 		Log.e("Where?", "OnResume");
 	}
 	
 	@Override
 	protected void onPause ()
 	{
+		super.onPause();
 		Log.e("Where?", "OnPause");
 	}
 	
 	@Override
 	protected void onStop ()
 	{
+		super.onStop();
 		Log.e("Where?", "OnStop");
 	}
-	
 	
 	//*
 	@Override  
