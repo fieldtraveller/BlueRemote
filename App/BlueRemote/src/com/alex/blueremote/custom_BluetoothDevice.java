@@ -1,7 +1,6 @@
 package com.alex.blueremote;
 
 import android.bluetooth.BluetoothDevice;
-import android.util.Log;
 
 public class custom_BluetoothDevice {
 	

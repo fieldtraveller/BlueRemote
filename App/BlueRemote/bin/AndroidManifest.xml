@@ -37,17 +37,6 @@
             android:value=".MainActivity" />
     	
     	</activity>
-		
-        <activity
-	        android:name=".device_list_activity_2"
-	        android:label="@string/dl_activity"
-	        android:parentActivityName=".MainActivity" >
-        
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value=".MainActivity" />
-    	
-    	</activity>
         
         
     </application>

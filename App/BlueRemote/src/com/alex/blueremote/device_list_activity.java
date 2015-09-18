@@ -1,8 +1,10 @@
 package com.alex.blueremote;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+//import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import android.support.v7.app.AppCompatActivity;
 import android.bluetooth.BluetoothAdapter;
@@ -11,28 +13,22 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.os.ParcelUuid;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.EditText;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.Switch;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.SimpleExpandableListAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.view.ViewGroup;
 
 public class device_list_activity extends AppCompatActivity {
 
-	BluetoothAdapter BtAdapter;
-	
 	BT_global_variables BT_global_variables_1;
 	
 	BroadcastReceiver bt_device_found_receiver;
@@ -40,60 +36,173 @@ public class device_list_activity extends AppCompatActivity {
 	BroadcastReceiver bt_discovery_finished_receiver;
 	
 	Set<BluetoothDevice> pairedDevices;
-	Set<BluetoothDevice> unpairedDevices = new HashSet<BluetoothDevice>();
+//	Set<BluetoothDevice> discoveredDevices = new HashSet<BluetoothDevice>();
 	
-	ListView lv_1;
-	
+	ExpandableListView elv_1;
+	Button button_1; 
+	    
+    ArrayList<HashMap<String, String>> group_list=new ArrayList<HashMap<String, String>>();
+    
+    ArrayList<ArrayList<HashMap<String, BT_spp>>> group_child_list=new ArrayList<ArrayList<HashMap<String, BT_spp>>>(); 
+    ArrayList<HashMap<String, BT_spp>> paired_device_list = new ArrayList<HashMap<String, BT_spp>>();
+    ArrayList<HashMap<String, BT_spp>> unpaired_device_list = new ArrayList<HashMap<String, BT_spp>>();
+    
+    String[] mGroupFrom;
+    int[] mGroupTo;
+    
+    String[] mChildFrom;
+    int[] mChildTo;
+    
+    SimpleExpandableListAdapter elv_adapter;
+    
+    String mac_address;
+    
+    Intent close_intent = new Intent();
+    boolean quit_warning=false;
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.dl_layout_1);
+		setContentView(R.layout.dl_layout);
 		
-		lv_1=(ListView)findViewById(R.id.List_1);
+		elv_1=(ExpandableListView)findViewById(R.id.eList_1);
+		button_1=(Button)findViewById(R.id.buttondl);
 		
-//		Log.e("Where am I?", "Device List Activity");
+		button_1.setEnabled(false);
 		
 		BT_global_variables_1 = (BT_global_variables)getApplicationContext();
-		
-		BtAdapter=BT_global_variables_1.getBtAdapter();
-		
-		Log.d(BLUETOOTH_SERVICE, "Bluetooth On? "+(BtAdapter.getState()==BluetoothAdapter.STATE_ON));
-		
-		//*
-	    pairedDevices = BtAdapter.getBondedDevices();
+						
+	    pairedDevices = BT_global_variables_1.getBtAdapter().getBondedDevices();
 	    
 	    Log.d(BLUETOOTH_SERVICE,"Paired Devices: "+pairedDevices.size());
-	    
-	    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,R.layout.lv_textview);
-
+	    	    
 	    if (pairedDevices.size() > 0) 
 	    {
 	    	for (BluetoothDevice device : pairedDevices) 
 	    	{
-	    		Log.d(BLUETOOTH_SERVICE,device.getName()+" "+device.getAddress());
-	    		adapter.add(device.getName()+"\n"+device.getAddress());
+//	    		Log.d(BLUETOOTH_SERVICE,device.getName()+" "+device.getAddress());
+
+	    		HashMap<String, BT_spp> temp = new HashMap<String, BT_spp>();
+	        	temp.put("group_child_item", new BT_spp(device,false));
+	        	paired_device_list.add(temp);
 	    	}
 	    }
-	    	    
-	    lv_1.setAdapter(adapter);
-	    
-	    lv_1.setOnItemClickListener(new OnItemClickListener() {
 
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				
-	               String mac_address=((String) lv_1.getItemAtPosition(position)).substring((((String) lv_1.getItemAtPosition(position)).length())-17);
-	               
-//	               Toast.makeText(getApplicationContext(),""+mac_address , Toast.LENGTH_LONG).show();
+	    {
+	    	HashMap<String, String> temp = new HashMap<String, String>();
+	    	temp.put("group_item","Paired Devices");
+		    group_list.add(temp);    
+	    }
+	    
+	    {
+	    	HashMap<String, String> temp = new HashMap<String, String>();
+			temp.put("group_item","Un-Paired Devices");
+		    group_list.add(temp);
+	    }
+
+	    group_child_list.add(paired_device_list);
+	    group_child_list.add(unpaired_device_list);
+	    
+	    mGroupFrom=new String[] {"group_item"};
+	    mGroupTo=new int[] { R.id.elv_group };
+	    
+	    mChildFrom=new String[] {"group_child_item"};
+	    mChildTo=new int[] { R.id.elv_group_child};
+	    
+	    elv_adapter = new SimpleExpandableListAdapter(
+	                    this,	
+	                    
+	                    (List<HashMap<String, String>>)group_list,
+	                    R.layout.elv_textview_group,             
+	                    mGroupFrom,  			
+	                    mGroupTo,    		
+	                    
+	                    (List<ArrayList<HashMap<String, BT_spp>>>)group_child_list,
+	                    R.layout.elv_textview_group_child,        
+	                    mChildFrom,      	
+	                    mChildTo     		
+	                	)
+	    {
+		    
+            @Override
+            public View getChildView(int groupPosition, int childPosition,
+                    boolean isLastChild, View convertView, ViewGroup parent) {
+
+            	View v;
+            	
+                if (convertView == null)
+                {
+                    v = newChildView(isLastChild, parent);
+                }
+                else 
+                {
+                    v = convertView;
+                }
+                
+                int len = mChildTo.length;
+
+                for (int i = 0; i < len; i++) 
+                {
+                    TextView tv = (TextView)v.findViewById(mChildTo[i]);
+                    
+                    if (tv != null) 
+                    {
+                        tv.setText(group_child_list.get(groupPosition).get(childPosition).get(mChildFrom[i]).toString());
+                                                
+                        if(group_child_list.get(groupPosition).get(childPosition).get("group_child_item").isDiscovered == true)
+                        {
+                        	tv.setBackgroundColor(Color.rgb(0x8F,0xE6,0x5B));
+                        }
+                        else
+                        {
+                        	tv.setBackgroundColor(Color.rgb(0xFF,0xFF,0xFF));                        	
+                        }
+                    }
+                }
+                return v;
+            }
+
+            @Override
+            public View getGroupView(int groupPosition, boolean isExpanded,
+                    View convertView, ViewGroup parent) {
+               
+                TextView tv = (TextView) super.getGroupView(groupPosition, isExpanded, convertView, parent);
+                
+                return tv;
+            }
+	    };
+	    
+	    elv_1.setAdapter(elv_adapter);
+	    
+	    elv_1.expandGroup(0,true);
+//	    elv_1.expandGroup(1,true);
+	    
+	    elv_1.setOnChildClickListener(new OnChildClickListener() {
+
+	    	@Override
+			public boolean onChildClick(ExpandableListView parent, View v,
+					int groupPosition, int childPosition, long id) {
+	    		
+	    		if(group_child_list.get(groupPosition).get(childPosition).get("group_child_item").isDiscovered == true)
+	    		{
+	    			mac_address=((BT_spp)group_child_list.get(groupPosition).get(childPosition).get("group_child_item"))
+							.BT_Device.getAddress();
+	    			
+	    			close_intent.putExtra("mac_address",mac_address);
+	    			close_intent.putExtra("closeApp", false);
+	    			setResult(RESULT_OK, close_intent);        
+	    			finish();
+	    			
+//	    			Log.e("MAC Address",mac_address);
+	    		}
+	    		else
+	    		{
+	    			Toast.makeText(getApplicationContext(),"Selected Device Not Discovered.\nChoose A Highligthed Device.",Toast.LENGTH_SHORT).show();
+	    		}
+	            return true;
 			}
-
          });
-	    
- 
-	    //*/
-	    
-	    /*
+
 	    bt_device_found_receiver = new BroadcastReceiver() {
 	        
 			@Override
@@ -103,14 +212,33 @@ public class device_list_activity extends AppCompatActivity {
 
 				if (BluetoothDevice.ACTION_FOUND.equals(action)) {
 	            	
-	            	Log.d(BLUETOOTH_SERVICE,"BT Device Found");
+	            	Log.d(BLUETOOTH_SERVICE,"New BT Device Found");
 
 	            	BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 	                
-	                unpairedDevices.add(device);
-	                //Log.d(BLUETOOTH_SERVICE,device.getName()+" "+device.getAddress());
+//	                discoveredDevices.add(device);
+	                
+	                if(pairedDevices.contains(device)==true)
+	                {	                	
+	                	for(int count_0=0;count_0<pairedDevices.size();count_0++)
+	                	{
+	                		if(group_child_list.get(0).get(count_0).get("group_child_item").equals(new BT_spp(device)))
+	                		{
+	                			group_child_list.get(0).get(count_0).get("group_child_item").setDiscovered(true);
+	                			break;
+	                		}
+	                	}
+	    				elv_adapter.notifyDataSetChanged();
+	                }
+	                else
+	                {
+	                	HashMap<String, BT_spp> temp = new HashMap<String, BT_spp>();
+			        	temp.put("group_child_item", new BT_spp(device,true));
+			        	unpaired_device_list.add(temp);
+			        	
+			        	elv_adapter.notifyDataSetChanged();
+	                }
 	            }
-	        	
 			}
 	    };
 	    
@@ -121,11 +249,12 @@ public class device_list_activity extends AppCompatActivity {
 			    
 				String action = intent.getAction();
 	            
-				if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
-	            	
-					Log.d(BLUETOOTH_SERVICE,"BT Discovery Started");
+				if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) 
+				{	
+//					Log.d(BLUETOOTH_SERVICE,"BT Discovery Started");
+					
+					Toast.makeText(getApplicationContext(),"BT Discovery Started",Toast.LENGTH_SHORT).show();
 	            }
-	        	
 			}
 	    };
 	    
@@ -138,24 +267,21 @@ public class device_list_activity extends AppCompatActivity {
 	            
 				if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
 	            	
-					Log.d(BLUETOOTH_SERVICE,"BT Discovery Finished");
-					Log.d(BLUETOOTH_SERVICE,"UnPaired Devices: "+unpairedDevices.size());
+//					Log.d(BLUETOOTH_SERVICE,"BT Discovery Finished");
+					
+					Toast.makeText(getApplicationContext(),"BT Discovery Finished",Toast.LENGTH_SHORT).show();
+					button_1.setEnabled(true);
+					
+//					Log.d(BLUETOOTH_SERVICE,"Discovered Devices: "+discoveredDevices.size());
 				    
-					if (unpairedDevices.size() > 0) 
-				    {
-					    for (BluetoothDevice device : unpairedDevices) 
-		    	    	{
-		    	    		Log.d(BLUETOOTH_SERVICE,device.getName()+" "+device.getAddress());
-		    	    	}
-				    }
-					
-					if(BtAdapter.isDiscovering());
-					{
-						Log.d(BLUETOOTH_SERVICE,"BT Discovery Cancelled:"+BtAdapter.cancelDiscovery());
-					}
-					
+//					if (discoveredDevices.size() > 0) 
+//				    {
+//					    for (BluetoothDevice device : discoveredDevices) 
+//		    	    	{
+//		    	    		Log.d(BLUETOOTH_SERVICE,device.getName()+" "+device.getAddress());
+//		    	    	}
+//				    }
 				}
-	        	
 			}
 	    };
 	    
@@ -167,37 +293,39 @@ public class device_list_activity extends AppCompatActivity {
 	    
 	    IntentFilter bt_discovery_finished_intent_filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 	    registerReceiver(bt_discovery_finished_receiver, bt_discovery_finished_intent_filter);
-	    
-	    Log.d(BLUETOOTH_SERVICE,"BT Discovery Started:"+BtAdapter.startDiscovery());
-	    //Log.d(BLUETOOTH_SERVICE,"BT isDiscovering:"+BtAdapter.isDiscovering());
-	    //*/
 
+	    BT_global_variables_1.getBtAdapter().startDiscovery();
+	    
+	    button_1.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				
+				button_1.setEnabled(false);
+				
+				int childCount=elv_adapter.getChildrenCount(0);
+				
+				for(int count_0=0;count_0<childCount;count_0++)
+            	{
+					group_child_list.get(0).get(count_0).get("group_child_item").setDiscovered(false);
+            	}
+				
+				childCount=elv_adapter.getChildrenCount(1);
+				
+				for(int count_0=0;count_0<childCount;count_0++)
+            	{
+					unpaired_device_list.remove(count_0);
+            	}
+				
+				BT_global_variables_1.getBtAdapter().startDiscovery();
+				
+				elv_adapter.notifyDataSetChanged();
+				
+			}
+	    	
+	    });
 	}
-	
-	/*
-	@Override  
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)  
-    {
-		super.onActivityResult(requestCode, resultCode, data);
 		
-		if(requestCode==BT_turn_on_fragment_request_code)
-		{
-			Log.d(BLUETOOTH_SERVICE,"resultCode:"+resultCode);
-			
-			if(resultCode==RESULT_OK)
-			{
-				Log.d(BLUETOOTH_SERVICE, "Bluetooth is On.");
-			}
-			else if(resultCode==RESULT_CANCELED)
-			{
-				Log.d(BLUETOOTH_SERVICE, "Bluetooth is Off.");
-			}
-			
-		}
-        
-    }  
-	//*/
-	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -217,15 +345,53 @@ public class device_list_activity extends AppCompatActivity {
 		return super.onOptionsItemSelected(item);
 	}
 	
+	private void quit()
+	{
+		if(quit_warning==false)
+		{
+			quit_warning=true;
+			
+			Toast.makeText(getApplicationContext(),"Press Again To Quit.",Toast.LENGTH_SHORT).show();
+		}
+		else
+		{
+			close_intent.putExtra("closeApp", true);
+			setResult(RESULT_OK, close_intent);        
+			finish();
+		}
+	}
+	
+	@Override
+	public boolean onSupportNavigateUp()
+	{
+//		Log.e("SupportNavigateUp","I Was Pressed.");
+		
+		this.quit();
+		
+		return true;
+	}
+	
+	@Override
+	public void onBackPressed ()
+	{
+//		Log.e("Back Button","I Was Pressed.");
+		
+		this.quit();
+	}
+	
 	@Override
 	protected void onDestroy ()
 	{
 		super.onDestroy();
 		
+		if(BT_global_variables_1.getBtAdapter().isDiscovering())
+		{
+			Log.d(BLUETOOTH_SERVICE,"BT Discovery Cancelled:"+BT_global_variables_1.getBtAdapter().cancelDiscovery());
+		}
+		
 		//unregister receivers
-//		unregisterReceiver(bt_device_found_receiver);
-//		unregisterReceiver(bt_discovery_started_receiver);
-//		unregisterReceiver(bt_discovery_finished_receiver);
-
-	}
+		unregisterReceiver(bt_device_found_receiver);
+		unregisterReceiver(bt_discovery_started_receiver);
+		unregisterReceiver(bt_discovery_finished_receiver);
+	}	
 }

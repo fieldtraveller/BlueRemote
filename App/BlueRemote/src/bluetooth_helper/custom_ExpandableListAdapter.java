@@ -1,4 +1,4 @@
-package com.alex.blueremote;
+package bluetooth_helper;
 
 import android.content.Context;
 import android.view.View;
