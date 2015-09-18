@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import android.support.v7.app.AppCompatActivity;
@@ -27,8 +26,10 @@ import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.view.ViewGroup;
 
-public class device_list_activity_2 extends AppCompatActivity {
+public class device_list_activity_2_0 extends AppCompatActivity {
 
+	BluetoothAdapter BtAdapter;
+	
 	BT_global_variables BT_global_variables_1;
 	
 	BroadcastReceiver bt_device_found_receiver;
@@ -36,21 +37,15 @@ public class device_list_activity_2 extends AppCompatActivity {
 	BroadcastReceiver bt_discovery_finished_receiver;
 	
 	Set<BluetoothDevice> pairedDevices;
-	Set<BluetoothDevice> discoveredDevices = new HashSet<BluetoothDevice>();
+	Set<BluetoothDevice> unpairedDevices = new HashSet<BluetoothDevice>();
 	
 	ExpandableListView elv_1;
 	    
     ArrayList<HashMap<String, String>> group_list=new ArrayList<HashMap<String, String>>();
     
-    ArrayList<ArrayList<HashMap<String, custom_BluetoothDevice>>> group_child_list=new ArrayList<ArrayList<HashMap<String, custom_BluetoothDevice>>>(); 
-    ArrayList<HashMap<String, custom_BluetoothDevice>> paired_device_list = new ArrayList<HashMap<String, custom_BluetoothDevice>>();
-    ArrayList<HashMap<String, custom_BluetoothDevice>> unpaired_device_list = new ArrayList<HashMap<String, custom_BluetoothDevice>>();
-    
-    String[] mGroupFrom;
-    int[] mGroupTo;
-    
-    String[] mChildFrom;
-    int[] mChildTo;
+    ArrayList<ArrayList<HashMap<String, String>>> group_child_list=new ArrayList<ArrayList<HashMap<String, String>>>(); 
+    ArrayList<HashMap<String, String>> paired_device_list = new ArrayList<HashMap<String, String>>();
+    ArrayList<HashMap<String, String>> unpaired_device_list = new ArrayList<HashMap<String, String>>();
     
     SimpleExpandableListAdapter elv_adapter;
     
@@ -60,10 +55,14 @@ public class device_list_activity_2 extends AppCompatActivity {
 		setContentView(R.layout.dl_layout_2);
 		
 		elv_1=(ExpandableListView)findViewById(R.id.eList_1);
+		
 		BT_global_variables_1 = (BT_global_variables)getApplicationContext();
-						
+		BtAdapter=BT_global_variables_1.getBtAdapter();
+		
+//		Log.d(BLUETOOTH_SERVICE, "Bluetooth On? "+(BtAdapter.getState()==BluetoothAdapter.STATE_ON));
+		
 		//*
-	    pairedDevices = BT_global_variables_1.getBtAdapter().getBondedDevices();
+	    pairedDevices = BtAdapter.getBondedDevices();
 	    
 	    Log.d(BLUETOOTH_SERVICE,"Paired Devices: "+pairedDevices.size());
 	    	    
@@ -71,16 +70,16 @@ public class device_list_activity_2 extends AppCompatActivity {
 	    {
 	    	for (BluetoothDevice device : pairedDevices) 
 	    	{
-//	    		Log.d(BLUETOOTH_SERVICE,""+(new custom_BluetoothDevice(device)));
 	    		Log.d(BLUETOOTH_SERVICE,device.getName()+" "+device.getAddress());
 
-	    		HashMap<String, custom_BluetoothDevice> temp = new HashMap<String, custom_BluetoothDevice>();
-	        	temp.put("group_child_item", new custom_BluetoothDevice(device,false));
+	    		HashMap<String, String> temp = new HashMap<String, String>();
+	        	temp.put("group_child_item", device.getName()+"\n"+device.getAddress());
 	        	paired_device_list.add(temp);
 	    	}
 	    }
 	    //*/
-	    	    
+	    
+	    
 //	    HashMap<String, String> temp = new HashMap<String, String>();
 //    	temp.put("group_item_1","Paired Devices");
 //    	temp.put("group_item_2","Un-Paired Devices");
@@ -89,9 +88,9 @@ public class device_list_activity_2 extends AppCompatActivity {
 	    {
 	    	HashMap<String, String> temp = new HashMap<String, String>();
 	    	temp.put("group_item","Paired Devices");
-		    group_list.add(temp);    
+		    group_list.add(temp);
+		    
 	    }
-	    
 	    {
 	    	HashMap<String, String> temp = new HashMap<String, String>();
 			temp.put("group_item","Un-Paired Devices");
@@ -101,86 +100,46 @@ public class device_list_activity_2 extends AppCompatActivity {
 	    group_child_list.add(paired_device_list);
 	    group_child_list.add(unpaired_device_list);
 	    
-	    mGroupFrom=new String[] {"group_item"};
-//	    mGroupFrom=new String[] {"group_item_1","group_item_2"};
-	    mGroupTo=new int[] { R.id.elv_group };
-	    
-	    mChildFrom=new String[] {"group_child_item"};
-	    mChildTo=new int[] { R.id.elv_group_child};
-	    
 	    elv_adapter = new SimpleExpandableListAdapter(
-	                    this,	
-	                    
+	                    this,			
 	                    (List<HashMap<String, String>>)group_list,
 	                    R.layout.elv_textview_group,             
-	                    mGroupFrom,  			
-	                    mGroupTo,    		
-	                    
-	                    (List<ArrayList<HashMap<String, custom_BluetoothDevice>>>)group_child_list,
+	                    new String[] {"group_item"},  			
+//	                    new String[] {"group_item_1","group_item_2"},
+	                    new int[] { R.id.elv_group },    		
+	                    (List<ArrayList<HashMap<String, String>>>)group_child_list,
 	                    R.layout.elv_textview_group_child,        
-	                    mChildFrom,      	
-	                    mChildTo     		
-	                	)
-	    {
-		    
+	                    new String[] {"group_child_item"},      	
+	                    new int[] { R.id.elv_group_child}     		
+	                	){
+	    	
             @Override
             public View getChildView(int groupPosition, int childPosition,
                     boolean isLastChild, View convertView, ViewGroup parent) {
 
-            	View v;
-            	
-                if (convertView == null)
-                {
-                    v = newChildView(isLastChild, parent);
-                }
-                else 
-                {
-                    v = convertView;
-                }
+                TextView tv = (TextView)super.getChildView(groupPosition, childPosition, isLastChild,convertView, parent);
                 
-                
-                int len = mChildTo.length;
-
-                for (int i = 0; i < len; i++) 
-                {
-                    TextView tv = (TextView)v.findViewById(mChildTo[i]);
-                    
-                    if (tv != null) 
-                    {
-                        tv.setText(group_child_list.get(groupPosition).get(childPosition).get(mChildFrom[i]).toString());
-                        
-//                        if(groupPosition==1)
-//                        {
-//                        	tv.setBackgroundColor(Color.rgb(50, 100, 150));
-//                        }
-                        
-                        if(group_child_list.get(groupPosition).get(childPosition).get("group_child_item").isDiscovered == true)
-                        {
-                        	Log.e("Painted", ""+group_child_list.get(groupPosition).get(childPosition).get("group_child_item").toString()+"\n"
-                        						+group_child_list.get(groupPosition).get(childPosition).get("group_child_item").isDiscovered);
-                        	
-                        	tv.setBackgroundColor(Color.rgb(0x8F,0xE6,0x5B));
-                        }
-                        
-                    }
-                }
-                
-                return v;
+//                tv.setBackgroundColor(Color.GREEN);
+//                
+//                String mac_address=tv.getText().toString();
+//				Log.e("text",mac_address);
+//	    		
+                return tv;
             }
 
             @Override
             public View getGroupView(int groupPosition, boolean isExpanded,
                     View convertView, ViewGroup parent) {
-               
+                // TODO Auto-generated method stub
                 TextView tv = (TextView) super.getGroupView(groupPosition, isExpanded, convertView, parent);
                 
                 return tv;
             }
 
-	    };
+	    	};
 	    
 	    elv_1.setAdapter(elv_adapter);
-	    
+	        
 //	    Log.e("GroupCount",elv_1.getCount()+"");
 //	    elv_1.expandGroup(0,true);
 //	    elv_1.expandGroup(1,true);
@@ -194,35 +153,55 @@ public class device_list_activity_2 extends AppCompatActivity {
 	    		if(elv_1.isGroupExpanded(groupPosition))
 	    		{
 	    			elv_1.collapseGroup(groupPosition);
-//	    			parent.refreshDrawableState();
-//	    			parent.invalidate();
+	    			
+	    			if(groupPosition==1)
+		    		{
+	    				if(BtAdapter.isDiscovering())
+	    				{
+//		    				BtAdapter.cancelDiscovery();
+		    				Log.d(BLUETOOTH_SERVICE,"BT Discovery Cancelled:"+BtAdapter.cancelDiscovery());		
+		    			}
+		    		}
+	    			else
+	    			{
+	    				
+	    			}
 	    		}
 	    		else
 	    		{
 	    			elv_1.expandGroup(groupPosition);
 	    			
-//	    			elv_adapter.notifyDataSetInvalidated();
-//	    			parent.invalidate();
+	    			if(groupPosition==1)
+		    		{
+	    				elv_adapter.notifyDataSetInvalidated();
+	    				Log.d("Success?",""+unpaired_device_list.retainAll(paired_device_list));
+	    				elv_adapter.notifyDataSetChanged();
+	    				
+		    			BtAdapter.startDiscovery();
+//		    			Log.d(BLUETOOTH_SERVICE,"BT Discovery Started:"+BtAdapter.startDiscovery());
+		    			Log.d("Click","Yes");
+		    		}
+		    		else
+		    		{
+		    			
+		    		}
 	    		}
 	    		
 				return true;
 			}
 
          });
-
+	    
 	    elv_1.setOnChildClickListener(new OnChildClickListener() {
 
 	    	@Override
 			public boolean onChildClick(ExpandableListView parent, View v,
 					int groupPosition, int childPosition, long id) {
 
-//				String mac_address=((TextView)v.findViewById(R.id.elv_group_child)).getText().toString();
-//				mac_address=mac_address.substring(mac_address.length()-17);
+				String mac_address=((TextView)v.findViewById(R.id.elv_group_child)).getText().toString();
+				mac_address=mac_address.substring(mac_address.length()-17);
 				
-				String mac_address=((custom_BluetoothDevice)group_child_list.get(groupPosition).get(childPosition).get("group_child_item"))
-									.BT_Device.getAddress();
-				
-	    		Log.e("MAC Address",mac_address+" "+group_child_list.get(groupPosition).get(childPosition).get("group_child_item").isDiscovered);
+	    		Log.e("MAC Address",mac_address);
 	    		
 	            return true;
 			}
@@ -243,33 +222,14 @@ public class device_list_activity_2 extends AppCompatActivity {
 
 	            	BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 	                
-	                discoveredDevices.add(device);
+	                unpairedDevices.add(device);
 	                //Log.d(BLUETOOTH_SERVICE,device.getName()+" "+device.getAddress());
 	                
-	                if(pairedDevices.contains(device)==true)
-	                {	                	
-	                	for(int count_0=0;count_0<pairedDevices.size();count_0++)
-	                	{
-	                		if(group_child_list.get(0).get(count_0).get("group_child_item").equals(new custom_BluetoothDevice(device)))
-	                		{
-	                			group_child_list.get(0).get(count_0).get("group_child_item").setDiscovered(true);
-	                			break;
-	                		}
-	                	}
-	                	
-//	                	elv_adapter.notifyDataSetInvalidated();
-	    				elv_adapter.notifyDataSetChanged();
-
-	                }
-	                else
-	                {
-	                	HashMap<String, custom_BluetoothDevice> temp = new HashMap<String, custom_BluetoothDevice>();
-			        	temp.put("group_child_item", new custom_BluetoothDevice(device,true));
-			        	unpaired_device_list.add(temp);
-			        	
-			        	elv_adapter.notifyDataSetChanged();
-	                }
-	                
+		    		HashMap<String, String> temp = new HashMap<String, String>();
+		        	temp.put("group_child_item", device.getName()+"\n"+device.getAddress());
+		        	unpaired_device_list.add(temp);
+		        	
+		        	elv_adapter.notifyDataSetChanged();
 	            }
 	        	
 			}
@@ -300,11 +260,11 @@ public class device_list_activity_2 extends AppCompatActivity {
 				if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
 	            	
 					Log.d(BLUETOOTH_SERVICE,"BT Discovery Finished");
-					Log.d(BLUETOOTH_SERVICE,"Discovered Devices: "+discoveredDevices.size());
+					Log.d(BLUETOOTH_SERVICE,"UnPaired Devices: "+unpairedDevices.size());
 				    
-					if (discoveredDevices.size() > 0) 
+					if (unpairedDevices.size() > 0) 
 				    {
-					    for (BluetoothDevice device : discoveredDevices) 
+					    for (BluetoothDevice device : unpairedDevices) 
 		    	    	{
 		    	    		Log.d(BLUETOOTH_SERVICE,device.getName()+" "+device.getAddress());
 		    	    	}
@@ -328,8 +288,7 @@ public class device_list_activity_2 extends AppCompatActivity {
 	    
 	    IntentFilter bt_discovery_finished_intent_filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 	    registerReceiver(bt_discovery_finished_receiver, bt_discovery_finished_intent_filter);
-
-	    BT_global_variables_1.getBtAdapter().startDiscovery();
+	    
 //	    Log.d(BLUETOOTH_SERVICE,"BT Discovery Started:"+BtAdapter.startDiscovery());
 	    //Log.d(BLUETOOTH_SERVICE,"BT isDiscovering:"+BtAdapter.isDiscovering());
 	    //*/
@@ -360,9 +319,9 @@ public class device_list_activity_2 extends AppCompatActivity {
 	{
 		super.onDestroy();
 		
-		if(BT_global_variables_1.getBtAdapter().isDiscovering())
+		if(BtAdapter.isDiscovering())
 		{
-			Log.d(BLUETOOTH_SERVICE,"BT Discovery Cancelled:"+BT_global_variables_1.getBtAdapter().cancelDiscovery());
+			Log.d(BLUETOOTH_SERVICE,"BT Discovery Cancelled:"+BtAdapter.cancelDiscovery());
 		}
 		
 		//unregister receivers
