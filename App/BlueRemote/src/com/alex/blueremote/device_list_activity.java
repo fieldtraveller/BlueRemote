@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListView;
@@ -26,23 +27,15 @@ import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.view.ViewGroup;
+import android.view.View.OnTouchListener;
 
 public class device_list_activity extends AppCompatActivity {
 
-	BT_global_variables BT_global_variables_1;
-	
-	BroadcastReceiver bt_device_found_receiver;
-	BroadcastReceiver bt_discovery_started_receiver;
-	BroadcastReceiver bt_discovery_finished_receiver;
-	
+	BlueRemote_global_variables global_variables_object;
+	BroadcastReceiver bt_discovery_status;
 	Set<BluetoothDevice> pairedDevices;
-//	Set<BluetoothDevice> discoveredDevices = new HashSet<BluetoothDevice>();
-	
-	ExpandableListView elv_1;
-	Button button_1; 
 	    
     ArrayList<HashMap<String, String>> group_list=new ArrayList<HashMap<String, String>>();
-    
     ArrayList<ArrayList<HashMap<String, BT_spp>>> group_child_list=new ArrayList<ArrayList<HashMap<String, BT_spp>>>(); 
     ArrayList<HashMap<String, BT_spp>> paired_device_list = new ArrayList<HashMap<String, BT_spp>>();
     ArrayList<HashMap<String, BT_spp>> unpaired_device_list = new ArrayList<HashMap<String, BT_spp>>();
@@ -53,10 +46,10 @@ public class device_list_activity extends AppCompatActivity {
     String[] mChildFrom;
     int[] mChildTo;
     
+    ExpandableListView elv_1;
     SimpleExpandableListAdapter elv_adapter;
-    
-    String mac_address;
-    
+    Button refresh_button; 
+	
     Intent close_intent = new Intent();
     boolean quit_warning=false;
     
@@ -66,15 +59,83 @@ public class device_list_activity extends AppCompatActivity {
 		setContentView(R.layout.dl_layout);
 		
 		elv_1=(ExpandableListView)findViewById(R.id.eList_1);
-		button_1=(Button)findViewById(R.id.buttondl);
+		refresh_button=(Button)findViewById(R.id.buttondl);
 		
-		button_1.setEnabled(false);
+//		elv_1.setSelector(R.color.list_selector);
+		refresh_button.setEnabled(false);
 		
-		BT_global_variables_1 = (BT_global_variables)getApplicationContext();
-						
-	    pairedDevices = BT_global_variables_1.getBtAdapter().getBondedDevices();
+		global_variables_object = (BlueRemote_global_variables)getApplicationContext();
+		
+		bt_discovery_status = new BroadcastReceiver() {
+	        
+			@Override
+			public void onReceive(Context context, Intent intent) {
+			    
+				String action = intent.getAction();
+
+				if (BluetoothDevice.ACTION_FOUND.equals(action)) 
+				{	
+	            	Log.d(BLUETOOTH_SERVICE,"New BT Device Found");
+
+	            	BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+	                
+	                if(pairedDevices.contains(device)==true)
+	                {	                	
+	                	for(int count_0=0;count_0<pairedDevices.size();count_0++)
+	                	{
+	                		if(group_child_list.get(0).get(count_0).get("group_child_item").equals(new BT_spp(device,false)))
+	                		{
+	                			group_child_list.get(0).get(count_0).get("group_child_item").setDiscovered(true);
+	                			break;
+	                		}
+	                	}
+	    				elv_adapter.notifyDataSetChanged();
+	                }
+	                else
+	                {
+	                	HashMap<String, BT_spp> temp = new HashMap<String, BT_spp>();
+			        	temp.put("group_child_item", new BT_spp(device,true));
+			        	unpaired_device_list.add(temp);
+			        	
+			        	elv_adapter.notifyDataSetChanged();
+	                }
+	            }
+				else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) 
+				{	
+//					Log.d(BLUETOOTH_SERVICE,"BT Discovery Started");
+					
+					Toast.makeText(getApplicationContext(),"BT Discovery Started",Toast.LENGTH_SHORT).show();
+	            }
+				else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) 
+				{
+	            	
+//					Log.d(BLUETOOTH_SERVICE,"BT Discovery Finished");
+					
+					Toast.makeText(getApplicationContext(),"BT Discovery Finished",Toast.LENGTH_SHORT).show();
+					refresh_button.setEnabled(true);
+					
+//					Log.d(BLUETOOTH_SERVICE,"Discovered Devices: "+discoveredDevices.size());
+				    
+//					if (discoveredDevices.size() > 0) 
+//				    {
+//					    for (BluetoothDevice device : discoveredDevices) 
+//		    	    	{
+//		    	    		Log.d(BLUETOOTH_SERVICE,device.getName()+" "+device.getAddress());
+//		    	    	}
+//				    }
+				}	
+			}
+	    };
 	    
-	    Log.d(BLUETOOTH_SERVICE,"Paired Devices: "+pairedDevices.size());
+	    registerReceiver(bt_discovery_status, new IntentFilter(BluetoothDevice.ACTION_FOUND)); 
+	    registerReceiver(bt_discovery_status, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED));
+	    registerReceiver(bt_discovery_status, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
+	    
+	    global_variables_object.getBtAdapter().startDiscovery();
+
+	    pairedDevices = global_variables_object.getBtAdapter().getBondedDevices();
+	    
+//	    Log.d(BLUETOOTH_SERVICE,"Paired Devices: "+pairedDevices.size());
 	    	    
 	    if (pairedDevices.size() > 0) 
 	    {
@@ -88,18 +149,14 @@ public class device_list_activity extends AppCompatActivity {
 	    	}
 	    }
 
-	    {
-	    	HashMap<String, String> temp = new HashMap<String, String>();
-	    	temp.put("group_item","Paired Devices");
-		    group_list.add(temp);    
-	    }
+	    HashMap<String, String> group_heading_1 = new HashMap<String, String>();
+	    group_heading_1.put("group_item","Paired Devices");
+		group_list.add(group_heading_1);
+		    
+	    HashMap<String, String> group_heading_2 = new HashMap<String, String>();
+	    group_heading_2.put("group_item","Un-Paired Devices");
+		group_list.add(group_heading_2);
 	    
-	    {
-	    	HashMap<String, String> temp = new HashMap<String, String>();
-			temp.put("group_item","Un-Paired Devices");
-		    group_list.add(temp);
-	    }
-
 	    group_child_list.add(paired_device_list);
 	    group_child_list.add(unpaired_device_list);
 	    
@@ -141,13 +198,13 @@ public class device_list_activity extends AppCompatActivity {
                 
                 int len = mChildTo.length;
 
-                for (int i = 0; i < len; i++) 
+                for (int count = 0; count < len; count++) 
                 {
-                    TextView tv = (TextView)v.findViewById(mChildTo[i]);
+                    TextView tv = (TextView)v.findViewById(mChildTo[count]);
                     
                     if (tv != null) 
                     {
-                        tv.setText(group_child_list.get(groupPosition).get(childPosition).get(mChildFrom[i]).toString());
+                        tv.setText(group_child_list.get(groupPosition).get(childPosition).get(mChildFrom[count]).toString());
                                                 
                         if(group_child_list.get(groupPosition).get(childPosition).get("group_child_item").isDiscovered == true)
                         {
@@ -162,38 +219,33 @@ public class device_list_activity extends AppCompatActivity {
                 return v;
             }
 
-            @Override
-            public View getGroupView(int groupPosition, boolean isExpanded,
-                    View convertView, ViewGroup parent) {
-               
-                TextView tv = (TextView) super.getGroupView(groupPosition, isExpanded, convertView, parent);
-                
-                return tv;
-            }
+//            @Override
+//            public View getGroupView(int groupPosition, boolean isExpanded,
+//                    View convertView, ViewGroup parent) {
+//               
+//                TextView tv = (TextView) super.getGroupView(groupPosition, isExpanded, convertView, parent);
+//                
+//                return tv;
+//            }
 	    };
 	    
 	    elv_1.setAdapter(elv_adapter);
 	    
 	    elv_1.expandGroup(0,true);
 //	    elv_1.expandGroup(1,true);
-	    
+	    	    
 	    elv_1.setOnChildClickListener(new OnChildClickListener() {
 
 	    	@Override
 			public boolean onChildClick(ExpandableListView parent, View v,
 					int groupPosition, int childPosition, long id) {
-	    		
-	    		if(group_child_list.get(groupPosition).get(childPosition).get("group_child_item").isDiscovered == true)
-	    		{
-	    			mac_address=((BT_spp)group_child_list.get(groupPosition).get(childPosition).get("group_child_item"))
-							.BT_Device.getAddress();
 	    			
-	    			close_intent.putExtra("mac_address",mac_address);
+	    		if(group_child_list.get(groupPosition).get(childPosition).get("group_child_item").isDiscovered == true)
+	    		{	    			
+	    			close_intent.putExtra("BT_device_selected",((BT_spp)group_child_list.get(groupPosition).get(childPosition).get("group_child_item")));
 	    			close_intent.putExtra("closeApp", false);
 	    			setResult(RESULT_OK, close_intent);        
 	    			finish();
-	    			
-//	    			Log.e("MAC Address",mac_address);
 	    		}
 	    		else
 	    		{
@@ -202,106 +254,13 @@ public class device_list_activity extends AppCompatActivity {
 	            return true;
 			}
          });
-
-	    bt_device_found_receiver = new BroadcastReceiver() {
-	        
-			@Override
-			public void onReceive(Context context, Intent intent) {
-			    
-				String action = intent.getAction();
-
-				if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-	            	
-	            	Log.d(BLUETOOTH_SERVICE,"New BT Device Found");
-
-	            	BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-	                
-//	                discoveredDevices.add(device);
-	                
-	                if(pairedDevices.contains(device)==true)
-	                {	                	
-	                	for(int count_0=0;count_0<pairedDevices.size();count_0++)
-	                	{
-	                		if(group_child_list.get(0).get(count_0).get("group_child_item").equals(new BT_spp(device)))
-	                		{
-	                			group_child_list.get(0).get(count_0).get("group_child_item").setDiscovered(true);
-	                			break;
-	                		}
-	                	}
-	    				elv_adapter.notifyDataSetChanged();
-	                }
-	                else
-	                {
-	                	HashMap<String, BT_spp> temp = new HashMap<String, BT_spp>();
-			        	temp.put("group_child_item", new BT_spp(device,true));
-			        	unpaired_device_list.add(temp);
-			        	
-			        	elv_adapter.notifyDataSetChanged();
-	                }
-	            }
-			}
-	    };
 	    
-	    bt_discovery_started_receiver = new BroadcastReceiver() {
-	        
-			@Override
-			public void onReceive(Context context, Intent intent) {
-			    
-				String action = intent.getAction();
-	            
-				if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) 
-				{	
-//					Log.d(BLUETOOTH_SERVICE,"BT Discovery Started");
-					
-					Toast.makeText(getApplicationContext(),"BT Discovery Started",Toast.LENGTH_SHORT).show();
-	            }
-			}
-	    };
-	    
-	    bt_discovery_finished_receiver = new BroadcastReceiver() {
-	        
-			@Override
-			public void onReceive(Context context, Intent intent) {
-			    
-				String action = intent.getAction();
-	            
-				if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-	            	
-//					Log.d(BLUETOOTH_SERVICE,"BT Discovery Finished");
-					
-					Toast.makeText(getApplicationContext(),"BT Discovery Finished",Toast.LENGTH_SHORT).show();
-					button_1.setEnabled(true);
-					
-//					Log.d(BLUETOOTH_SERVICE,"Discovered Devices: "+discoveredDevices.size());
-				    
-//					if (discoveredDevices.size() > 0) 
-//				    {
-//					    for (BluetoothDevice device : discoveredDevices) 
-//		    	    	{
-//		    	    		Log.d(BLUETOOTH_SERVICE,device.getName()+" "+device.getAddress());
-//		    	    	}
-//				    }
-				}
-			}
-	    };
-	    
-	    IntentFilter bt_device_found_intent_filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-	    registerReceiver(bt_device_found_receiver, bt_device_found_intent_filter); 
-	    
-	    IntentFilter bt_discovery_started_intent_filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-	    registerReceiver(bt_discovery_started_receiver, bt_discovery_started_intent_filter);
-	    
-	    IntentFilter bt_discovery_finished_intent_filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-	    registerReceiver(bt_discovery_finished_receiver, bt_discovery_finished_intent_filter);
-
-	    BT_global_variables_1.getBtAdapter().startDiscovery();
-	    
-	    button_1.setOnClickListener(new View.OnClickListener() {
+	    refresh_button.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				
-				button_1.setEnabled(false);
+				refresh_button.setEnabled(false);
 				
 				int childCount=elv_adapter.getChildrenCount(0);
 				
@@ -317,12 +276,10 @@ public class device_list_activity extends AppCompatActivity {
 					unpaired_device_list.remove(count_0);
             	}
 				
-				BT_global_variables_1.getBtAdapter().startDiscovery();
+				global_variables_object.getBtAdapter().startDiscovery();
 				
-				elv_adapter.notifyDataSetChanged();
-				
+				elv_adapter.notifyDataSetChanged();	
 			}
-	    	
 	    });
 	}
 		
@@ -330,6 +287,7 @@ public class device_list_activity extends AppCompatActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
+		
 		return true;
 	}
 
@@ -342,6 +300,7 @@ public class device_list_activity extends AppCompatActivity {
 		if (id == R.id.action_settings) {
 			return true;
 		}
+		
 		return super.onOptionsItemSelected(item);
 	}
 	
@@ -384,14 +343,12 @@ public class device_list_activity extends AppCompatActivity {
 	{
 		super.onDestroy();
 		
-		if(BT_global_variables_1.getBtAdapter().isDiscovering())
+		if(global_variables_object.getBtAdapter().isDiscovering())
 		{
-			Log.d(BLUETOOTH_SERVICE,"BT Discovery Cancelled:"+BT_global_variables_1.getBtAdapter().cancelDiscovery());
+			Log.d(BLUETOOTH_SERVICE,"BT Discovery Cancelled:"+global_variables_object.getBtAdapter().cancelDiscovery());
 		}
 		
 		//unregister receivers
-		unregisterReceiver(bt_device_found_receiver);
-		unregisterReceiver(bt_discovery_started_receiver);
-		unregisterReceiver(bt_discovery_finished_receiver);
+		unregisterReceiver(bt_discovery_status);
 	}	
 }

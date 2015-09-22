@@ -1,13 +1,12 @@
 package com.alex.blueremote;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import android.support.v7.app.AppCompatActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -22,24 +21,18 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 	
-	BluetoothAdapter BtAdapter;
-	BT_global_variables BT_global_variables_1;
+	BlueRemote_global_variables global_variables_object;
 	
-	final int BT_turn_on_fragment_request_code=2;
-	final int BT_device_list_request_code=3;
+	final int BT_turn_on_request_code=2;
+	final int BT_device_list_activity_request_code=3;
 	
-	BroadcastReceiver bt_device_found_receiver;
-	BroadcastReceiver bt_discovery_started_receiver;
-	BroadcastReceiver bt_discovery_finished_receiver;
-	
-	Set<BluetoothDevice> pairedDevices;
-	Set<BluetoothDevice> unpairedDevices = new HashSet<BluetoothDevice>();
+	BroadcastReceiver bt_device_connection_status;
 	
 //	String BT_mac_address="20:13:05:27:09:64";	//ALEXBT
 //	String BT_mac_address="98:D3:31:80:18:29";	//BURZO
-	String BT_mac_address;
 	
-	BT_spp BT_serial;
+	BT_spp BT_serial_device;
+	boolean BT_discovered_device_available=false;
 	
 	Button channel_up,channel_down,volume_up,volume_down,select,send;
 	Switch power,mute;
@@ -70,66 +63,49 @@ public class MainActivity extends AppCompatActivity {
 		
 		data=(EditText)findViewById(R.id.editText1);
 		
-		BT_global_variables_1 = (BT_global_variables)getApplicationContext();
+//	    power.setChecked(false);
+//	    mute.setChecked(false);
 		
-		BtAdapter = BluetoothAdapter.getDefaultAdapter();
+		global_variables_object = (BlueRemote_global_variables)getApplicationContext();
 		
-		 BT_global_variables_1.setBtAdapter(BtAdapter);
+//		global_variables_object.setBtAdapter(BluetoothAdapter.getDefaultAdapter());
 		
-		if (BtAdapter == null) 
-		{
-		    Toast.makeText(getApplicationContext(), "No BlueTooth Hardware Detected.\nApp Exited", Toast.LENGTH_LONG).show();
-		    this.finish();
-		}
-		
-		//*
-		//Direct Turn On BT by App 
-		if (!BtAdapter.isEnabled()) 
-		{
-			BtAdapter.enable();
-			
-			while(BtAdapter.getState()==BluetoothAdapter.STATE_TURNING_ON)
-			{
-				//Log.d(BLUETOOTH_SERVICE, "Bluetooth turning On.");
-			}
-		}
-	    Log.d(BLUETOOTH_SERVICE, "Bluetooth turned On.");
-	    //*/
+	    bt_device_connection_status=new BroadcastReceiver() {
+	        
+	    	@Override
+	        public void onReceive(Context context, Intent intent) {
+	            
+	    		String action = intent.getAction();
+	            
+	    		if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) 
+	    		{
+//	    			BT_serial_device.setDataTransferReady(true);
+	    			Log.e(BLUETOOTH_SERVICE, "BT Device Connected");
+	            }
+	            else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) 
+	            {
+	            	Log.e(BLUETOOTH_SERVICE, "BT Device about to Disconnect");
+	            }
+	            else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) 
+	            {
+//	            	BT_serial_device.setDataTransferReady(false);
+	            	Log.e(BLUETOOTH_SERVICE, "BT Device Disconnected");
+	            }           
+	        }
+	    };
 	    
-	    /*
-		//Request User to turn on BT 
-	    //Can not turned off
-	    if (!BtAdapter.isEnabled()) 
-		{
-			Log.d(BLUETOOTH_SERVICE, "Bluetooth is Off.");
-			Log.d(BLUETOOTH_SERVICE, "Turning on Bluetoooth.");
-		    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-		    startActivityForResult(enableBtIntent, BT_turn_on_fragment_request_code);
-		    //startActivity(enableBtIntent);
-		    
-		    while(BtAdapter.getState()==BluetoothAdapter.STATE_TURNING_ON)
-			{
-				//Log.d(BLUETOOTH_SERVICE, "Bluetooth turning On.");
-			}
-				
-		}
-		else
-		{
-			Log.d(BLUETOOTH_SERVICE, "Bluetooth is On.");
-		}
-		//*/
-	    
-	    Intent device_list= new Intent(this, device_list_activity.class);
-	    startActivityForResult(device_list, BT_device_list_request_code);
-	    	    
-//	    BT_serial=new BT_spp(BtAdapter, BT_mac_address);
-//	    BT_serial.connect();
-	    	    
+	    registerReceiver(bt_device_connection_status,new IntentFilter(android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECTED));
+	    registerReceiver(bt_device_connection_status,new IntentFilter(android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED));
+	    registerReceiver(bt_device_connection_status,new IntentFilter(android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED));   
+
+//	    Intent splash= new Intent(this, splash.class);
+//	    startActivityForResult(splash,BT_turn_on_request_code);
+	    	    	    	    
 	    channel_up.setOnClickListener(new View.OnClickListener() {
 	    	
 	    	@Override
 			public void onClick(View v) {	    		
-	    		BT_serial.write(channel_up_command);
+	    		BT_serial_device.write(channel_up_command);
 	    	}
 	    	
 		});
@@ -139,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
 	    	@Override
 			public void onClick(View v) {
 	    		
-	    		BT_serial.write(channel_down_command);
+	    		BT_serial_device.write(channel_down_command);
 	    		
 	    	}
 	    	
@@ -150,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
 	    	@Override
 			public void onClick(View v) {
 	    		
-	    		BT_serial.write(volume_down_command);
+	    		BT_serial_device.write(volume_down_command);
 	    		
 	    	}
 	    	
@@ -161,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
 	    	@Override
 			public void onClick(View v) {
 	    		
-	    		BT_serial.write(volume_down_command);
+	    		BT_serial_device.write(volume_down_command);
 	    		
 	    	}
 	    	
@@ -172,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
 	    	@Override
 			public void onClick(View v) {
 	    		
-	    		BT_serial.write(select_command);
+	    		BT_serial_device.write(select_command);
 	    		
 	    	}
 	    	
@@ -186,16 +162,13 @@ public class MainActivity extends AppCompatActivity {
 	    	}
 	    	
 		});
-	    
-	    power.setChecked(false);
-	    mute.setChecked(false);
-	    
+	    	    
 	    power.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 	   
 		    @Override
 			public void onCheckedChanged(CompoundButton buttonView,	boolean isChecked) {
 		    	
-		    	BT_serial.write(power_command);
+		    	BT_serial_device.write(power_command);
 				
 		    	if(isChecked)
 				{
@@ -214,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
 		    @Override
 			public void onCheckedChanged(CompoundButton buttonView,	boolean isChecked) {
 		    	
-		    	BT_serial.write(mute_command);
+		    	BT_serial_device.write(mute_command);
 		    	
 		    	if(isChecked)
 				{
@@ -226,44 +199,56 @@ public class MainActivity extends AppCompatActivity {
 				}
 		    	
 			}
-	    });
-	    	    
+	    });  
 	}
 	
-	@Override
-	protected void onRestart()
-	{
-		super.onRestart();
-		Log.e("Where?", "OnRestart");
-	}
-	
-	@Override
-	protected void onStart()
-	{
-		super.onStart();
-		Log.e("Where?", "OnStart");
-	}
-	
+//	@Override
+//	protected void onRestart()
+//	{
+//		super.onRestart();
+//		Log.e("Where?", "OnRestart");
+//	}
+//	
+//	@Override
+//	protected void onStart()
+//	{
+//		super.onStart();
+//		Log.e("Where?", "OnStart");
+//	}
+//	
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
-		Log.e("Where?", "OnResume");
+//		Log.e("Where?", "OnResume");
+		
+		if(BT_discovered_device_available == true )
+		{
+			if(BT_serial_device.BT_socket == null)
+			{
+			    BT_serial_device.connect();
+			}	
+		}
+		else
+		{
+			Intent device_list= new Intent(this, device_list_activity.class);
+		    startActivityForResult(device_list, BT_device_list_activity_request_code);
+		}
 	}
-	
-	@Override
-	protected void onPause ()
-	{
-		super.onPause();
-		Log.e("Where?", "OnPause");
-	}
-	
-	@Override
-	protected void onStop ()
-	{
-		super.onStop();
-		Log.e("Where?", "OnStop");
-	}
+//	
+//	@Override
+//	protected void onPause ()
+//	{
+//		super.onPause();
+//		Log.e("Where?", "OnPause");
+//	}
+//	
+//	@Override
+//	protected void onStop ()
+//	{
+//		super.onStop();
+//		Log.e("Where?", "OnStop");
+//	}
 	
 	//*
 	@Override  
@@ -271,36 +256,34 @@ public class MainActivity extends AppCompatActivity {
     {
 		super.onActivityResult(requestCode, resultCode, data);
 		
-//		if(requestCode==BT_turn_on_fragment_request_code)
+//		if(requestCode==BT_turn_on_request_code)
 //		{
-//			Log.d(BLUETOOTH_SERVICE,"resultCode:"+resultCode);
-//			
-//			if(resultCode==RESULT_OK)
+//			if(data.getBooleanExtra("closeApp",false) == true)
 //			{
-//				Log.d(BLUETOOTH_SERVICE, "Bluetooth is On.");
+//				this.finish();
+//				Log.e("Quit", "Bye-Bye");
 //			}
-//			else if(resultCode==RESULT_CANCELED)
+//			else
 //			{
-//				Log.d(BLUETOOTH_SERVICE, "Bluetooth is Off.");
+//				Intent device_list= new Intent(this, device_list_activity.class);
+//			    startActivityForResult(device_list, BT_device_list_activity_request_code);
 //			}
 //			
 //		}
 		
-		if(requestCode==BT_device_list_request_code)
+		if(requestCode==BT_device_list_activity_request_code)
 		{
 			if(data.getBooleanExtra("closeApp",false) == true)
 			{
 				this.finish();
-				
 				Log.e("Quit", "Bye-Bye");
 			}
 			else
 			{
-				BT_mac_address=data.getStringExtra("mac_address");
-			}
-			
-		}
-        
+				BT_serial_device=data.getParcelableExtra("BT_device_selected");
+				BT_discovered_device_available=true;
+			}	
+		}    
     }  
 	//*/
 	
@@ -328,12 +311,17 @@ public class MainActivity extends AppCompatActivity {
 	{
 		super.onDestroy();
 	    
-//		BT_serial.disconnect();
+		if(BT_discovered_device_available == true )
+		{
+			BT_serial_device.disconnect();
+		}
+		
+		unregisterReceiver(bt_device_connection_status);
 		
 		//Direct Turn Off BT by App 
-		if (BtAdapter.isEnabled()) 
+		if (global_variables_object.getBtAdapter().isEnabled()) 
 		{
-			BtAdapter.disable();
+			global_variables_object.getBtAdapter().disable();
 		}
 			
 		Log.d(BLUETOOTH_SERVICE, "Bluetooth turned Off.");

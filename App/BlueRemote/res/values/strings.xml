@@ -4,6 +4,7 @@
     <string name="app_name">BlueRemote</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    
 	<string name="power_switch">Power</string>
 	<string name="mute_switch">Mute</string>
 	<string name="volume_up">V+</string>
@@ -15,5 +16,29 @@
 	
 	<string name="dl_activity">Device List</string>
 	<string name="refresh">Refresh</string>
+	
+	<string name="splash_image_description">App Logo</string>
+	
+	<string name="hexboard">HexBoard</string>
+	<string name="Button16">F</string>
+    <string name="Button15">E</string>
+    <string name="Button14">D</string>
+    <string name="Button13">C</string>
+    <string name="Button12">B</string>
+    <string name="Button11">A</string>
+    <string name="Button10">0</string>
+    <string name="Button09">9</string>
+    <string name="Button08">8</string>
+    <string name="Button07">7</string>
+    <string name="Button06">6</string>
+    <string name="Button05">5</string>
+    <string name="Button04">4</string>
+    <string name="Button03">3</string>
+    <string name="Button02">2</string>
+    <string name="Button01">1</string>
+	
+    <string name="Button17">OK</string>
+    <string name="Button18">&lt;</string>
+	
 		
 </resources>
