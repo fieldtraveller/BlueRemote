@@ -172,7 +172,9 @@
             android:layout_alignLeft="@+id/Button01"
             android:layout_marginBottom="40dp"
             android:ems="10"
-            android:inputType="text"  >
+            android:inputType="textCapCharacters" 
+            android:digits="0123456789ABCDEFabcdef"
+             >
 
             <requestFocus />
         </EditText>

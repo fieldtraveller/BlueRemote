@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -206,9 +205,10 @@ public class HexBoard extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				
-				close_intent.putExtra("data", data);
-    			setResult(RESULT_OK, close_intent);        
-    			finish();
+				bye_bye();
+//				close_intent.putExtra("data",ev1.getText().toString() );
+//    			setResult(RESULT_OK, close_intent);        
+//    			finish();
 			}
 		});
         
@@ -275,6 +275,43 @@ public class HexBoard extends AppCompatActivity {
 			}
         });
                 
+//        ev1.setKeyListener(new KeyListener(){
+//
+//			@Override
+//			public int getInputType() {
+//				
+//				Log.e("Where?", "getInputType()");
+//				return 0;
+//			}
+//
+//			@Override
+//			public boolean onKeyDown(View view, Editable text, int keyCode,
+//					KeyEvent event) {
+//				Log.e("Where?", "onKeyDown()");
+//				return false;
+//			}
+//
+//			@Override
+//			public boolean onKeyUp(View view, Editable text, int keyCode,
+//					KeyEvent event) {
+//				Log.e("Where?", "onKeyUp()");
+//				return false;
+//			}
+//
+//			@Override
+//			public boolean onKeyOther(View view, Editable text, KeyEvent event) {
+//				Log.e("Where?", "onKeyOther()");
+//				return false;
+//			}
+//
+//			@Override
+//			public void clearMetaKeyState(View view, Editable content,
+//					int states) {
+//				Log.e("Where?", "clearMetaKeyState");
+//				
+//			}
+//			
+//        });
 	}
 	
 	void backspace(boolean start_or_stop)
@@ -290,6 +327,7 @@ public class HexBoard extends AppCompatActivity {
 					int cursor_end=ev1.getSelectionEnd();
 	        		
 //					Log.e("TimerTask?", "Called");
+					data=ev1.getText().toString();
 					
 					if((cursor_start<=0)||(cursor_end<=0))
 	        		{
@@ -335,15 +373,50 @@ public class HexBoard extends AppCompatActivity {
 	
 	void setData(String dataIn)
 	{
-		data=data+dataIn;
+		data=ev1.getText().toString()+dataIn;
 		ev1.setText(data);
 		ev1.setSelection(data.length());
 	}
 	
 	void setData()
 	{
+//		data=ev1.getText().toString();
 		ev1.setText(data);
 		ev1.setSelection(data.length());
+	}
+	
+	public String hex_to_string(String input)
+	{
+		int number_of_nibbles=input.length();
+		String output="";
+		
+		if(number_of_nibbles==0)
+		{
+			return input; 
+		}
+		else 
+		{
+			if(number_of_nibbles%2 != 0)
+			{
+				input="0"+input;
+				number_of_nibbles+=1;
+			}
+			
+			for(int count=0;count<number_of_nibbles;count+=2)
+			{
+				output=output+((char)Short.parseShort("00"+input.substring(count, count+2), 16));
+			}
+		}
+		
+		return output;	
+	}
+	
+	void bye_bye()
+	{
+		close_intent.putExtra("hex_data",ev1.getText().toString());
+		close_intent.putExtra("stringed_data",hex_to_string(ev1.getText().toString()));
+		setResult(RESULT_OK, close_intent);        
+		finish();
 	}
 	
 //     @Override
@@ -386,20 +459,7 @@ public class HexBoard extends AppCompatActivity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		
-		return super.onOptionsItemSelected(item);
+		return false;
 	}
 
 //	@Override
@@ -408,14 +468,16 @@ public class HexBoard extends AppCompatActivity {
 //		return false;
 //	}
 //	
-//	@Override
-//	public void onBackPressed ()
-//	{
-//	}
+	@Override
+	public void onBackPressed ()
+	{
+		bye_bye();
+	}
 	
 //	@Override
 //	protected void onDestroy ()
 //	{
 //		super.onDestroy();
-//	}	
+//	}
+	
 }

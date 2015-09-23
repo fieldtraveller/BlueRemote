@@ -1,23 +1,29 @@
 package com.alex.blueremote;
 
+import java.nio.charset.Charset;
+
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
+import android.view.ViewConfiguration;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Switch;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 	
@@ -25,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 	
 	final int BT_turn_on_request_code=2;
 	final int BT_device_list_activity_request_code=3;
+	final int hexboard_activity_request_code=4;
 	
 	BroadcastReceiver bt_device_connection_status;
 	
@@ -34,9 +41,11 @@ public class MainActivity extends AppCompatActivity {
 	BT_spp BT_serial_device;
 	boolean BT_discovered_device_available=false;
 	
-	Button channel_up,channel_down,volume_up,volume_down,select,send;
+	Button channel_up,channel_down,volume_up,volume_down,select,send,set_value;
 	Switch power,mute;
-	EditText data;
+	EditText data_input;
+	
+	boolean in_program_mode=false;
 	
 	byte channel_up_command=0;
 	byte channel_down_command=1;
@@ -46,10 +55,18 @@ public class MainActivity extends AppCompatActivity {
 	byte power_command=32;
 	byte mute_command=64;
 	
+	Handler hex_board_handler;
+	Runnable hex_board_runnable;
+	int hex_board_call_delay=ViewConfiguration.getLongPressTimeout()*3;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+//		byte[] b = "Alex".getBytes(Charset.forName("UTF-8"));
+//		Log.e("length",""+b.length+" "+b[0]+" "+b[1]+" "+b[2]+" "+b[3]);
+//		Log.e("test",hexstring2string_pasrser("41424344"));
 		
 		channel_up=(Button)findViewById(R.id.button1);
 		channel_down=(Button)findViewById(R.id.button5);
@@ -57,15 +74,20 @@ public class MainActivity extends AppCompatActivity {
 		volume_down=(Button)findViewById(R.id.button2);
 		select=(Button)findViewById(R.id.button3);
 		send=(Button)findViewById(R.id.button6);
+		set_value=(Button)findViewById(R.id.button7);
 		
 		power=(Switch)findViewById(R.id.switch1);
 		mute=(Switch)findViewById(R.id.switch2);
 		
-		data=(EditText)findViewById(R.id.editText1);
+		data_input=(EditText)findViewById(R.id.editText1);
+		
+		set_value.setVisibility(View.INVISIBLE);
+		set_value.invalidate();
 		
 //	    power.setChecked(false);
 //	    mute.setChecked(false);
 		
+		hex_board_handler=new Handler();
 		global_variables_object = (BlueRemote_global_variables)getApplicationContext();
 		
 //		global_variables_object.setBtAdapter(BluetoothAdapter.getDefaultAdapter());
@@ -104,8 +126,15 @@ public class MainActivity extends AppCompatActivity {
 	    channel_up.setOnClickListener(new View.OnClickListener() {
 	    	
 	    	@Override
-			public void onClick(View v) {	    		
-	    		BT_serial_device.write(channel_up_command);
+			public void onClick(View v) {
+	    		if(in_program_mode==true)
+	    		{
+	    			
+	    		}
+	    		else
+	    		{
+	    			BT_serial_device.write(channel_up_command);
+	    		}
 	    	}
 	    	
 		});
@@ -115,7 +144,14 @@ public class MainActivity extends AppCompatActivity {
 	    	@Override
 			public void onClick(View v) {
 	    		
-	    		BT_serial_device.write(channel_down_command);
+	    		if(in_program_mode==true)
+	    		{
+	    			
+	    		}
+	    		else
+	    		{
+	    			BT_serial_device.write(channel_down_command);
+	    		}
 	    		
 	    	}
 	    	
@@ -126,7 +162,14 @@ public class MainActivity extends AppCompatActivity {
 	    	@Override
 			public void onClick(View v) {
 	    		
-	    		BT_serial_device.write(volume_down_command);
+	    		if(in_program_mode==true)
+	    		{
+	    			
+	    		}
+	    		else
+	    		{
+	    			BT_serial_device.write(volume_up_command);
+	    		}
 	    		
 	    	}
 	    	
@@ -137,7 +180,14 @@ public class MainActivity extends AppCompatActivity {
 	    	@Override
 			public void onClick(View v) {
 	    		
-	    		BT_serial_device.write(volume_down_command);
+	    		if(in_program_mode==true)
+	    		{
+	    			
+	    		}
+	    		else
+	    		{
+	    			BT_serial_device.write(volume_down_command);
+	    		}
 	    		
 	    	}
 	    	
@@ -148,7 +198,14 @@ public class MainActivity extends AppCompatActivity {
 	    	@Override
 			public void onClick(View v) {
 	    		
-	    		BT_serial_device.write(select_command);
+	    		if(in_program_mode==true)
+	    		{
+	    			
+	    		}
+	    		else
+	    		{
+	    			BT_serial_device.write(select_command);
+	    		}
 	    		
 	    	}
 	    	
@@ -158,9 +215,17 @@ public class MainActivity extends AppCompatActivity {
 	    	
 	    	@Override
 			public void onClick(View v) {
-	    			    		
+	    		
+	    		if(in_program_mode==true)
+	    		{
+	    			
+	    		}
+	    		else
+	    		{
+//	    			BT_serial_device.write(data_input.getText().toString().getBytes(Charset.forName("UTF-8")));
+	    			BT_serial_device.write(data_input.getText().toString().getBytes(Charset.forName("ISO-8859-1")));
+	    		}
 	    	}
-	    	
 		});
 	    	    
 	    power.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -168,16 +233,24 @@ public class MainActivity extends AppCompatActivity {
 		    @Override
 			public void onCheckedChanged(CompoundButton buttonView,	boolean isChecked) {
 		    	
-		    	BT_serial_device.write(power_command);
-				
-		    	if(isChecked)
-				{
+		    	if(in_program_mode==true)
+	    		{
+	    			
+	    		}
+	    		else
+	    		{
+	    			BT_serial_device.write(power_command);
 					
-				}
-				else
-				{
-					mute.setChecked(false);
-				}
+			    	if(isChecked)
+					{
+						
+					}
+					else
+					{
+						mute.setChecked(false);
+					}
+	    		}
+		    	
 				
 			}
 	    });
@@ -187,19 +260,60 @@ public class MainActivity extends AppCompatActivity {
 		    @Override
 			public void onCheckedChanged(CompoundButton buttonView,	boolean isChecked) {
 		    	
-		    	BT_serial_device.write(mute_command);
-		    	
-		    	if(isChecked)
-				{
+		    	if(in_program_mode==true)
+	    		{
+	    			
+	    		}
+	    		else
+	    		{
+	    			BT_serial_device.write(mute_command);
 					
-				}
-				else
-				{
-					
-				}
-		    	
+	    			if(isChecked)
+					{
+						
+					}
+					else
+					{
+						
+					}
+	    		}	    	
 			}
-	    });  
+	    });
+	    
+	    hex_board_runnable=new Runnable(){
+
+			@Override
+			public void run() {
+				
+				Intent device_list= new Intent(MainActivity.this,HexBoard.class);
+			    startActivityForResult(device_list, hexboard_activity_request_code);
+			}
+			
+		};
+	    		
+	    data_input.setOnTouchListener(new OnTouchListener(){
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				
+				switch(event.getAction())
+				{
+					case MotionEvent.ACTION_DOWN:
+						hex_board_handler.postDelayed(hex_board_runnable,hex_board_call_delay);
+						break;
+							
+					case MotionEvent.ACTION_UP:
+						hex_board_handler.removeCallbacks(hex_board_runnable);
+						v.performClick();
+						break;
+							
+//					default:				
+				}
+				
+				return false;
+			}
+	    	
+	    });
 	}
 	
 //	@Override
@@ -227,6 +341,11 @@ public class MainActivity extends AppCompatActivity {
 			if(BT_serial_device.BT_socket == null)
 			{
 			    BT_serial_device.connect();
+			    
+			    FragmentManager fm = getFragmentManager();
+			    FragmentTransaction fragmentTransaction = fm.beginTransaction();
+			    fragmentTransaction.replace(R.id.fragment1, new connecting_fragment());
+			    fragmentTransaction.commit();
 			}	
 		}
 		else
@@ -283,7 +402,13 @@ public class MainActivity extends AppCompatActivity {
 				BT_serial_device=data.getParcelableExtra("BT_device_selected");
 				BT_discovered_device_available=true;
 			}	
-		}    
+		}
+		
+		if(requestCode==hexboard_activity_request_code)
+		{
+			data_input.setText(data_input.getText().toString()+data.getStringExtra("stringed_data"));
+			data_input.setSelection(data_input.getText().length());
+		}
     }  
 	//*/
 	
@@ -291,18 +416,46 @@ public class MainActivity extends AppCompatActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
+//		Log.e("Where?", "onCreateOptionsMenu");
 		return true;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
+		
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
+		Log.e("Where?", "onOptionsItemSelected");
+		
+		switch(id)
+		{
+			case R.id.menu_item_1:
+				Log.e("Where?", "R.id.menu_item_1");
+				return true;
+				
+			case R.id.menu_item_1_1:
+				Log.e("Where?", "R.id.menu_item_1_1");
+				return true;
+				
+			case R.id.menu_item_1_2:
+				Log.e("Where?", "R.id.menu_item_1_2");
+				return true;
+				
+			case R.id.menu_item_2:
+				Log.e("Where?", "R.id.menu_item_2");
+				
+				in_program_mode=true;
+				send.setVisibility(View.GONE);
+				send.invalidate();
+				data_input.setVisibility(View.GONE);
+				data_input.invalidate();
+				set_value.setVisibility(View.VISIBLE);
+				set_value.invalidate();
+				return true;
+				
+			default:
+				break;
 		}
+		
 		return super.onOptionsItemSelected(item);
 	}
 	

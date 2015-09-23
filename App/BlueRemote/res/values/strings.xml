@@ -2,8 +2,6 @@
 <resources>
 
     <string name="app_name">BlueRemote</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
     
 	<string name="power_switch">Power</string>
 	<string name="mute_switch">Mute</string>
@@ -13,6 +11,7 @@
 	<string name="channel_down">CH-</string>
 	<string name="send">Send</string>
 	<string name="select">Select</string>
+	<string name="set_value">Set Value</string>	
 	
 	<string name="dl_activity">Device List</string>
 	<string name="refresh">Refresh</string>
@@ -39,6 +38,15 @@
 	
     <string name="Button17">OK</string>
     <string name="Button18">&lt;</string>
-	
-		
+    
+    <string name="action_settings">Settings</string>
+    
+    <string name="bt_device">Select Device</string>
+    <string name="set_preferred_device">Set Preferred Device</string>
+    <string name="other_device">Connect to Other Device</string>
+    
+    <string name="program_buttons">Program Button</string>
+    
+    <string name="connecting">Connecting To Device</string>
+    	
 </resources>
