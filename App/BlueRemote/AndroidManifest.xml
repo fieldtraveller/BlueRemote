@@ -66,6 +66,18 @@
             </intent-filter>
             
     	</activity>
+    	
+        <activity
+			android:name=".button_programming_activity"
+			android:label="@string/button_programming_activity" >
+	    	
+	    	<intent-filter>
+                <action android:name=".button_programming_activity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            
+		</activity>
+        
         
     </application>
 

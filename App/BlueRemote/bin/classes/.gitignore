@@ -1,4 +1,5 @@
 /android/
 /com/
 /.gitignore
-/bluetooth_helper/
+/dump/
+/button_programming_activity/

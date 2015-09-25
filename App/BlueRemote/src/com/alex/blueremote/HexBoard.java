@@ -27,6 +27,11 @@ public class HexBoard extends AppCompatActivity {
 	Handler ui_Handler;
 	final int backspace_delay=200;
 	
+	public static final String identification_number="IDENTIFICATION_NUMBER";
+	public static final String initial_text="INITIAL_TEXT";
+	public static final String hex_data="HEX_DATA";
+	public static final String stringed_data="STRINGED_DATA";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
 	{
@@ -53,6 +58,7 @@ public class HexBoard extends AppCompatActivity {
         button[17]=(Button)findViewById(R.id.Button18);
         
         ev1=(EditText)findViewById(R.id.editText1);
+        ev1.setText(this.getIntent().getStringExtra(HexBoard.initial_text));
         
         ui_Handler=new Handler();
                 
@@ -413,8 +419,9 @@ public class HexBoard extends AppCompatActivity {
 	
 	void bye_bye()
 	{
-		close_intent.putExtra("hex_data",ev1.getText().toString());
-		close_intent.putExtra("stringed_data",hex_to_string(ev1.getText().toString()));
+		close_intent.putExtra(HexBoard.identification_number,this.getIntent().getIntExtra(HexBoard.identification_number,-1));
+		close_intent.putExtra(HexBoard.hex_data,ev1.getText().toString());
+		close_intent.putExtra(HexBoard.stringed_data,hex_to_string(ev1.getText().toString()));
 		setResult(RESULT_OK, close_intent);        
 		finish();
 	}

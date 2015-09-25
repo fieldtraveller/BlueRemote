@@ -1,9 +1,11 @@
 package com.alex.blueremote;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -24,6 +26,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Switch;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 	
@@ -41,24 +44,31 @@ public class MainActivity extends AppCompatActivity {
 	BT_spp BT_serial_device;
 	boolean BT_discovered_device_available=false;
 	
-	Button channel_up,channel_down,volume_up,volume_down,select,send,set_value;
+	Button channel_up,channel_down,volume_up,volume_down,select,send;
 	Switch power,mute;
 	EditText data_input;
 	
+	bluetooth_button button_7;
+	
 	boolean in_program_mode=false;
 	
-	byte channel_up_command=0;
-	byte channel_down_command=1;
-	byte volume_up_command=2;
-	byte volume_down_command=4;
-	byte select_command=8;
-	byte power_command=32;
-	byte mute_command=64;
+	byte[] channel_up_command={0};
+	byte[] channel_down_command={1};
+	byte[] volume_up_command={2};
+	byte[] volume_down_command={4};
+	byte[] select_command={8};
+	
+	byte[] power_command={32};
+	byte[] power_on_command={32};
+	byte[] power_off_command={32};
+	byte[] mute_command={64};
+	byte[] mute_on_command={64};
+	byte[] mute_off_command={64};
 	
 	Handler hex_board_handler;
 	Runnable hex_board_runnable;
 	int hex_board_call_delay=ViewConfiguration.getLongPressTimeout()*3;
-	
+		
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -74,15 +84,18 @@ public class MainActivity extends AppCompatActivity {
 		volume_down=(Button)findViewById(R.id.button2);
 		select=(Button)findViewById(R.id.button3);
 		send=(Button)findViewById(R.id.button6);
-		set_value=(Button)findViewById(R.id.button7);
 		
+		bluetooth_button_data a=new bluetooth_button_data(null,new byte[]{12,13});
+		button_7=new bluetooth_button(this, BT_serial_device, (Button)findViewById(R.id.button7), 
+										false,a);
+				
 		power=(Switch)findViewById(R.id.switch1);
 		mute=(Switch)findViewById(R.id.switch2);
 		
 		data_input=(EditText)findViewById(R.id.editText1);
 		
-		set_value.setVisibility(View.INVISIBLE);
-		set_value.invalidate();
+//		set_value.setVisibility(View.INVISIBLE);
+//		set_value.invalidate();
 		
 //	    power.setChecked(false);
 //	    mute.setChecked(false);
@@ -103,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
 	    		{
 //	    			BT_serial_device.setDataTransferReady(true);
 	    			Log.e(BLUETOOTH_SERVICE, "BT Device Connected");
+//	    			progressDialog.cancel();
 	            }
 	            else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) 
 	            {
@@ -340,12 +354,28 @@ public class MainActivity extends AppCompatActivity {
 		{
 			if(BT_serial_device.BT_socket == null)
 			{
-			    BT_serial_device.connect();
+				ProgressDialog progressDialog=ProgressDialog.show(MainActivity.this, "", "Connecting to Device...");
 			    
-			    FragmentManager fm = getFragmentManager();
-			    FragmentTransaction fragmentTransaction = fm.beginTransaction();
-			    fragmentTransaction.replace(R.id.fragment1, new connecting_fragment());
-			    fragmentTransaction.commit();
+			    try 
+			    {
+					BT_serial_device.connect();
+				}
+			    catch (IOException e) 
+			    {
+			    	Toast.makeText(getApplicationContext(), "Unable To Connect To Device.", Toast.LENGTH_LONG).show();
+				}
+			    
+			    progressDialog.cancel();
+			    
+			    
+//			    FragmentManager fm = getFragmentManager();
+//			    FragmentTransaction fragmentTransaction = fm.beginTransaction();
+//			    fragmentTransaction.replace(R.id.fragment1, new connecting_fragment());
+//			    fragmentTransaction.commit();
+			    
+//			    Intent device_list= new Intent(this, connecting_dialog.class);
+//			    startActivity(device_list);
+			    
 			}	
 		}
 		else
@@ -354,20 +384,6 @@ public class MainActivity extends AppCompatActivity {
 		    startActivityForResult(device_list, BT_device_list_activity_request_code);
 		}
 	}
-//	
-//	@Override
-//	protected void onPause ()
-//	{
-//		super.onPause();
-//		Log.e("Where?", "OnPause");
-//	}
-//	
-//	@Override
-//	protected void onStop ()
-//	{
-//		super.onStop();
-//		Log.e("Where?", "OnStop");
-//	}
 	
 	//*
 	@Override  
@@ -401,14 +417,16 @@ public class MainActivity extends AppCompatActivity {
 			{
 				BT_serial_device=data.getParcelableExtra("BT_device_selected");
 				BT_discovered_device_available=true;
+				button_7.setBT_serial_device(BT_serial_device);
 			}	
 		}
 		
 		if(requestCode==hexboard_activity_request_code)
 		{
-			data_input.setText(data_input.getText().toString()+data.getStringExtra("stringed_data"));
+			data_input.setText(data_input.getText().toString()+data.getStringExtra(HexBoard.stringed_data));
 			data_input.setSelection(data_input.getText().length());
 		}
+		
     }  
 	//*/
 	
@@ -448,8 +466,8 @@ public class MainActivity extends AppCompatActivity {
 				send.invalidate();
 				data_input.setVisibility(View.GONE);
 				data_input.invalidate();
-				set_value.setVisibility(View.VISIBLE);
-				set_value.invalidate();
+//				set_value.setVisibility(View.VISIBLE);
+//				set_value.invalidate();
 				return true;
 				
 			default:

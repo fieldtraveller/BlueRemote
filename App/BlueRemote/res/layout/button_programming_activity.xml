@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" 
+    android:gravity="center"
+    >
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
+
+    <TextView
+        android:id="@+id/textView_bpa_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/enter_button_text"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    
+    <EditText
+        android:id="@+id/editText_bpa_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:ems="10"
+        android:inputType="text"
+        android:paddingLeft="10dp" >
+
+        <requestFocus />
+    </EditText>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp" />
+    
+    <TextView
+        android:id="@+id/textView_bpa_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/enter_button_code"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    
+    <EditText
+        android:id="@+id/editText_bpa_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:ems="10" 
+        android:inputType="text"
+        />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp" />
+    
+    <TextView
+        android:id="@+id/textView_bpa_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/enter_button_on_down_code"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    
+    <EditText
+        android:id="@+id/editText_bpa_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:ems="10" 
+        android:inputType="text"
+        />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp" />
+    
+    <TextView
+        android:id="@+id/textView_bpa_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/enter_button_on_up_code"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    
+    <EditText
+        android:id="@+id/editText_bpa_4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:ems="10" 
+        android:inputType="text"
+        />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp" />
+
+    <Button
+        android:id="@+id/button_bpa_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/ok" />
+
+</LinearLayout>

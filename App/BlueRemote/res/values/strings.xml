@@ -48,5 +48,13 @@
     <string name="program_buttons">Program Button</string>
     
     <string name="connecting">Connecting To Device</string>
+    
+    <string name="enter_button_text">Enter Button Text:</string>
+    <string name="enter_button_code">Enter Button Code:</string>
+    <string name="enter_button_on_up_code">Enter Button On Up Code:</string>
+    <string name="enter_button_on_down_code">Enter Button On Down Code:</string>
+    
+    <string name="ok">  OK  </string>
+    <string name="button_programming_activity">Set Button Values</string>
     	
 </resources>
