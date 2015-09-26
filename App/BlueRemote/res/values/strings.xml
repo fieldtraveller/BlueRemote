@@ -45,7 +45,8 @@
     <string name="set_preferred_device">Set Preferred Device</string>
     <string name="other_device">Connect to Other Device</string>
     
-    <string name="program_buttons">Program Button</string>
+    <string name="program_mode">Program Mode</string>
+    <string name="normal_mode">Normal Mode</string>
     
     <string name="connecting">Connecting To Device</string>
     
@@ -56,5 +57,6 @@
     
     <string name="ok">  OK  </string>
     <string name="button_programming_activity">Set Button Values</string>
-    	
+    <string name="continuous_touch">Continuous Touch</string>
+    
 </resources>

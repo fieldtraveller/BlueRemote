@@ -46,29 +46,35 @@ public class BT_spp implements Parcelable
     
     public void connect() throws IOException
     {
-    	BT_socket = BT_Device.createInsecureRfcommSocketToServiceRecord(BT_spp_uuid);
-		
-		if(BT_socket!=null)
-    	{
-        	Log.d("Bluetooth","Socket Created.");
-    	}
-        else
-        {
-        	Log.d("Bluetooth","Socket:Null.");
-        }
-    	
-    	BT_socket.connect();
-    	
-    	Log.d("Bluetooth","isConnected():"+BT_socket.isConnected());
-    	
-    	try 
-	    {
-    		this.BT_outputStream = BT_socket.getOutputStream();
-    		this.BT_inputStream = BT_socket.getInputStream();
+    	if(BT_socket==null)
+		{
+    		BT_socket = BT_Device.createInsecureRfcommSocketToServiceRecord(BT_spp_uuid);
+    		
+    		if(BT_socket!=null)
+        	{
+            	Log.d("Bluetooth","Socket Created.");
+        	}
+            else
+            {
+            	Log.d("Bluetooth","Socket:Null.");
+            }
 		}
-	    catch (IOException e) 
-	    {
-			e.printStackTrace();
+		
+		if(BT_socket.isConnected()==false)
+		{
+			BT_socket.connect();
+	    	
+	    	Log.d("Bluetooth","isConnected():"+BT_socket.isConnected());
+	    	
+	    	try 
+		    {
+	    		this.BT_outputStream = BT_socket.getOutputStream();
+	    		this.BT_inputStream = BT_socket.getInputStream();
+			}
+		    catch (IOException e) 
+		    {
+				e.printStackTrace();
+			}
 		}
     }
     

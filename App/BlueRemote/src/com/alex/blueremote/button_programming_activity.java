@@ -1,5 +1,7 @@
 package com.alex.blueremote;
 
+import java.nio.charset.Charset;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -7,20 +9,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 //import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 
 public class button_programming_activity extends AppCompatActivity implements OnTouchListener,Runnable {
 
-	EditText et[];
+	EditText et[]=new EditText[4];
+	CheckBox cb;
 	Button ok_button;
 	
 	final int hexboard_activity_request_code=4;
 	Handler hex_board_handler;
-	int hex_board_call_delay=ViewConfiguration.getLongPressTimeout()*3;
 	
 	Intent close_intent=new Intent();
 	
@@ -35,19 +40,63 @@ public class button_programming_activity extends AppCompatActivity implements On
 		et[2]=(EditText)findViewById(R.id.editText_bpa_3);
 		et[3]=(EditText)findViewById(R.id.editText_bpa_4);
 		
+		cb=(CheckBox)findViewById(R.id.checkBox_bpa_1);
+				
 		ok_button=(Button)findViewById(R.id.button_bpa_1);
 		
 		hex_board_handler=new Handler();
 		
 		et[0].setText(getIntent().getStringExtra(bluetooth_button_data.button_text_extra_name));
-		et[1].setText(getIntent().getStringExtra(bluetooth_button_data.button_code_extra_name));
-		et[2].setText(getIntent().getStringExtra(bluetooth_button_data.button_on_down_code_extra_name));
-		et[3].setText(getIntent().getStringExtra(bluetooth_button_data.button_on_up_code_extra_name));
+		
+		et[1].setText(new String(getIntent().getByteArrayExtra(bluetooth_button_data.button_code_extra_name)));
+		et[2].setText(new String(getIntent().getByteArrayExtra(bluetooth_button_data.button_on_down_code_extra_name)));
+		et[3].setText(new String(getIntent().getByteArrayExtra(bluetooth_button_data.button_on_up_code_extra_name)));
+		
+		et[0].setSelection(et[0].getText().length());
+		et[1].setSelection(et[1].getText().length());
+		et[2].setSelection(et[2].getText().length());
+		et[3].setSelection(et[3].getText().length());
+		
+		cb.setChecked(getIntent().getBooleanExtra(bluetooth_button_data.respond_on_continuous_touch_extra_name,false));
+		
+		if(cb.isChecked()==false)
+		{
+			et[2].setEnabled(false);
+			et[3].setEnabled(false);
+		}
 		
 		et[0].setOnTouchListener(this);
 		et[1].setOnTouchListener(this);
 		et[2].setOnTouchListener(this);
 		et[3].setOnTouchListener(this);	
+		
+		cb.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) 
+			{
+				if(isChecked==true)
+				{
+					et[2].setEnabled(true);
+					et[3].setEnabled(true);
+				}
+				else
+				{
+					et[2].setEnabled(false);
+					et[3].setEnabled(false);
+				}
+			}
+			
+		} );
+		
+		ok_button.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				bye_bye();
+			}
+			
+		});
 	}
 
 	@Override  
@@ -56,27 +105,26 @@ public class button_programming_activity extends AppCompatActivity implements On
 		if(requestCode==hexboard_activity_request_code)
 		{
 			int index=-1;
+			int identification_number=data.getIntExtra(HexBoard.identification_number,-1);
 			
-			switch(data.getIntExtra(HexBoard.identification_number,-1))
+			if(identification_number==et[0].getId())
 			{
-				case 0:
-					index=0;
-					break;
-					
-				case 1:
-					index=1;
-					break;
-					
-				case 2:
-					index=2;
-					break;
-					
-				case 3:
-					index=3;
-					break;
+				index=0;
 			}
-			
-			et[index].setText(et[index].getText().toString()+data.getStringExtra(HexBoard.stringed_data));
+			else if(identification_number==et[1].getId())
+			{
+				index=1;
+			}
+			else if(identification_number==et[2].getId())
+			{
+				index=2;
+			}
+			else if(identification_number==et[3].getId())
+			{
+				index=3;
+			}
+						
+			et[index].setText(data.getStringExtra(HexBoard.stringed_data));
 			et[index].setSelection(et[index].getText().length());
 		}
 	}  
@@ -113,13 +161,12 @@ public class button_programming_activity extends AppCompatActivity implements On
 		{
 			case MotionEvent.ACTION_DOWN:
 				v.setPressed(true);
-//				hex_board_handler.postDelayed(hex_board_runnable,hex_board_call_delay);
-				hex_board_handler.postDelayed(this,hex_board_call_delay);
+				v.requestFocus();
+				hex_board_handler.postDelayed(this,HexBoard.hex_board_call_delay);
 				break;
 					
 			case MotionEvent.ACTION_UP:
 				v.setPressed(false);
-//				hex_board_handler.removeCallbacks(hex_board_runnable);
 				hex_board_handler.removeCallbacks(this);
 				v.performClick();
 				break;
@@ -136,25 +183,25 @@ public class button_programming_activity extends AppCompatActivity implements On
 		
 		if(et[0].isPressed())
 		{
-			identification_number=0;
+			identification_number=et[0].getId();
 			initial_text=et[0].getText().toString();
 		}
 		
 		if(et[1].isPressed())
 		{
-			identification_number=1;
+			identification_number=et[1].getId();
 			initial_text=et[1].getText().toString();
 		}
 		
 		if(et[2].isPressed())
 		{
-			identification_number=2;
+			identification_number=et[2].getId();
 			initial_text=et[2].getText().toString();
 		}
 		
 		if(et[3].isPressed())
 		{
-			identification_number=3;
+			identification_number=et[3].getId();
 			initial_text=et[3].getText().toString();
 		}
 		
@@ -167,9 +214,15 @@ public class button_programming_activity extends AppCompatActivity implements On
 	void bye_bye()
 	{
 		close_intent.putExtra(bluetooth_button_data.button_text_extra_name,et[0].getText().toString());
-		close_intent.putExtra(bluetooth_button_data.button_code_extra_name,et[1].getText().toString());
-		close_intent.putExtra(bluetooth_button_data.button_on_down_code_extra_name,et[2].getText().toString());
-		close_intent.putExtra(bluetooth_button_data.button_on_up_code_extra_name,et[3].getText().toString());
+
+		close_intent.putExtra(bluetooth_button_data.button_code_extra_name,
+							  et[1].getText().toString().getBytes(Charset.forName("ISO-8859-1")));
+		close_intent.putExtra(bluetooth_button_data.button_on_down_code_extra_name,
+							  et[2].getText().toString().getBytes(Charset.forName("ISO-8859-1")));
+		close_intent.putExtra(bluetooth_button_data.button_on_up_code_extra_name,
+							  et[3].getText().toString().getBytes(Charset.forName("ISO-8859-1")));
+		
+		close_intent.putExtra(bluetooth_button_data.respond_on_continuous_touch_extra_name,cb.isChecked());
 		
 		setResult(RESULT_OK, close_intent);        
 		finish();

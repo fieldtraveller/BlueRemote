@@ -1,5 +1,6 @@
 package com.alex.blueremote;
 
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -12,6 +13,7 @@ import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewConfiguration;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -22,10 +24,12 @@ public class HexBoard extends AppCompatActivity {
 	String data="";
 	Intent close_intent=new Intent();
 	
+	public static int hex_board_call_delay=ViewConfiguration.getLongPressTimeout()*3;
+
 	TimerTask backspace_task;
 	Timer backspace_timer;
 	Handler ui_Handler;
-	final int backspace_delay=200;
+	public static int hex_board_backspace_delay=200;
 	
 	public static final String identification_number="IDENTIFICATION_NUMBER";
 	public static final String initial_text="INITIAL_TEXT";
@@ -58,7 +62,8 @@ public class HexBoard extends AppCompatActivity {
         button[17]=(Button)findViewById(R.id.Button18);
         
         ev1=(EditText)findViewById(R.id.editText1);
-        ev1.setText(this.getIntent().getStringExtra(HexBoard.initial_text));
+        ev1.setText(string_to_hex(this.getIntent().getStringExtra(HexBoard.initial_text)));
+        ev1.setSelection(ev1.getText().toString().length());
         
         ui_Handler=new Handler();
                 
@@ -217,44 +222,7 @@ public class HexBoard extends AppCompatActivity {
 //    			finish();
 			}
 		});
-        
-//        button[17].setOnClickListener(new View.OnClickListener() {
-//			
-//        	@Override
-//			public void onClick(View v) {
-//			
-//				int cursor_start=ev1.getSelectionStart();
-//				int cursor_end=ev1.getSelectionEnd();
-//        		
-//				if((cursor_start<=0)||(cursor_end<=0))
-//        		{
-////					Log.e("Selection", "Start:"+cursor_start+" End:"+cursor_end);
-//        		}
-//				else if(cursor_start==cursor_end)
-//        		{
-//        			data=data.substring(0,cursor_end-1)+data.substring(cursor_end);
-//        		}
-//        		else
-//        		{
-//        			data=data.substring(0,cursor_start)+data.substring(cursor_end);
-//        		}
-//        		
-////        		Log.e("Data", data);
-//        		
-//        		setData();	
-//			}
-//		});
-        
-//        button[17].setOnLongClickListener(new OnLongClickListener(){
-//
-//			@Override
-//			public boolean onLongClick(View v) {
-//				
-//				return true;
-//			}
-//        	
-//        });
-        
+                
         button[17].setOnTouchListener(new OnTouchListener() {
 
 			@Override
@@ -281,43 +249,26 @@ public class HexBoard extends AppCompatActivity {
 			}
         });
                 
-//        ev1.setKeyListener(new KeyListener(){
-//
-//			@Override
-//			public int getInputType() {
-//				
-//				Log.e("Where?", "getInputType()");
-//				return 0;
-//			}
-//
-//			@Override
-//			public boolean onKeyDown(View view, Editable text, int keyCode,
-//					KeyEvent event) {
-//				Log.e("Where?", "onKeyDown()");
-//				return false;
-//			}
-//
-//			@Override
-//			public boolean onKeyUp(View view, Editable text, int keyCode,
-//					KeyEvent event) {
-//				Log.e("Where?", "onKeyUp()");
-//				return false;
-//			}
-//
-//			@Override
-//			public boolean onKeyOther(View view, Editable text, KeyEvent event) {
-//				Log.e("Where?", "onKeyOther()");
-//				return false;
-//			}
-//
-//			@Override
-//			public void clearMetaKeyState(View view, Editable content,
-//					int states) {
-//				Log.e("Where?", "clearMetaKeyState");
-//				
-//			}
-//			
-//        });
+	}
+	
+	public static int getHex_board_call_delay() 
+	{
+		return hex_board_call_delay;
+	}
+
+	public static void setHex_board_call_delay(int hex_board_call_delay) 
+	{
+		HexBoard.hex_board_call_delay = hex_board_call_delay;
+	}
+	
+	public static int getHex_board_backspace_delay() 
+	{
+		return hex_board_backspace_delay;
+	}
+
+	public static void setHex_board_backspace_delay(int hex_board_backspace_delay) 
+	{
+		HexBoard.hex_board_backspace_delay = hex_board_backspace_delay;
 	}
 	
 	void backspace(boolean start_or_stop)
@@ -332,7 +283,6 @@ public class HexBoard extends AppCompatActivity {
 					int cursor_start=ev1.getSelectionStart();
 					int cursor_end=ev1.getSelectionEnd();
 	        		
-//					Log.e("TimerTask?", "Called");
 					data=ev1.getText().toString();
 					
 					if((cursor_start<=0)||(cursor_end<=0))
@@ -354,15 +304,12 @@ public class HexBoard extends AppCompatActivity {
 					        	
 							setData();	
 						}
-					});
-	        		
+					});	
 				}
 			};
 			
 			backspace_timer = new Timer();
-			backspace_timer.scheduleAtFixedRate(backspace_task,0,backspace_delay);
-			
-//			Log.e("Timer?", "On");
+			backspace_timer.scheduleAtFixedRate(backspace_task,0,hex_board_backspace_delay);
 		}
 		else
 		{
@@ -372,8 +319,6 @@ public class HexBoard extends AppCompatActivity {
 			
 			backspace_timer.cancel();
 			backspace_timer=null;
-			
-//			Log.e("Timer?", "Off");
 		}
 	}
 	
@@ -391,7 +336,27 @@ public class HexBoard extends AppCompatActivity {
 		ev1.setSelection(data.length());
 	}
 	
-	public String hex_to_string(String input)
+	public static String string_to_hex(String input)
+	{
+		int number_of_characters=input.length();
+		String output="";
+		
+		if(number_of_characters==0)
+		{
+			return input; 
+		}
+		else 
+		{
+			for(int count=0;count<number_of_characters;count++)
+			{
+				output=output+Integer.toHexString((int)input.charAt(count)).toUpperCase(Locale.getDefault());
+			}
+		}
+		
+		return output;	
+	}
+	
+	public static String hex_to_string(String input)
 	{
 		int number_of_nibbles=input.length();
 		String output="";
@@ -426,65 +391,16 @@ public class HexBoard extends AppCompatActivity {
 		finish();
 	}
 	
-//     @Override
-//	 protected void onRestart()
-//	 {
-//	   	super.onRestart();
-//	 }
-//	 
-//	 @Override
-//	 protected void onStart()
-//	 {
-//	 	super.onStart();
-//	 }
-// 
-//	@Override
-//	protected void onResume()
-//	{
-//		super.onResume();
-//	}
-//
-//	 @Override
-//	 protected void onPause ()
-//	 {
-//	   	super.onPause();
-//	 }
-//	 
-//	 @Override
-//	 protected void onStop ()
-//	 {
-//	 	super.onStop();
-//	 }
-//	
-//	@Override  
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data)  
-//    {
-//	}  
-	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
 		return false;
 	}
 
-//	@Override
-//	public boolean onSupportNavigateUp()
-//	{
-//		return false;
-//	}
-//	
 	@Override
 	public void onBackPressed ()
 	{
 		bye_bye();
 	}
-	
-//	@Override
-//	protected void onDestroy ()
-//	{
-//		super.onDestroy();
-//	}
-	
+		
 }

@@ -1,6 +1,8 @@
 package com.alex.blueremote;
 
-import android.annotation.SuppressLint;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.util.Log;
@@ -16,7 +18,6 @@ public class bluetooth_button implements OnClickListener,OnTouchListener,OnLongC
 	BT_spp BT_serial_device;
 	Button button;
 	
-	boolean respond_on_continuous_touch=false;
 	private boolean mode=false;
 	
 	bluetooth_button_data button_data;
@@ -24,9 +25,13 @@ public class bluetooth_button implements OnClickListener,OnTouchListener,OnLongC
 	Intent programming_activity_intent;
 	int programming_activity_request_code;
 	Activity calling_activity;
+	
+	TimerTask button_task;
+	Timer button_timer;
+	final int button_delay=200;
 
-	final boolean PROGRAM_MODE=true;
-	final boolean NORMAL_MODE=true;
+	public static final boolean PROGRAM_MODE=true;
+	public static final boolean NORMAL_MODE=false;
 	
 	public bluetooth_button(Activity calling_activity,BT_spp BT_serial_device,Button button) 
 	{
@@ -40,23 +45,8 @@ public class bluetooth_button implements OnClickListener,OnTouchListener,OnLongC
 		this.button.setOnClickListener(this);
 		this.button.setOnLongClickListener(this);
 	}
-	
-	public bluetooth_button(Activity calling_activity,BT_spp BT_serial_device,Button button, boolean respond_on_touch) 
-	{
-		super();
 		
-		this.calling_activity=calling_activity;
-		this.BT_serial_device=BT_serial_device;
-		this.button = button;
-		
-		this.respond_on_continuous_touch = respond_on_touch;
-		
-		this.button.setOnTouchListener(this);
-		this.button.setOnClickListener(this);
-		this.button.setOnLongClickListener(this);
-	}
-	
-	public bluetooth_button(Activity calling_activity,BT_spp BT_serial_device,Button button, boolean respond_on_touch,bluetooth_button_data button_data) 
+	public bluetooth_button(Activity calling_activity,BT_spp BT_serial_device,Button button,bluetooth_button_data button_data) 
 	{
 		super();
 		
@@ -64,8 +54,6 @@ public class bluetooth_button implements OnClickListener,OnTouchListener,OnLongC
 		this.BT_serial_device=BT_serial_device;
 		this.button = button;
 	
-		this.respond_on_continuous_touch = respond_on_touch;
-		
 		this.button_data=button_data;
 		
 		this.button.setText(this.button_data.getButton_text());
@@ -105,16 +93,6 @@ public class bluetooth_button implements OnClickListener,OnTouchListener,OnLongC
 		this.button = button;
 	}
 
-	public boolean isRespond_on_continuous_touch() 
-	{
-		return respond_on_continuous_touch;
-	}
-
-	public void setRespond_on_continuous_touch(boolean respond_on_touch) 
-	{
-		this.respond_on_continuous_touch = respond_on_touch;
-	}
-
 	public bluetooth_button_data getButton_data() 
 	{
 		return button_data;
@@ -151,47 +129,47 @@ public class bluetooth_button implements OnClickListener,OnTouchListener,OnLongC
 		this.programming_activity_intent = new Intent(input);
 	}
 	
-	public int getProgramming_activity_request_code() {
+	public int getProgramming_activity_request_code() 
+	{
 		return programming_activity_request_code;
 	}
 
-	public void setProgramming_activity_request_code(
-			int programming_activity_request_code) {
+	public void setProgramming_activity_request_code(int programming_activity_request_code) 
+	{
 		this.programming_activity_request_code = programming_activity_request_code;
 	}
-
-	@SuppressLint("ClickableViewAccessibility")
+	
 	@Override
-	public boolean onTouch(View v, MotionEvent event) {
+	public boolean onTouch(View v, MotionEvent event) 
+	{
 		
-		if(this.isMode()==this.PROGRAM_MODE)
+		if(this.isMode()==bluetooth_button.PROGRAM_MODE)
 		{
 			return false;
 		}
 		else
 		{
-			if(respond_on_continuous_touch==false)
+			if(button_data.isRespond_on_continuous_touch()==false)
 			{
 				return false;
 			}
 			else
 			{
-				Log.e("Where?", "onTouch2");
-				
 				switch(event.getAction())
 				{
 					case MotionEvent.ACTION_DOWN:
 						v.setPressed(true);
+						button_pressed_response(true);
 						Log.e("Where?", "onTouchdown");
 						break;
 							
 					case MotionEvent.ACTION_UP:
 						v.setPressed(false);
+						button_pressed_response(false);
+						BT_serial_device.write(button_data.getButton_on_up_code());
 						Log.e("Where?", "onTouchup");
-//						v.performClick();
-						break;
-							
-//					default:				
+						v.performClick();
+						break;							
 				}
 				
 				return true;
@@ -199,19 +177,53 @@ public class bluetooth_button implements OnClickListener,OnTouchListener,OnLongC
 		}
 	}
 
+	private void button_pressed_response(boolean start_or_stop)
+	{
+		if(start_or_stop==true)
+		{
+			button_task=new TimerTask(){
+				
+				@Override
+				public void run() {
+					
+					BT_serial_device.write(button_data.getButton_on_down_code());
+				}
+			};
+			
+			button_timer = new Timer();
+			button_timer.scheduleAtFixedRate(button_task,0,button_delay);			
+		}
+		else
+		{
+			button_task.cancel();
+			button_timer.purge();
+			button_task=null;	//Timer Task not Reusable
+			
+			button_timer.cancel();
+			button_timer=null;			
+		}
+	}
+	
 	@Override
-	public void onClick(View v) {
-		
+	public void onClick(View v) 
+	{	
 		Log.e("Where?", "onClick1");
-//		Log.e("What?", "BT_serial_device: "+BT_serial_device);
 		BT_serial_device.write(button_data.getButton_code());
 	}
 
 	@Override
 	public boolean onLongClick(View v) 
 	{
-		if(this.isMode()==this.PROGRAM_MODE)
+		if(this.isMode()==bluetooth_button.PROGRAM_MODE)
 		{
+			this.programming_activity_intent.putExtra(bluetooth_button_data.button_text_extra_name,this.getButton_data().getButton_text());
+			
+			this.programming_activity_intent.putExtra(bluetooth_button_data.button_code_extra_name,this.getButton_data().getButton_code());
+			this.programming_activity_intent.putExtra(bluetooth_button_data.button_on_down_code_extra_name,this.getButton_data().getButton_on_down_code());
+			this.programming_activity_intent.putExtra(bluetooth_button_data.button_on_up_code_extra_name,this.getButton_data().getButton_on_up_code());
+			
+			this.programming_activity_intent.putExtra(bluetooth_button_data.respond_on_continuous_touch_extra_name,this.getButton_data().isRespond_on_continuous_touch());
+			
 			calling_activity.startActivityForResult(this.programming_activity_intent,this.programming_activity_request_code);
 			return true;
 		}
@@ -225,13 +237,26 @@ public class bluetooth_button implements OnClickListener,OnTouchListener,OnLongC
 	{
 		if(requestCode==this.programming_activity_request_code)
 		{
+			Log.e("Where?", "update_button_onActivityResult");
 			this.button_data.setButton_text(data.getStringExtra(bluetooth_button_data.button_text_extra_name));
-			this.button_data.setButton_code(data.getByteArrayExtra(bluetooth_button_data.button_code_extra_name));
-			this.button_data.setButton_on_up_code(data.getByteArrayExtra(bluetooth_button_data.button_on_up_code_extra_name));
-			this.button_data.setButton_on_down_code(data.getByteArrayExtra(bluetooth_button_data.button_on_down_code_extra_name));
+			update_button_text();
 			
-			this.setMode(NORMAL_MODE);
+			this.button_data.setButton_code(data.getByteArrayExtra(bluetooth_button_data.button_code_extra_name));
+			this.button_data.setButton_on_down_code(data.getByteArrayExtra(bluetooth_button_data.button_on_down_code_extra_name));
+			this.button_data.setButton_on_up_code(data.getByteArrayExtra(bluetooth_button_data.button_on_up_code_extra_name));
+			
+			this.button_data.setRespond_on_continuous_touch(data.getBooleanExtra(bluetooth_button_data.respond_on_continuous_touch_extra_name,false));
+			
+//			Log.e("What?","Button_text: "+this.button_data.getButton_text());
+//			Log.e("What?","Button_code: "+this.button_data.getButton_code().toString());
+//			Log.e("What?","Button_on_down_code: "+this.button_data.getButton_on_down_code().toString());
+//			Log.e("What?","Button_on_up_code: "+this.button_data.getButton_on_up_code().toString());
+//			Log.e("What?","Respond_on_continuous_touch: "+this.button_data.isRespond_on_continuous_touch());
 		}
 	}
 	
+	void update_button_text()
+	{
+		this.button.setText(this.button_data.getButton_text());
+	}
 }

@@ -3,8 +3,6 @@ package com.alex.blueremote;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.bluetooth.BluetoothDevice;
@@ -20,7 +18,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.ViewConfiguration;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -43,14 +40,13 @@ public class MainActivity extends AppCompatActivity {
 	
 	BT_spp BT_serial_device;
 	boolean BT_discovered_device_available=false;
+	boolean in_program_mode=false;
 	
 	Button channel_up,channel_down,volume_up,volume_down,select,send;
 	Switch power,mute;
 	EditText data_input;
 	
 	bluetooth_button button_7;
-	
-	boolean in_program_mode=false;
 	
 	byte[] channel_up_command={0};
 	byte[] channel_down_command={1};
@@ -67,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 	
 	Handler hex_board_handler;
 	Runnable hex_board_runnable;
-	int hex_board_call_delay=ViewConfiguration.getLongPressTimeout()*3;
+//	int hex_board_call_delay=ViewConfiguration.getLongPressTimeout()*3;
 		
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,9 +81,10 @@ public class MainActivity extends AppCompatActivity {
 		select=(Button)findViewById(R.id.button3);
 		send=(Button)findViewById(R.id.button6);
 		
-		bluetooth_button_data a=new bluetooth_button_data(null,new byte[]{12,13});
-		button_7=new bluetooth_button(this, BT_serial_device, (Button)findViewById(R.id.button7), 
-										false,a);
+//		bluetooth_button_data a=new bluetooth_button_data("Test",new byte[]{12,13});
+		bluetooth_button_data a=new bluetooth_button_data("Test",new byte[]{0x42},true,new byte[]{0x43},new byte[]{0x44});
+		button_7=new bluetooth_button(this, BT_serial_device, (Button)findViewById(R.id.button7),a);
+		button_7.setProgramming_activity_intent(new Intent(this,button_programming_activity.class));
 				
 		power=(Switch)findViewById(R.id.switch1);
 		mute=(Switch)findViewById(R.id.switch2);
@@ -299,8 +296,9 @@ public class MainActivity extends AppCompatActivity {
 			@Override
 			public void run() {
 				
-				Intent device_list= new Intent(MainActivity.this,HexBoard.class);
-			    startActivityForResult(device_list, hexboard_activity_request_code);
+				Intent launch_hex_board= new Intent(MainActivity.this,HexBoard.class);
+				launch_hex_board.putExtra(HexBoard.initial_text, data_input.getText().toString());
+			    startActivityForResult(launch_hex_board, hexboard_activity_request_code);
 			}
 			
 		};
@@ -313,7 +311,7 @@ public class MainActivity extends AppCompatActivity {
 				switch(event.getAction())
 				{
 					case MotionEvent.ACTION_DOWN:
-						hex_board_handler.postDelayed(hex_board_runnable,hex_board_call_delay);
+						hex_board_handler.postDelayed(hex_board_runnable,HexBoard.hex_board_call_delay);
 						break;
 							
 					case MotionEvent.ACTION_UP:
@@ -330,28 +328,15 @@ public class MainActivity extends AppCompatActivity {
 	    });
 	}
 	
-//	@Override
-//	protected void onRestart()
-//	{
-//		super.onRestart();
-//		Log.e("Where?", "OnRestart");
-//	}
-//	
-//	@Override
-//	protected void onStart()
-//	{
-//		super.onStart();
-//		Log.e("Where?", "OnStart");
-//	}
-//	
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
-//		Log.e("Where?", "OnResume");
+		Log.e("Where?", "OnResume");
 		
-		if(BT_discovered_device_available == true )
+		if((BT_discovered_device_available == true )&&(in_program_mode==false))
 		{
+			Log.e("Where?", "New BT Device");
 			if(BT_serial_device.BT_socket == null)
 			{
 				ProgressDialog progressDialog=ProgressDialog.show(MainActivity.this, "", "Connecting to Device...");
@@ -366,17 +351,11 @@ public class MainActivity extends AppCompatActivity {
 				}
 			    
 			    progressDialog.cancel();
-			    
-			    
-//			    FragmentManager fm = getFragmentManager();
-//			    FragmentTransaction fragmentTransaction = fm.beginTransaction();
-//			    fragmentTransaction.replace(R.id.fragment1, new connecting_fragment());
-//			    fragmentTransaction.commit();
-			    
-//			    Intent device_list= new Intent(this, connecting_dialog.class);
-//			    startActivity(device_list);
-			    
 			}	
+		}
+		else if(in_program_mode==true)
+		{
+			
 		}
 		else
 		{
@@ -423,9 +402,12 @@ public class MainActivity extends AppCompatActivity {
 		
 		if(requestCode==hexboard_activity_request_code)
 		{
-			data_input.setText(data_input.getText().toString()+data.getStringExtra(HexBoard.stringed_data));
+//			data_input.setText(data_input.getText().toString()+data.getStringExtra(HexBoard.stringed_data));
+			data_input.setText(data.getStringExtra(HexBoard.stringed_data));
 			data_input.setSelection(data_input.getText().length());
 		}
+		
+		button_7.update_button_onActivityResult(requestCode,resultCode,data);
 		
     }  
 	//*/
@@ -461,13 +443,33 @@ public class MainActivity extends AppCompatActivity {
 			case R.id.menu_item_2:
 				Log.e("Where?", "R.id.menu_item_2");
 				
-				in_program_mode=true;
-				send.setVisibility(View.GONE);
-				send.invalidate();
-				data_input.setVisibility(View.GONE);
-				data_input.invalidate();
-//				set_value.setVisibility(View.VISIBLE);
-//				set_value.invalidate();
+				if(in_program_mode==true)
+				{
+					item.setTitle(R.string.program_mode);
+					in_program_mode=false;
+					
+					send.setVisibility(View.VISIBLE);
+					send.invalidate();
+					data_input.setVisibility(View.VISIBLE);
+					data_input.invalidate();
+					
+					button_7.setMode(bluetooth_button.NORMAL_MODE);
+					Log.e("What?", "button_7.isMode(): "+(button_7.isMode()==bluetooth_button.PROGRAM_MODE));
+				}
+				else
+				{
+					item.setTitle(R.string.normal_mode);
+					in_program_mode=true;
+					
+					send.setVisibility(View.GONE);
+					send.invalidate();
+					data_input.setVisibility(View.GONE);
+					data_input.invalidate();
+					
+					button_7.setMode(bluetooth_button.PROGRAM_MODE);
+					Log.e("What?", "button_7.isMode(): "+(button_7.isMode()==bluetooth_button.PROGRAM_MODE));
+				}
+				
 				return true;
 				
 			default:

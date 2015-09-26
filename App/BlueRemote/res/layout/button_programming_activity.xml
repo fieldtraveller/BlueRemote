@@ -29,9 +29,10 @@
         android:layout_marginRight="10dp"
         android:ems="10"
         android:inputType="text"
-        android:paddingLeft="10dp" >
+        android:paddingLeft="10dp"
+        android:maxLength="6" >
 
-        <requestFocus />
+        <!-- <requestFocus /> -->
     </EditText>
 
     <Space
@@ -59,6 +60,29 @@
         android:inputType="text"
         />
 
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp" />
+	
+    <LinearLayout
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal" 
+	    >
+
+        <CheckBox
+            android:id="@+id/checkBox_bpa_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/continuous_touch" 
+            android:textSize="22sp"/>
+
+    <Space
+        android:layout_width="80dp"
+        android:layout_height="match_parent" />
+    
+    </LinearLayout>
+    
     <Space
         android:layout_width="match_parent"
         android:layout_height="10dp" />
