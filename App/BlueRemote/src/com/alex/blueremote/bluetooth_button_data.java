@@ -1,7 +1,11 @@
 package com.alex.blueremote;
 
-public class bluetooth_button_data 
+import java.io.Serializable;
+
+public class bluetooth_button_data implements Serializable
 {
+	private static final long serialVersionUID = -7759786860591402406L;
+
 	String button_text;
 	
 	byte[] button_code;

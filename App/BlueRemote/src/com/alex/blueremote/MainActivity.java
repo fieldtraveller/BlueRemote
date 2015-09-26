@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
@@ -85,7 +86,15 @@ public class MainActivity extends AppCompatActivity {
 		bluetooth_button_data a=new bluetooth_button_data("Test",new byte[]{0x42},true,new byte[]{0x43},new byte[]{0x44});
 		button_7=new bluetooth_button(this, BT_serial_device, (Button)findViewById(R.id.button7),a);
 		button_7.setProgramming_activity_intent(new Intent(this,button_programming_activity.class));
-				
+		
+		String filename="e.br";
+		Log.e("file directory",""+Environment.getExternalStorageDirectory().getPath());
+		file_operations.save_to_file(getApplicationContext(), filename,a);
+
+//		bluetooth_button_data b=(bluetooth_button_data)file_operations.read_from_file(getApplicationContext(), filename);
+//		Log.e("Read Data"," "+b);
+//		Log.e("Read Data"," "+b.getButton_text()+" "+b.getButton_code()+" "+b.getButton_on_down_code()+" "+b.getButton_on_up_code());
+		
 		power=(Switch)findViewById(R.id.switch1);
 		mute=(Switch)findViewById(R.id.switch2);
 		
@@ -499,4 +508,6 @@ public class MainActivity extends AppCompatActivity {
 			
 		Log.d(BLUETOOTH_SERVICE, "Bluetooth turned Off.");
 	}
+	
+	
 }
