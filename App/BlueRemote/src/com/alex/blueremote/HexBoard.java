@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
@@ -233,14 +232,12 @@ public class HexBoard extends AppCompatActivity {
 					case MotionEvent.ACTION_DOWN:
 						v.setPressed(true);
 						backspace(true);
-						Log.e("Button?","Down");
 						break;
 							
 					case MotionEvent.ACTION_UP:
 						v.setPressed(false);
 						backspace(false);
 						v.performClick();
-						Log.e("Button?","UP");
 						break;
 							
 					default:				

@@ -8,7 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import android.content.Context;
-import android.os.Environment;
+//import android.os.Environment;
 
 public class file_operations
 {
@@ -60,5 +60,17 @@ public class file_operations
 	    }
 	    
 	    return object_read;
+	}
+	
+	public static boolean file_exists(Context context, String filename) 
+	{    
+	    File file = context.getFileStreamPath(filename);
+	    
+	    if(file == null || !file.exists()) 
+	    {
+	        return false;
+	    }
+	    
+	    return true;
 	}
 }

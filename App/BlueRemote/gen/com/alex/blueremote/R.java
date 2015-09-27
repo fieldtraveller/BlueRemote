@@ -2021,13 +2021,12 @@ containing a value of this type.
         public static final int alertTitle=0x7f09002e;
         public static final int always=0x7f090019;
         public static final int beginning=0x7f09001e;
-        public static final int button1=0x7f090055;
-        public static final int button2=0x7f090054;
-        public static final int button3=0x7f090056;
-        public static final int button4=0x7f090051;
-        public static final int button5=0x7f09004f;
-        public static final int button6=0x7f090050;
-        public static final int button7=0x7f090057;
+        public static final int button1=0x7f090056;
+        public static final int button2=0x7f090055;
+        public static final int button3=0x7f090057;
+        public static final int button4=0x7f090052;
+        public static final int button5=0x7f090050;
+        public static final int button6=0x7f090051;
         public static final int buttonPanel=0x7f090034;
         public static final int button_bpa_1=0x7f090061;
         public static final int buttondl=0x7f090063;
@@ -2043,7 +2042,7 @@ containing a value of this type.
         public static final int default_activity_button=0x7f090027;
         public static final int disableHome=0x7f09000d;
         public static final int eList_1=0x7f090062;
-        public static final int editText1=0x7f09004e;
+        public static final int editText1=0x7f09004f;
         public static final int editText_bpa_1=0x7f090059;
         public static final int editText_bpa_2=0x7f09005b;
         public static final int editText_bpa_3=0x7f09005e;
@@ -2105,12 +2104,13 @@ containing a value of this type.
         public static final int src_over=0x7f090018;
         public static final int status_bar_latest_event_content=0x7f09007b;
         public static final int submit_area=0x7f090049;
-        public static final int switch1=0x7f090052;
+        public static final int switch1=0x7f090054;
         public static final int switch2=0x7f090053;
         public static final int tabMode=0x7f09000c;
         public static final int text=0x7f090083;
         public static final int text2=0x7f090081;
         public static final int textSpacerNoButtons=0x7f090031;
+        public static final int textView1=0x7f09004e;
         public static final int textView_bpa_1=0x7f090058;
         public static final int textView_bpa_2=0x7f09005a;
         public static final int textView_bpa_3=0x7f09005d;
@@ -2209,24 +2209,24 @@ containing a value of this type.
         public static final int main=0x7f0c0000;
     }
     public static final class string {
-        public static final int Button01=0x7f0a002f;
-        public static final int Button02=0x7f0a002e;
-        public static final int Button03=0x7f0a002d;
-        public static final int Button04=0x7f0a002c;
-        public static final int Button05=0x7f0a002b;
-        public static final int Button06=0x7f0a002a;
-        public static final int Button07=0x7f0a0029;
-        public static final int Button08=0x7f0a0028;
-        public static final int Button09=0x7f0a0027;
-        public static final int Button10=0x7f0a0026;
-        public static final int Button11=0x7f0a0025;
-        public static final int Button12=0x7f0a0024;
-        public static final int Button13=0x7f0a0023;
-        public static final int Button14=0x7f0a0022;
-        public static final int Button15=0x7f0a0021;
-        public static final int Button16=0x7f0a0020;
-        public static final int Button17=0x7f0a0030;
-        public static final int Button18=0x7f0a0031;
+        public static final int Button01=0x7f0a0030;
+        public static final int Button02=0x7f0a002f;
+        public static final int Button03=0x7f0a002e;
+        public static final int Button04=0x7f0a002d;
+        public static final int Button05=0x7f0a002c;
+        public static final int Button06=0x7f0a002b;
+        public static final int Button07=0x7f0a002a;
+        public static final int Button08=0x7f0a0029;
+        public static final int Button09=0x7f0a0028;
+        public static final int Button10=0x7f0a0027;
+        public static final int Button11=0x7f0a0026;
+        public static final int Button12=0x7f0a0025;
+        public static final int Button13=0x7f0a0024;
+        public static final int Button14=0x7f0a0023;
+        public static final int Button15=0x7f0a0022;
+        public static final int Button16=0x7f0a0021;
+        public static final int Button17=0x7f0a0031;
+        public static final int Button18=0x7f0a0032;
         /**  Content description for the action bar "home" affordance. [CHAR LIMIT=NONE] 
          */
         public static final int abc_action_bar_home_description=0x7f0a0001;
@@ -2286,32 +2286,36 @@ containing a value of this type.
         /**  Content description for the Toolbar icon used to collapse an expanded action mode. [CHAR LIMIT=NONE] 
          */
         public static final int abc_toolbar_collapse_description=0x7f0a0004;
-        public static final int action_settings=0x7f0a0032;
+        public static final int action_settings=0x7f0a003d;
         public static final int app_name=0x7f0a0012;
-        public static final int bt_device=0x7f0a0033;
-        public static final int button_programming_activity=0x7f0a003e;
-        public static final int channel_down=0x7f0a0018;
-        public static final int channel_up=0x7f0a0017;
-        public static final int connecting=0x7f0a0038;
-        public static final int continuous_touch=0x7f0a003f;
-        public static final int dl_activity=0x7f0a001c;
-        public static final int enter_button_code=0x7f0a003a;
-        public static final int enter_button_on_down_code=0x7f0a003c;
-        public static final int enter_button_on_up_code=0x7f0a003b;
-        public static final int enter_button_text=0x7f0a0039;
-        public static final int hexboard=0x7f0a001f;
-        public static final int mute_switch=0x7f0a0014;
-        public static final int normal_mode=0x7f0a0037;
-        public static final int ok=0x7f0a003d;
-        public static final int other_device=0x7f0a0035;
-        public static final int power_switch=0x7f0a0013;
-        public static final int program_mode=0x7f0a0036;
-        public static final int refresh=0x7f0a001d;
-        public static final int select=0x7f0a001a;
-        public static final int send=0x7f0a0019;
-        public static final int set_preferred_device=0x7f0a0034;
-        public static final int set_value=0x7f0a001b;
-        public static final int splash_image_description=0x7f0a001e;
+        public static final int bt_device=0x7f0a003e;
+        public static final int channel_down=0x7f0a001c;
+        public static final int channel_up=0x7f0a001b;
+        public static final int connecting=0x7f0a0043;
+        public static final int continuous_touch=0x7f0a003c;
+        public static final int dl_activity=0x7f0a0013;
+        public static final int enter_button_code=0x7f0a0034;
+        public static final int enter_button_on_down_code=0x7f0a0036;
+        public static final int enter_button_on_up_code=0x7f0a0035;
+        public static final int enter_button_text=0x7f0a0033;
+        public static final int enter_switch_code=0x7f0a0038;
+        public static final int enter_switch_off_code=0x7f0a003a;
+        public static final int enter_switch_on_code=0x7f0a0039;
+        public static final int enter_switch_text=0x7f0a0037;
+        public static final int hexboard=0x7f0a0014;
+        public static final int mute_switch=0x7f0a0018;
+        public static final int normal_mode=0x7f0a0042;
+        public static final int ok=0x7f0a003b;
+        public static final int other_device=0x7f0a0040;
+        public static final int power_switch=0x7f0a0017;
+        public static final int program_mode=0x7f0a0041;
+        public static final int programming_activity=0x7f0a0015;
+        public static final int refresh=0x7f0a0020;
+        public static final int select=0x7f0a001e;
+        public static final int send=0x7f0a001d;
+        public static final int set_preferred_device=0x7f0a003f;
+        public static final int set_value=0x7f0a001f;
+        public static final int splash_image_description=0x7f0a0016;
         /**  Text to use when the number in a notification info is too large
          (greater than status_bar_notification_info_maxnum, defined in
          values/config.xml) and must be truncated. May need to be localized
@@ -2319,8 +2323,8 @@ containing a value of this type.
          [CHAR LIMIT=4] 
          */
         public static final int status_bar_notification_info_overflow=0x7f0a0011;
-        public static final int volume_down=0x7f0a0016;
-        public static final int volume_up=0x7f0a0015;
+        public static final int volume_down=0x7f0a001a;
+        public static final int volume_up=0x7f0a0019;
     }
     public static final class style {
         public static final int AlertDialog_AppCompat=0x7f0b0041;

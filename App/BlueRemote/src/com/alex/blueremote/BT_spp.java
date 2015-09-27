@@ -10,7 +10,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
+//import android.util.Log;
 
 public class BT_spp implements Parcelable
 {
@@ -36,11 +36,11 @@ public class BT_spp implements Parcelable
 
     	if(BT_Device!=null)
     	{
-    		Log.d("Bluetooth","BT Device Obtained.");
+//    		Log.d("Bluetooth","BT Device Obtained.");
     	}
     	else
     	{
-    		Log.d("Bluetooth","BT Device:Null.");
+//    		Log.d("Bluetooth","BT Device:Null.");
     	}	
     }
     
@@ -52,11 +52,11 @@ public class BT_spp implements Parcelable
     		
     		if(BT_socket!=null)
         	{
-            	Log.d("Bluetooth","Socket Created.");
+//            	Log.d("Bluetooth","Socket Created.");
         	}
             else
             {
-            	Log.d("Bluetooth","Socket:Null.");
+//            	Log.d("Bluetooth","Socket:Null.");
             }
 		}
 		
@@ -64,7 +64,7 @@ public class BT_spp implements Parcelable
 		{
 			BT_socket.connect();
 	    	
-	    	Log.d("Bluetooth","isConnected():"+BT_socket.isConnected());
+//	    	Log.d("Bluetooth","isConnected():"+BT_socket.isConnected());
 	    	
 	    	try 
 		    {

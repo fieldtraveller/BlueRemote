@@ -8,7 +8,19 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.alex.blueremote.MainActivity" >
-
+	
+   <TextView
+       android:id="@+id/textView1"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_alignParentTop="true"
+       android:layout_centerHorizontal="true"
+       android:background="#FF0F0F"
+       android:gravity="center"
+       android:text="@string/program_mode"
+       android:textAppearance="?android:attr/textAppearanceLarge"
+       android:textColor="#FFFFFF" />
+        
     <EditText
         android:id="@+id/editText1"
         android:layout_width="wrap_content"
@@ -34,14 +46,6 @@
         android:layout_alignLeft="@+id/button4"
         android:layout_alignRight="@+id/button4"
         android:text="@string/send" />
-
-    <Switch
-        android:id="@+id/switch1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/power_switch" />
 
     <Switch
         android:id="@+id/switch2"
@@ -97,16 +101,6 @@
         android:layout_marginLeft="16dp"
         android:layout_toRightOf="@+id/button3"
         android:text="@string/volume_up" />
-
-    <Button
-        android:id="@+id/button7"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="18dp"
-        android:text="@string/set_value"
-        />
 	
     <!-- 
     <fragment
@@ -119,5 +113,14 @@
         android:layout_alignLeft="@+id/button2"
         android:layout_alignTop="@+id/button2" />
 	 -->
+
+    <Switch
+        android:id="@+id/switch1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="@string/power_switch" />
 	 
 </RelativeLayout>
