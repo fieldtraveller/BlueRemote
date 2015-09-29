@@ -260,19 +260,22 @@ public class device_list_activity extends AppCompatActivity {
 				refresh_button.setEnabled(false);
 				
 				int childCount=elv_adapter.getChildrenCount(0);
+//				int childCount=elv_adapter.getChildrenCount(0);
 				
 				for(int count_0=0;count_0<childCount;count_0++)
             	{
 					group_child_list.get(0).get(count_0).get("group_child_item").setDiscovered(false);
             	}
 				
-				childCount=elv_adapter.getChildrenCount(1);
+//				childCount=elv_adapter.getChildrenCount(1);
+				childCount=unpaired_device_list.size();
 				
 				for(int count_0=0;count_0<childCount;count_0++)
             	{
 					unpaired_device_list.remove(count_0);
             	}
 				
+//				Log.e("What?", "discovery?"+global_variables_object.getBtAdapter().isDiscovering());
 				global_variables_object.getBtAdapter().startDiscovery();
 				
 				elv_adapter.notifyDataSetChanged();	

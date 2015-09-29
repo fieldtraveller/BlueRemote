@@ -25,7 +25,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity_1 extends AppCompatActivity {
 	
 	BlueRemote_global_variables global_variables_object;
 	
@@ -53,8 +53,6 @@ public class MainActivity extends AppCompatActivity {
 	
 	bluetooth_switch_data switch_data[]=new bluetooth_switch_data[2];
 	bluetooth_switch switchs[]=new bluetooth_switch[2]; 
-	
-	boolean is_menu_item_enabled[]={true,true};
 	
 	Handler hex_board_handler;
 	Runnable hex_board_runnable;
@@ -178,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
 			@Override
 			public void run() {
 				
-				Intent launch_hex_board= new Intent(MainActivity.this,HexBoard.class);
+				Intent launch_hex_board= new Intent(MainActivity_1.this,HexBoard.class);
 				launch_hex_board.putExtra(HexBoard.initial_text, data_input.getText().toString());
 			    startActivityForResult(launch_hex_board, hexboard_activity_request_code);
 			}			
@@ -217,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
 			Log.e("Where?", "New BT Device");
 			if(BT_serial_device.BT_socket == null)
 			{
-				ProgressDialog progressDialog=ProgressDialog.show(MainActivity.this, "", "Connecting to Device...");
+				ProgressDialog progressDialog=ProgressDialog.show(MainActivity_1.this, "", "Connecting to Device...");
 			    
 			    try 
 			    {
@@ -294,27 +292,7 @@ public class MainActivity extends AppCompatActivity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-	
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		
-		for(int count=0;count<is_menu_item_enabled.length;count++)
-		{
-			menu.getItem(count).setEnabled(is_menu_item_enabled[count]);
-		}
-		
-		if(in_program_mode==true)
-		{
-			menu.getItem(1).setTitle(R.string.normal_mode);
-		}
-		else
-		{
-			menu.getItem(1).setTitle(R.string.program_mode);
-		}
-		
-		return true;
-	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		
@@ -336,11 +314,8 @@ public class MainActivity extends AppCompatActivity {
 				if(in_program_mode==true)
 				{
 					file_operations.save_to_file(getApplicationContext(), filename,data_from_file);
-
-					is_menu_item_enabled[0]=true;
-					invalidateOptionsMenu();
 					
-//					item.setTitle(R.string.program_mode);
+					item.setTitle(R.string.program_mode);
 					in_program_mode=false;
 					
 					tv.setVisibility(View.GONE);
@@ -361,10 +336,7 @@ public class MainActivity extends AppCompatActivity {
 				}
 				else
 				{
-					is_menu_item_enabled[0]=false;
-					invalidateOptionsMenu();
-					
-//					item.setTitle(R.string.normal_mode);
+					item.setTitle(R.string.normal_mode);
 					in_program_mode=true;
 					
 					tv.setVisibility(View.VISIBLE);
@@ -391,19 +363,6 @@ public class MainActivity extends AppCompatActivity {
 		}
 		
 		return super.onOptionsItemSelected(item);
-	}
-	
-	@Override
-	public void onBackPressed ()
-	{
-		if(in_program_mode==true)
-		{
-			Toast.makeText(getApplicationContext(),"Exit Program Mode First", Toast.LENGTH_SHORT).show();
-		}
-		else
-		{
-			this.finish();
-		}
 	}
 	
 	@Override
