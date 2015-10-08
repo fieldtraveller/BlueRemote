@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 public class splash extends AppCompatActivity {
 	
-	BlueRemote_global_variables global_variables_object;
+	BlueRemote global_variables_object;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
@@ -23,7 +23,7 @@ public class splash extends AppCompatActivity {
 //		ImageView imageView = (ImageView) findViewById(R.id.iv);
 //		imageView.setImageResource(R.drawable.logo);
 		
-		global_variables_object = (BlueRemote_global_variables)getApplicationContext();
+		global_variables_object = (BlueRemote)getApplicationContext();
 		global_variables_object.setBtAdapter(BluetoothAdapter.getDefaultAdapter());
 		
 		if(global_variables_object.getBtAdapter() == null) 
@@ -54,7 +54,12 @@ public class splash extends AppCompatActivity {
 					Log.d(BLUETOOTH_SERVICE, "Bluetooth turned On.");
 				    
 					startActivity(new Intent(".MainActivity"));
-//					startActivity(new Intent(".HexBoard"));
+//					startActivity(new Intent(".connected_device_list_activity"));
+					
+//					Intent a= new Intent(splash.this,programming_activity.class);
+//					a.putExtra(programming_activity.input_type,programming_activity.input_type_just_devices);
+//					startActivity(a);
+					
 				}
 				catch(InterruptedException e)
 				{

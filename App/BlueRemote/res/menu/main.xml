@@ -7,35 +7,38 @@
     <item
         android:id="@+id/menu_item_1"
         android:orderInCategory="100"
-        android:title="@string/bt_device"
+        android:title="@string/bt_connect_device"
         app:showAsAction="never">
      	
-     	<menu>
-     	    
-     	    <item
-		        android:id="@+id/menu_item_1_1"
-		        android:orderInCategory="100"
-		        android:title="@string/set_preferred_device"
-		        app:showAsAction="never">
-		    </item>
-		        
-     	    <item
-		        android:id="@+id/menu_item_1_2"
-		        android:orderInCategory="100"
-		        android:title="@string/other_device"
-		        app:showAsAction="never">
-		    </item>
-		    
-		</menu>
-		     	       
-     </item>
-     
-     <item
-	       android:id="@+id/menu_item_2"
+    </item>
+    
+    <item
+        android:id="@+id/menu_item_2"
+        android:orderInCategory="100"
+        android:title="@string/bt_disconnect_device"
+        app:showAsAction="never">
+     	
+    </item>
+    
+    <item
+	       android:id="@+id/menu_item_3"
+	       android:orderInCategory="100"
+	       android:title="@string/make_device_discoverable"
+	       app:showAsAction="never">
+	</item>
+	
+   	<item
+	       android:id="@+id/menu_item_4"
 	       android:orderInCategory="100"
 	       android:title="@string/program_mode"
 	       app:showAsAction="never">
 	</item>
-		    
- 
+	
+	<item
+	       android:id="@+id/menu_item_5"
+	       android:orderInCategory="100"
+	       android:title="@string/preferences"
+	       app:showAsAction="never">
+	</item>
+	
 </menu>

@@ -23,12 +23,15 @@ public class HexBoard extends AppCompatActivity {
 	String data="";
 	Intent close_intent=new Intent();
 	
-	public static int hex_board_call_delay=ViewConfiguration.getLongPressTimeout()*3;
-
+//	public static int hex_board_call_time_out=ViewConfiguration.getLongPressTimeout()*3;
+//	public static int hex_board_backspace_repetition_period=200;
+	
+	public static int hex_board_call_time_out;
+	public static int hex_board_backspace_repetition_period;
+	
 	TimerTask backspace_task;
 	Timer backspace_timer;
 	Handler ui_Handler;
-	public static int hex_board_backspace_delay=200;
 	
 	public static final String identification_number="IDENTIFICATION_NUMBER";
 	public static final String initial_text="INITIAL_TEXT";
@@ -60,7 +63,7 @@ public class HexBoard extends AppCompatActivity {
         button[16]=(Button)findViewById(R.id.Button17);
         button[17]=(Button)findViewById(R.id.Button18);
         
-        ev1=(EditText)findViewById(R.id.editText1);
+        ev1=(EditText)findViewById(R.id.editText1_preferences);
         ev1.setText(string_to_hex(this.getIntent().getStringExtra(HexBoard.initial_text)));
         ev1.setSelection(ev1.getText().toString().length());
         
@@ -250,22 +253,27 @@ public class HexBoard extends AppCompatActivity {
 	
 	public static int getHex_board_call_delay() 
 	{
-		return hex_board_call_delay;
+		return hex_board_call_time_out;
 	}
 
-	public static void setHex_board_call_delay(int hex_board_call_delay) 
+	public static int getHex_board_call_delay_factor() 
 	{
-		HexBoard.hex_board_call_delay = hex_board_call_delay;
+		return (int)(hex_board_call_time_out/ViewConfiguration.getLongPressTimeout());
+	}
+	
+	public static void setHex_board_call_delay(float hex_board_call_delay_factor) 
+	{
+		HexBoard.hex_board_call_time_out = (int)hex_board_call_delay_factor*ViewConfiguration.getLongPressTimeout();
 	}
 	
 	public static int getHex_board_backspace_delay() 
 	{
-		return hex_board_backspace_delay;
+		return hex_board_backspace_repetition_period;
 	}
 
 	public static void setHex_board_backspace_delay(int hex_board_backspace_delay) 
 	{
-		HexBoard.hex_board_backspace_delay = hex_board_backspace_delay;
+		HexBoard.hex_board_backspace_repetition_period = hex_board_backspace_delay;
 	}
 	
 	void backspace(boolean start_or_stop)
@@ -306,7 +314,7 @@ public class HexBoard extends AppCompatActivity {
 			};
 			
 			backspace_timer = new Timer();
-			backspace_timer.scheduleAtFixedRate(backspace_task,0,hex_board_backspace_delay);
+			backspace_timer.scheduleAtFixedRate(backspace_task,0,hex_board_backspace_repetition_period);
 		}
 		else
 		{
@@ -335,22 +343,23 @@ public class HexBoard extends AppCompatActivity {
 	
 	public static String string_to_hex(String input)
 	{
-		int number_of_characters=input.length();
-		String output="";
-		
-		if(number_of_characters==0)
+		if(input==null)
 		{
 			return input; 
 		}
 		else 
 		{
+			int number_of_characters=input.length();
+			String output="";
+			
 			for(int count=0;count<number_of_characters;count++)
 			{
 				output=output+Integer.toHexString((int)input.charAt(count)).toUpperCase(Locale.getDefault());
 			}
+			
+			return output;
 		}
 		
-		return output;	
 	}
 	
 	public static String hex_to_string(String input)

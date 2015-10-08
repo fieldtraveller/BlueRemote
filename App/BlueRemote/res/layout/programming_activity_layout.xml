@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" 
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+   android:id="@+id/scrollView1"
+   android:layout_width="fill_parent"
+   android:layout_height="fill_parent"
+     >
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:gravity="center"
-    >
+    android:orientation="vertical" >
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="1dp" />
+        android:layout_height="5dp" />
 
     <TextView
         android:id="@+id/textView_bpa_1"
@@ -29,7 +34,6 @@
         android:layout_marginRight="10dp"
         android:ems="10"
         android:inputType="text"
-        android:paddingLeft="10dp"
         android:maxLength="6" >
 
         <!-- <requestFocus /> -->
@@ -138,10 +142,23 @@
         android:layout_height="10dp" />
 
     <Button
+        android:id="@+id/button_bpa_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/select_devices" />
+    
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp" />
+    
+    <Button
         android:id="@+id/button_bpa_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/ok" />
-
+    
 </LinearLayout>
+
+</ScrollView>

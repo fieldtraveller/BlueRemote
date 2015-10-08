@@ -26,9 +26,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.view.ViewGroup;
 
-public class device_list_activity extends AppCompatActivity {
+public class new_device_list_activity extends AppCompatActivity {
 
-	BlueRemote_global_variables global_variables_object;
+	BlueRemote global_variables_object;
 	BroadcastReceiver bt_discovery_status;
 	Set<BluetoothDevice> pairedDevices;
 	    
@@ -50,18 +50,21 @@ public class device_list_activity extends AppCompatActivity {
     Intent close_intent = new Intent();
     boolean quit_warning=false;
     
+    public static final String new_bt_device_extra_name="NEW_BT_DEVICE"; 
+    public static final String new_bt_device_selected_extra_name="NEW_BT_DEVICE_SELECTED";
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.dl_layout);
+		setContentView(R.layout.new_device_list_activity_layout);
 		
 		elv_1=(ExpandableListView)findViewById(R.id.eList_1);
-		refresh_button=(Button)findViewById(R.id.buttondl);
+		refresh_button=(Button)findViewById(R.id.list_button);
 		
 //		elv_1.setSelector(R.color.list_selector);
 		refresh_button.setEnabled(false);
 		
-		global_variables_object = (BlueRemote_global_variables)getApplicationContext();
+		global_variables_object = (BlueRemote)getApplicationContext();
 		
 		bt_discovery_status = new BroadcastReceiver() {
 	        
@@ -239,8 +242,8 @@ public class device_list_activity extends AppCompatActivity {
 	    			
 	    		if(group_child_list.get(groupPosition).get(childPosition).get("group_child_item").isDiscovered == true)
 	    		{	    			
-	    			close_intent.putExtra("BT_device_selected",((BT_spp)group_child_list.get(groupPosition).get(childPosition).get("group_child_item")));
-	    			close_intent.putExtra("closeApp", false);
+	    			close_intent.putExtra(new_bt_device_extra_name,((BT_spp)group_child_list.get(groupPosition).get(childPosition).get("group_child_item")));
+	    			close_intent.putExtra(new_bt_device_selected_extra_name, true);
 	    			setResult(RESULT_OK, close_intent);        
 	    			finish();
 	    		}
@@ -285,36 +288,20 @@ public class device_list_activity extends AppCompatActivity {
 		
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		
 		return false;
 	}
 
-//	@Override
-//	public boolean onOptionsItemSelected(MenuItem item) {
-//		// Handle action bar item clicks here. The action bar will
-//		// automatically handle clicks on the Home/Up button, so long
-//		// as you specify a parent activity in AndroidManifest.xml.
-//		int id = item.getItemId();
-//		if (id == R.id.action_settings) {
-//			return true;
-//		}
-//		
-//		return super.onOptionsItemSelected(item);
-//	}
-	
 	private void quit()
 	{
 		if(quit_warning==false)
 		{
 			quit_warning=true;
 			
-			Toast.makeText(getApplicationContext(),"Press Again To Quit.",Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(),"Press Again To Go Back.",Toast.LENGTH_SHORT).show();
 		}
 		else
 		{
-			close_intent.putExtra("closeApp", true);
+			close_intent.putExtra(new_bt_device_selected_extra_name, false);
 			setResult(RESULT_OK, close_intent);        
 			finish();
 		}
@@ -326,7 +313,6 @@ public class device_list_activity extends AppCompatActivity {
 //		Log.e("SupportNavigateUp","I Was Pressed.");
 		
 		this.quit();
-		
 		return true;
 	}
 	
@@ -341,14 +327,24 @@ public class device_list_activity extends AppCompatActivity {
 	@Override
 	protected void onDestroy ()
 	{
-		super.onDestroy();
+		Thread closing_thread=new Thread(){
+			
+			public void run()
+			{
+				Log.w("","isDiscovering()"+global_variables_object.getBtAdapter().isDiscovering());
+				if(global_variables_object.getBtAdapter().isDiscovering())
+				{
+					Log.w(BLUETOOTH_SERVICE,"BT Discovery Cancelled:"+global_variables_object.getBtAdapter().cancelDiscovery());
+				}
+			}
+		};
 		
-		if(global_variables_object.getBtAdapter().isDiscovering())
-		{
-			Log.d(BLUETOOTH_SERVICE,"BT Discovery Cancelled:"+global_variables_object.getBtAdapter().cancelDiscovery());
-		}
+		closing_thread.start();
+		
+		super.onDestroy();
 		
 		//unregister receivers
 		unregisterReceiver(bt_discovery_status);
+				
 	}	
 }

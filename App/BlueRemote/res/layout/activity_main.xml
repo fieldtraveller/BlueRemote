@@ -22,7 +22,7 @@
        android:textColor="#FFFFFF" />
         
     <EditText
-        android:id="@+id/editText1"
+        android:id="@+id/editText1_preferences"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/button5"
@@ -41,8 +41,8 @@
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/editText1"
-        android:layout_alignBottom="@+id/editText1"
+        android:layout_alignBaseline="@+id/editText1_preferences"
+        android:layout_alignBottom="@+id/editText1_preferences"
         android:layout_alignLeft="@+id/button4"
         android:layout_alignRight="@+id/button4"
         android:text="@string/send" />

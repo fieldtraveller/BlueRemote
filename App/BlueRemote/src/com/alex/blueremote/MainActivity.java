@@ -1,17 +1,11 @@
 package com.alex.blueremote;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
+//import java.nio.charset.Charset;
+import java.util.ArrayList;
 
-import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-//import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
@@ -27,25 +21,22 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 	
-	BlueRemote_global_variables global_variables_object;
+	BlueRemote global_variables_object;
 	
-	final int BT_turn_on_request_code=2;
-	final int BT_device_list_activity_request_code=3;
+	final int new_device_list_activity_request_code=3;
 	final int hexboard_activity_request_code=4;
-	
-	BroadcastReceiver bt_device_connection_status;
 	
 //	String BT_mac_address="20:13:05:27:09:64";	//ALEXBT
 //	String BT_mac_address="98:D3:31:80:18:29";	//BURZO
 	
-	BT_spp BT_serial_device;
-	boolean BT_discovered_device_available=false;
+	boolean new_BT_device_available=false;
 	boolean in_program_mode=false;
 	
-	EditText data_input;
-	TextView tv;
+	EditText et_1;
+	TextView tv_1;
 	
-	saved_data data_from_file;
+	file_data data_from_file;
+	boolean file_data_changed=false;
 	
 	Button send;
 	bluetooth_button_data button_data[]=new bluetooth_button_data[5];
@@ -54,12 +45,11 @@ public class MainActivity extends AppCompatActivity {
 	bluetooth_switch_data switch_data[]=new bluetooth_switch_data[2];
 	bluetooth_switch switchs[]=new bluetooth_switch[2]; 
 	
-	boolean is_menu_item_enabled[]={true,true};
-	
 	Handler hex_board_handler;
 	Runnable hex_board_runnable;
 	
-	String filename="preferences.br";
+	final String filename="preferences.br";
+	final int program_mode_menu_option_position=3;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,12 +58,16 @@ public class MainActivity extends AppCompatActivity {
 		
 		if(file_operations.file_exists(getApplicationContext(),filename))
 		{
-			Log.e("Where?", "YEs FILE");
+			Log.e("Where?", "Yes FILE");
 
-			data_from_file=(saved_data)file_operations.read_from_file(getApplicationContext(), filename);
+			data_from_file=(file_data)file_operations.read_from_file(getApplicationContext(), filename);
 			
 			button_data=data_from_file.getButton_data();
 			switch_data=data_from_file.getSwitch_data();
+			
+			bluetooth_button.setButton_delay(data_from_file.getButton_repetition_period());
+			HexBoard.setHex_board_call_delay(data_from_file.get_hex_board_call_time_out_factor());
+			HexBoard.setHex_board_backspace_delay(data_from_file.get_hex_board_backspace_repetition_period());
 		}
 		else
 		{
@@ -88,27 +82,35 @@ public class MainActivity extends AppCompatActivity {
 			switch_data[0]=new bluetooth_switch_data(getResources().getString(R.string.power_switch),new byte[]{(byte)0xA1},new byte[]{(byte)0xA2},new byte[]{(byte)0xA3});
 			switch_data[1]=new bluetooth_switch_data(getResources().getString(R.string.mute_switch),new byte[]{(byte) 0xB1},new byte[]{(byte)0xB2},new byte[]{(byte)0xB3});
 			
-			data_from_file=new saved_data(button_data,switch_data);
-			file_operations.save_to_file(getApplicationContext(), filename,data_from_file);
+			bluetooth_button.setButton_delay(200);
+			HexBoard.setHex_board_call_delay(3);
+			HexBoard.setHex_board_backspace_delay(200);
+			
+			data_from_file=new file_data(button_data,switch_data,
+					bluetooth_button.getButton_delay(),HexBoard.getHex_board_call_delay_factor(),HexBoard.getHex_board_backspace_delay());
+			
+			file_data_changed=true;
+//			file_operations.save_to_file(getApplicationContext(), filename,data_from_file);
 		}
 		
 		//channel_up
-		buttons[0]=new bluetooth_button(this, BT_serial_device, (Button)findViewById(R.id.button1),button_data[0]);
+		buttons[0]=new bluetooth_button(this, null, (Button)findViewById(R.id.button1),button_data[0]);
 		//channel_down
-		buttons[1]=new bluetooth_button(this, BT_serial_device, (Button)findViewById(R.id.button5),button_data[1]);
+		buttons[1]=new bluetooth_button(this, null, (Button)findViewById(R.id.button5),button_data[1]);
 		//volume_up
-		buttons[2]=new bluetooth_button(this, BT_serial_device, (Button)findViewById(R.id.button4),button_data[2]);
+		buttons[2]=new bluetooth_button(this, null, (Button)findViewById(R.id.button4),button_data[2]);
 		//volume_down
-		buttons[3]=new bluetooth_button(this, BT_serial_device, (Button)findViewById(R.id.button2),button_data[3]);
+		buttons[3]=new bluetooth_button(this, null, (Button)findViewById(R.id.button2),button_data[3]);
 		//select
-		buttons[4]=new bluetooth_button(this, BT_serial_device, (Button)findViewById(R.id.button3),button_data[4]);
+		buttons[4]=new bluetooth_button(this, null, (Button)findViewById(R.id.button3),button_data[4]);
 		
 		//power
-		switchs[0]=new bluetooth_switch(this, BT_serial_device, (Switch)findViewById(R.id.switch1),switch_data[0]);
+		switchs[0]=new bluetooth_switch(this, null, (Switch)findViewById(R.id.switch1),switch_data[0]);
 		//mute
-		switchs[1]=new bluetooth_switch(this, BT_serial_device, (Switch)findViewById(R.id.switch2),switch_data[1]);
-		
-		Intent programming_activity_intent = new Intent(this,programming_activity.class);
+		switchs[1]=new bluetooth_switch(this, null, (Switch)findViewById(R.id.switch2),switch_data[1]);
+															 
+//		Intent programming_activity_intent = new Intent(this,programming_activity.class);
+		Intent programming_activity_intent = new Intent(".programming_activity");
 		
 		for(int count=0;count<buttons.length;count++)
 		{
@@ -121,13 +123,17 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 		send=(Button)findViewById(R.id.button6);
-		data_input=(EditText)findViewById(R.id.editText1);
-		tv=(TextView)findViewById(R.id.textView1);
+		et_1=(EditText)findViewById(R.id.editText1_preferences);
+		tv_1=(TextView)findViewById(R.id.textView1);
 		
-		tv.setVisibility(View.GONE);
+		tv_1.setVisibility(View.GONE);
 		
 		hex_board_handler=new Handler();
-		global_variables_object = (BlueRemote_global_variables)getApplicationContext();
+		
+		global_variables_object = (BlueRemote)getApplicationContext();
+		global_variables_object.setConnected_device_list(new ArrayList<BT_spp>());
+		
+		BT_spp.ui_handler=new Handler();
 		
 		switchs[0].setSet_task_on_switch_off(new set_task(){
 
@@ -138,40 +144,14 @@ public class MainActivity extends AppCompatActivity {
 			}
 		});
 		
-	    bt_device_connection_status=new BroadcastReceiver() {
-	        
-	    	@Override
-	        public void onReceive(Context context, Intent intent) {
-	            
-	    		String action = intent.getAction();
-	            
-	    		if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) 
-	    		{
-	    			Log.e(BLUETOOTH_SERVICE, "BT Device Connected");
-	            }
-	            else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) 
-	            {
-	            	Log.e(BLUETOOTH_SERVICE, "BT Device about to Disconnect");
-	            }
-	            else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) 
-	            {
-	            	Log.e(BLUETOOTH_SERVICE, "BT Device Disconnected");
-	            }           
-	        }
-	    };
-	    
-	    registerReceiver(bt_device_connection_status,new IntentFilter(android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECTED));
-	    registerReceiver(bt_device_connection_status,new IntentFilter(android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED));
-	    registerReceiver(bt_device_connection_status,new IntentFilter(android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED));   
-
-	    send.setOnClickListener(new View.OnClickListener() {
-	    	
-	    	@Override
-			public void onClick(View v) {
-	    		
-	    		BT_serial_device.write(data_input.getText().toString().getBytes(Charset.forName("ISO-8859-1")));
-	    	}
-		});
+//	    send.setOnClickListener(new View.OnClickListener() {
+//	    	
+//	    	@Override
+//			public void onClick(View v) {
+//	    		
+//	    		BT_serial_device.write(data_input.getText().toString().getBytes(Charset.forName("ISO-8859-1")));
+//	    	}
+//		});
 	    	    
 	    hex_board_runnable=new Runnable(){
 
@@ -179,12 +159,12 @@ public class MainActivity extends AppCompatActivity {
 			public void run() {
 				
 				Intent launch_hex_board= new Intent(MainActivity.this,HexBoard.class);
-				launch_hex_board.putExtra(HexBoard.initial_text, data_input.getText().toString());
+				launch_hex_board.putExtra(HexBoard.initial_text, et_1.getText().toString());
 			    startActivityForResult(launch_hex_board, hexboard_activity_request_code);
 			}			
 		};
 	    		
-	    data_input.setOnTouchListener(new OnTouchListener(){
+	    et_1.setOnTouchListener(new OnTouchListener(){
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -192,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
 				switch(event.getAction())
 				{
 					case MotionEvent.ACTION_DOWN:
-						hex_board_handler.postDelayed(hex_board_runnable,HexBoard.hex_board_call_delay);
+						hex_board_handler.postDelayed(hex_board_runnable,HexBoard.hex_board_call_time_out);
 						break;
 							
 					case MotionEvent.ACTION_UP:
@@ -210,36 +190,7 @@ public class MainActivity extends AppCompatActivity {
 	protected void onResume()
 	{
 		super.onResume();
-		Log.e("Where?", "OnResume");
-		
-		if((BT_discovered_device_available == true )&&(in_program_mode==false))
-		{
-			Log.e("Where?", "New BT Device");
-			if(BT_serial_device.BT_socket == null)
-			{
-				ProgressDialog progressDialog=ProgressDialog.show(MainActivity.this, "", "Connecting to Device...");
-			    
-			    try 
-			    {
-					BT_serial_device.connect();
-				}
-			    catch (IOException e) 
-			    {
-			    	Toast.makeText(getApplicationContext(), "Unable To Connect To Device.", Toast.LENGTH_LONG).show();
-				}
-			    
-			    progressDialog.cancel();
-			}	
-		}
-		else if(in_program_mode==true)
-		{
-			
-		}
-		else
-		{
-			Intent device_list= new Intent(this, device_list_activity.class);
-		    startActivityForResult(device_list, BT_device_list_activity_request_code);
-		}
+
 	}
 	
 	//*
@@ -248,49 +199,65 @@ public class MainActivity extends AppCompatActivity {
     {
 		super.onActivityResult(requestCode, resultCode, data);
 		
-		if(requestCode==BT_device_list_activity_request_code)
+		if(requestCode==new_device_list_activity_request_code)
 		{
-			if(data.getBooleanExtra("closeApp",false) == true)
+			if(data.getBooleanExtra(new_device_list_activity.new_bt_device_selected_extra_name,false))
 			{
-				this.finish();
-				Log.e("Quit", "Bye-Bye");
-			}
-			else
-			{
-				BT_serial_device=data.getParcelableExtra("BT_device_selected");
-				BT_discovered_device_available=true;
+				BT_spp BT_serial_device=data.getParcelableExtra(new_device_list_activity.new_bt_device_extra_name);
+				new_BT_device_available=true;
 				
 				for(int count=0;count<buttons.length;count++)
 				{
-					buttons[count].setBT_serial_device(BT_serial_device);
+					buttons[count].add_BT_serial_device(BT_serial_device);
 				}
 				
 				for(int count=0;count<switchs.length;count++)
 				{
-					switchs[count].setBT_serial_device(BT_serial_device);
-				}				
-			}	
+					switchs[count].add_BT_serial_device(BT_serial_device);
+				}
+				
+				global_variables_object.add_to_Connected_device_list(BT_serial_device);
+				
+				BT_serial_device.connect();
+			}
 		}
-		
-		if(requestCode==hexboard_activity_request_code)
+		else if(requestCode==hexboard_activity_request_code)
 		{
-			data_input.setText(data.getStringExtra(HexBoard.stringed_data));
-			data_input.setSelection(data_input.getText().length());
+			et_1.setText(data.getStringExtra(HexBoard.stringed_data));
+			et_1.setSelection(et_1.getText().length());
 		}
-		
-		for(int count=0;count<buttons.length;count++)
+		else if(requestCode==preferences_activity.preferences_activity_request_code)
 		{
-			buttons[count].update_button_onActivityResult(requestCode,resultCode,data);
+			int button_repetition_period=data.getIntExtra(preferences_activity.button_repetition_period_extra_name, 200);
+			int hex_board_call_time_out_factor=data.getIntExtra(preferences_activity.hex_board_call_time_out_factor_extra_name, 3);
+			int hex_board_backspace_repetition_period=data.getIntExtra(preferences_activity.hex_board_backspace_repetition_period_extra_name, 200);
+			
+			bluetooth_button.setButton_delay(button_repetition_period);
+			HexBoard.setHex_board_call_delay(hex_board_call_time_out_factor);
+			HexBoard.setHex_board_backspace_delay(hex_board_backspace_repetition_period);
+			
+			data_from_file.setButton_repetition_period(button_repetition_period);
+			data_from_file.set_hex_board_call_time_out_factor(hex_board_call_time_out_factor);
+			data_from_file.set_hex_board_backspace_repetition_period(hex_board_backspace_repetition_period);
+			file_data_changed=true;
 		}
-		
-		for(int count=0;count<switchs.length;count++)
+		else
 		{
-			switchs[count].update_switch_onActivityResult(requestCode,resultCode,data);
+			for(int count=0;count<buttons.length;count++)
+			{
+				buttons[count].update_button_onActivityResult(requestCode,resultCode,data);
+			}
+			
+			for(int count=0;count<switchs.length;count++)
+			{
+				switchs[count].update_switch_onActivityResult(requestCode,resultCode,data);
+			}
 		}
     }  
 	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu) 
+	{
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
@@ -298,18 +265,29 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		
-		for(int count=0;count<is_menu_item_enabled.length;count++)
+		for(int count=0;count<menu.size();count++)
 		{
-			menu.getItem(count).setEnabled(is_menu_item_enabled[count]);
+			if(in_program_mode==true)
+			{
+				if(count!=program_mode_menu_option_position)
+				{
+					menu.getItem(count).setEnabled(false);
+				}
+			}
+			else
+			{
+				menu.getItem(count).setEnabled(true);
+			}
+			
 		}
 		
 		if(in_program_mode==true)
 		{
-			menu.getItem(1).setTitle(R.string.normal_mode);
+			menu.getItem(program_mode_menu_option_position).setTitle(R.string.normal_mode);
 		}
 		else
 		{
-			menu.getItem(1).setTitle(R.string.program_mode);
+			menu.getItem(program_mode_menu_option_position).setTitle(R.string.program_mode);
 		}
 		
 		return true;
@@ -323,31 +301,33 @@ public class MainActivity extends AppCompatActivity {
 		switch(id)
 		{
 			case R.id.menu_item_1:
+				Intent device_list= new Intent(this, new_device_list_activity.class);
+			    startActivityForResult(device_list, new_device_list_activity_request_code);
 				return true;
-				
-			case R.id.menu_item_1_1:
-				return true;
-				
-			case R.id.menu_item_1_2:
-				return true;
-				
+			
 			case R.id.menu_item_2:
+				return true;
+				
+			case R.id.menu_item_3:
+				return true;
+			
+			case R.id.menu_item_4:
 				
 				if(in_program_mode==true)
 				{
-					file_operations.save_to_file(getApplicationContext(), filename,data_from_file);
+					file_data_changed=true;
+//					file_operations.save_to_file(getApplicationContext(), filename,data_from_file);
 
-					is_menu_item_enabled[0]=true;
 					invalidateOptionsMenu();
 					
 //					item.setTitle(R.string.program_mode);
 					in_program_mode=false;
 					
-					tv.setVisibility(View.GONE);
+					tv_1.setVisibility(View.GONE);
 					send.setVisibility(View.VISIBLE);
 					send.invalidate();
-					data_input.setVisibility(View.VISIBLE);
-					data_input.invalidate();
+					et_1.setVisibility(View.VISIBLE);
+					et_1.invalidate();
 					
 					for(int count=0;count<buttons.length;count++)
 					{
@@ -361,17 +341,16 @@ public class MainActivity extends AppCompatActivity {
 				}
 				else
 				{
-					is_menu_item_enabled[0]=false;
 					invalidateOptionsMenu();
 					
 //					item.setTitle(R.string.normal_mode);
 					in_program_mode=true;
 					
-					tv.setVisibility(View.VISIBLE);
+					tv_1.setVisibility(View.VISIBLE);
 					send.setVisibility(View.GONE);
 					send.invalidate();
-					data_input.setVisibility(View.GONE);
-					data_input.invalidate();
+					et_1.setVisibility(View.GONE);
+					et_1.invalidate();
 					
 					for(int count=0;count<buttons.length;count++)
 					{
@@ -384,6 +363,14 @@ public class MainActivity extends AppCompatActivity {
 					}					
 				}
 				
+				return true;
+				
+			case R.id.menu_item_5:
+				Intent preferences_intent=new Intent(this,preferences_activity.class);
+				preferences_intent.putExtra(preferences_activity.button_repetition_period_extra_name,bluetooth_button.getButton_delay());
+				preferences_intent.putExtra(preferences_activity.hex_board_call_time_out_factor_extra_name,HexBoard.getHex_board_call_delay_factor());
+				preferences_intent.putExtra(preferences_activity.hex_board_backspace_repetition_period_extra_name,HexBoard.getHex_board_backspace_delay());
+				startActivityForResult(preferences_intent, preferences_activity.preferences_activity_request_code);
 				return true;
 				
 			default:
@@ -409,21 +396,47 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onDestroy ()
 	{
-		super.onDestroy();
-	    
-		if(BT_discovered_device_available == true )
-		{
-			BT_serial_device.disconnect();
-		}
+//		if(new_BT_device_available == true )
+//		{
+//			BT_serial_device.disconnect();
+//		}
 		
-		unregisterReceiver(bt_device_connection_status);
-		
-		//Direct Turn Off BT by App 
-		if (global_variables_object.getBtAdapter().isEnabled()) 
-		{
-			global_variables_object.getBtAdapter().disable();
-		}
+		Thread app_closing_thread=new Thread(){
 			
-		Log.d(BLUETOOTH_SERVICE, "Bluetooth turned Off.");
+			public void run()
+			{
+				int number_of_connected_devices=global_variables_object.getConnected_device_list().size();
+				
+				for(int count=0;count<number_of_connected_devices;count++)
+				{
+					global_variables_object.getConnected_device(count).disconnect();	
+				}
+				
+				//Direct Turn Off BT by App 
+				if (global_variables_object.getBtAdapter().isEnabled()) 
+				{
+					global_variables_object.getBtAdapter().disable();
+				}
+					
+				Log.d(BLUETOOTH_SERVICE, "Bluetooth turned Off.");
+			}
+		};
+		
+		app_closing_thread.start();
+		
+		if(file_data_changed==true)
+		{
+			Thread data_saving_thread=new Thread(){
+				
+				public void run()
+				{
+					file_operations.save_to_file(getApplicationContext(), filename,data_from_file);
+				}
+			};
+			
+			data_saving_thread.start();
+		}
+		
+		super.onDestroy();
 	}
 }
