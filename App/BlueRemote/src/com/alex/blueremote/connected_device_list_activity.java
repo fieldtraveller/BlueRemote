@@ -25,11 +25,11 @@ public class connected_device_list_activity extends AppCompatActivity {
 	Intent close_intent=new Intent();
 	
 	public final static int connected_device_list_request_code=8461;
-	public static final String selected_devices_list_extra_name="SELECTED_DEVICES_LIST";
+	public static final String selected_devices_list_indices_extra_name="SELECTED_DEVICES_LIST_INDICES";
 	
 	ArrayList<BT_spp> connected_device_list;
+	ArrayList<Integer> selected_devices_list_indices;
 	
-	ArrayList<BT_spp> selected_devices_list;
 	String cb_text[];
 	boolean selected_status[];
 	
@@ -42,11 +42,13 @@ public class connected_device_list_activity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.connected_device_list_activity_layout);
 		
-		lv = (ListView) findViewById(R.id.list_1);
-		ok_b = (Button) findViewById(R.id.list_button);
+		setFinishOnTouchOutside(false);
+		
+		lv = (ListView) findViewById(R.id.list_cdla);
+		ok_b = (Button) findViewById(R.id.button_cdla);
 		
 		connected_device_list=((BlueRemote)getApplicationContext()).getConnected_device_list();
-		selected_devices_list=getIntent().getParcelableArrayListExtra(connected_device_list_activity.selected_devices_list_extra_name);
+		selected_devices_list_indices=getIntent().getIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name);
 		
 		Thread getting_cb_state_thread=new Thread(){
 			
@@ -56,9 +58,10 @@ public class connected_device_list_activity extends AppCompatActivity {
 				
 				selected_status[0]=false;
 				
-				for(int count=1;count<selected_status.length;count++)
+				int number_of_iterations=selected_devices_list_indices.size();
+				for(int count=0;count<number_of_iterations;count++)
 				{
-					selected_status[count]=selected_devices_list.contains(connected_device_list.get(count-1));
+					selected_status[selected_devices_list_indices.get(count).intValue()+1]=true;
 				}
 			}
 		};
@@ -80,12 +83,14 @@ public class connected_device_list_activity extends AppCompatActivity {
 		};
 		getting_cb_text_thread.start();
 		
-		lv_adapter = new ArrayAdapter<String>(this,R.layout.lv_checkbox,R.id.lv_checkBox1,cb_text){
+		lv_adapter = new ArrayAdapter<String>(this,R.layout.lv_checkbox,R.id.checkBox1_cdla,cb_text){
 			
 			  @Override
 			  public View getView(final int position, View convertView, ViewGroup parent) 
 			  {
-				  CheckBox cb = (CheckBox)super.getView(position, convertView, parent);
+				  View v = (View)super.getView(position, convertView, parent);
+
+				  CheckBox cb=(CheckBox)v.findViewById(R.id.checkBox1_cdla);
 				  
 				  cb.setOnCheckedChangeListener(null);
 				  
@@ -100,7 +105,7 @@ public class connected_device_list_activity extends AppCompatActivity {
 				  
 				  cb.setOnCheckedChangeListener(cb_OnCheckedChangeListener);
 				  
-				  return cb;
+				  return v;
 			  }
 		};
 		
@@ -137,27 +142,19 @@ public class connected_device_list_activity extends AppCompatActivity {
 			@Override
 			public void onClick(View v) 
 			{
-				selected_devices_list=null;
+				selected_devices_list_indices=null;
+				selected_devices_list_indices=new ArrayList<Integer>();
 				
-				if(selected_status[0]==true)
+				int size=lv_adapter.getCount();
+				for(int count=1;count<size;count++)
 				{
-					selected_devices_list=connected_device_list;
-				}
-				else
-				{
-					selected_devices_list=new ArrayList<BT_spp>();
-					int size=lv_adapter.getCount();
-					
-					for(int count=1;count<size;count++)
+					if(selected_status[count]==true)
 					{
-						if(selected_status[count]==true)
-						{
-							selected_devices_list.add(connected_device_list.get(count-1));
-						}
+						selected_devices_list_indices.add(count-1);
 					}
 				}
 				
-				close_intent.putParcelableArrayListExtra(connected_device_list_activity.selected_devices_list_extra_name,selected_devices_list);
+				close_intent.putIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name,selected_devices_list_indices);
 				setResult(RESULT_OK, close_intent);        
 				finish();
 			}

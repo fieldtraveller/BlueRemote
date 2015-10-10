@@ -6,6 +6,8 @@ import java.util.TimerTask;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.v4.app.Fragment;
+import android.util.Log;
 //import android.os.Parcelable;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,7 +16,7 @@ import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.Button;
 
-public class bluetooth_button implements OnClickListener,OnTouchListener,OnLongClickListener
+public class bluetooth_button<T> implements OnClickListener,OnTouchListener,OnLongClickListener
 {
 	ArrayList<BT_spp> BT_serial_devices;
 	Button button;
@@ -25,7 +27,7 @@ public class bluetooth_button implements OnClickListener,OnTouchListener,OnLongC
 	
 	Intent programming_activity_intent;
 	int programming_activity_request_code;
-	Activity calling_activity;
+	T calling_activity_or_fragment;
 	
 	TimerTask button_task;
 	Timer button_timer;
@@ -42,11 +44,16 @@ public class bluetooth_button implements OnClickListener,OnTouchListener,OnLongC
 	
 	public static final String input_type_button="BUTTON";
 	
-	public bluetooth_button(Activity calling_activity,ArrayList<BT_spp> BT_serial_devices,Button button) 
+	public bluetooth_button()
+	{
+		
+	}
+	
+	public bluetooth_button(T calling_activity_or_fragment,ArrayList<BT_spp> BT_serial_devices,Button button) 
 	{
 		super();
 		
-		this.calling_activity=calling_activity;
+		this.calling_activity_or_fragment=calling_activity_or_fragment;
 		
 		if(BT_serial_devices==null)
 		{
@@ -64,11 +71,11 @@ public class bluetooth_button implements OnClickListener,OnTouchListener,OnLongC
 		this.button.setOnLongClickListener(this);
 	}
 		
-	public bluetooth_button(Activity calling_activity,ArrayList<BT_spp> BT_serial_devices,Button button,bluetooth_button_data button_data) 
+	public bluetooth_button(T calling_activity_or_fragment,ArrayList<BT_spp> BT_serial_devices,Button button,bluetooth_button_data button_data) 
 	{
 		super();
 		
-		this.calling_activity=calling_activity;
+		this.calling_activity_or_fragment=calling_activity_or_fragment;
 		
 		if(BT_serial_devices==null)
 		{
@@ -90,14 +97,14 @@ public class bluetooth_button implements OnClickListener,OnTouchListener,OnLongC
 		this.button.setOnLongClickListener(this);
 	}
 
-	public Activity getCalling_activity() 
+	public T getCalling_activity_or_fragment() 
 	{
-		return calling_activity;
+		return calling_activity_or_fragment;
 	}
 
-	public void setCalling_activity(Activity calling_activity) 
+	public void setCalling_activity_or_fragment(T calling_activity_or_fragment) 
 	{
-		this.calling_activity = calling_activity;
+		this.calling_activity_or_fragment = calling_activity_or_fragment;
 	}
 
 	public ArrayList<BT_spp> getBT_serial_devices() 
@@ -223,7 +230,7 @@ public class bluetooth_button implements OnClickListener,OnTouchListener,OnLongC
 						
 						do_task(this.set_task_on_button_up);
 						v.performClick();
-						break;							
+						break;
 				}
 				
 				return true;
@@ -231,7 +238,7 @@ public class bluetooth_button implements OnClickListener,OnTouchListener,OnLongC
 		}
 	}
 
-	private void button_pressed_response(boolean start_or_stop)
+	void button_pressed_response(boolean start_or_stop)
 	{
 		if(start_or_stop==true)
 		{
@@ -288,9 +295,28 @@ public class bluetooth_button implements OnClickListener,OnTouchListener,OnLongC
 			
 			this.programming_activity_intent.putExtra(bluetooth_button_data.respond_on_continuous_touch_extra_name,this.getButton_data().isRespond_on_continuous_touch());
 			
-			this.programming_activity_intent.putParcelableArrayListExtra(connected_device_list_activity.selected_devices_list_extra_name,this.getBT_serial_devices());
-						
-			calling_activity.startActivityForResult(this.programming_activity_intent,this.programming_activity_request_code);
+			if(calling_activity_or_fragment instanceof Activity)
+			{
+				this.programming_activity_intent.putIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name,BT_spp.get_indices(
+						((BlueRemote)((Activity) calling_activity_or_fragment).getApplicationContext())
+						.getConnected_device_list(), this.getBT_serial_devices()));
+				
+				((Activity)calling_activity_or_fragment).startActivityForResult(this.programming_activity_intent,this.programming_activity_request_code);
+			}
+			else if(calling_activity_or_fragment instanceof Fragment)
+			{
+				this.programming_activity_intent.putIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name,BT_spp.get_indices(
+						((BlueRemote)(((Fragment)calling_activity_or_fragment).getActivity()).getApplicationContext())
+						.getConnected_device_list(), this.getBT_serial_devices())
+						);
+				
+//				Log.e("","get_indices:"+BT_spp.get_indices(
+//						((BlueRemote)(((Fragment)calling_activity_or_fragment).getActivity()).getApplicationContext())
+//							.getConnected_device_list(), this.getBT_serial_devices())
+//							);
+				((Fragment)calling_activity_or_fragment).startActivityForResult(this.programming_activity_intent,this.programming_activity_request_code);
+			}
+			
 			return true;
 		}
 		else
@@ -312,7 +338,23 @@ public class bluetooth_button implements OnClickListener,OnTouchListener,OnLongC
 			
 			this.button_data.setRespond_on_continuous_touch(data.getBooleanExtra(bluetooth_button_data.respond_on_continuous_touch_extra_name,false));
 			
-			this.BT_serial_devices=data.getParcelableArrayListExtra(connected_device_list_activity.selected_devices_list_extra_name);
+//			this.BT_serial_devices=data.getParcelableArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name);
+			
+			if(calling_activity_or_fragment instanceof Activity)
+			{
+				BT_spp.update_list_based_on_indices(
+						((BlueRemote)((Activity) calling_activity_or_fragment).getApplicationContext())
+						.getConnected_device_list(), this.getBT_serial_devices()
+						,data.getIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name));
+			}
+			else if(calling_activity_or_fragment instanceof Fragment)
+			{
+				BT_spp.update_list_based_on_indices(
+						((BlueRemote)(((Fragment)calling_activity_or_fragment).getActivity()).getApplicationContext())
+						.getConnected_device_list(), this.getBT_serial_devices()
+						,data.getIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name));
+			}
+			
 		}
 	}
 	

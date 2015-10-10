@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 //import android.util.Log;
 import android.view.Menu;
 import android.view.MotionEvent;
@@ -42,20 +43,20 @@ public class programming_activity extends AppCompatActivity implements OnTouchLi
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.programming_activity_layout);
 		
-		tv[0]=(TextView)findViewById(R.id.textView_bpa_1);
-		tv[1]=(TextView)findViewById(R.id.textView_bpa_2);
-		tv[2]=(TextView)findViewById(R.id.textView_bpa_3);
-		tv[3]=(TextView)findViewById(R.id.textView_bpa_4);
+		tv[0]=(TextView)findViewById(R.id.textView_1_pa);
+		tv[1]=(TextView)findViewById(R.id.textView_2_pa);
+		tv[2]=(TextView)findViewById(R.id.textView_3_pa);
+		tv[3]=(TextView)findViewById(R.id.textView_4_pa);
 		
-		et[0]=(EditText)findViewById(R.id.editText_bpa_1);
-		et[1]=(EditText)findViewById(R.id.editText_bpa_2);
-		et[2]=(EditText)findViewById(R.id.editText_bpa_3);
-		et[3]=(EditText)findViewById(R.id.editText_bpa_4);
+		et[0]=(EditText)findViewById(R.id.editText_1_pa);
+		et[1]=(EditText)findViewById(R.id.editText_2_pa);
+		et[2]=(EditText)findViewById(R.id.editText_3_pa);
+		et[3]=(EditText)findViewById(R.id.editText_4_pa);
 		
-		cb=(CheckBox)findViewById(R.id.checkBox_bpa_1);
+		cb=(CheckBox)findViewById(R.id.checkBox_1_pa);
 		
-		ok_button=(Button)findViewById(R.id.button_bpa_1);
-		select_devices_button=(Button)findViewById(R.id.button_bpa_2);
+		ok_button=(Button)findViewById(R.id.button_1_pa);
+		select_devices_button=(Button)findViewById(R.id.button_2_pa);
 		
 		hex_board_handler=new Handler();
 		
@@ -152,8 +153,8 @@ public class programming_activity extends AppCompatActivity implements OnTouchLi
 				
 				Intent connected_device_list= new Intent(programming_activity.this, connected_device_list_activity.class);
 				
-				connected_device_list.putParcelableArrayListExtra(connected_device_list_activity.selected_devices_list_extra_name,
-						getIntent().getParcelableArrayListExtra(connected_device_list_activity.selected_devices_list_extra_name));
+				connected_device_list.putIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name,
+						getIntent().getIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name));
 				
 				startActivityForResult(connected_device_list, connected_device_list_activity.connected_device_list_request_code);
 			}
@@ -198,8 +199,8 @@ public class programming_activity extends AppCompatActivity implements OnTouchLi
 		}
 		else if(requestCode==connected_device_list_activity.connected_device_list_request_code)
 		{
-			close_intent.putParcelableArrayListExtra(connected_device_list_activity.selected_devices_list_extra_name,
-					data.getParcelableArrayListExtra(connected_device_list_activity.selected_devices_list_extra_name));
+			close_intent.putIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name,
+					data.getIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name));
 		}
 	}  
 	
@@ -324,7 +325,14 @@ public class programming_activity extends AppCompatActivity implements OnTouchLi
 			
 			close_intent.putExtra(bluetooth_button_data.respond_on_continuous_touch_extra_name,cb.isChecked());
 		}
-
+		
+		if(close_intent.hasExtra(connected_device_list_activity.selected_devices_list_indices_extra_name)==false)
+		{
+			close_intent.putIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name,
+					getIntent().getIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name));
+		}
+		
+		
 		setResult(RESULT_OK, close_intent);        
 		finish();
 	}

@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
@@ -58,8 +59,11 @@ public class new_device_list_activity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.new_device_list_activity_layout);
 		
-		elv_1=(ExpandableListView)findViewById(R.id.eList_1);
-		refresh_button=(Button)findViewById(R.id.list_button);
+		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+		setFinishOnTouchOutside(false);
+		
+		elv_1=(ExpandableListView)findViewById(R.id.list_ndla);
+		refresh_button=(Button)findViewById(R.id.button_ndla);
 		
 //		elv_1.setSelector(R.color.list_selector);
 		refresh_button.setEnabled(false);

@@ -3,6 +3,7 @@ package com.alex.blueremote;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import android.bluetooth.BluetoothAdapter;
@@ -19,6 +20,10 @@ public class BT_spp implements Parcelable
 	BluetoothDevice BT_Device;
 	boolean isDiscovered=false;
 	
+	device_connection_status_interface dcsi;
+	device_write_interface dwi;
+	device_read_interface dri;
+	
 	//SPP UUID
     final static UUID BT_spp_uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
    
@@ -27,7 +32,9 @@ public class BT_spp implements Parcelable
     InputStream BT_inputStream;
     
     static Handler ui_handler;
-		
+	
+    int number_of_components_using_this_object=0;
+    
     BT_spp(BluetoothDevice BT_Device,boolean isDiscovered)
 	{
 		this.BT_Device=BT_Device;
@@ -63,73 +70,179 @@ public class BT_spp implements Parcelable
     	    		{
 //    					e.printStackTrace();
     				}
-    	    		
-    	    		if(BT_socket!=null)
-    	        	{
-//    	            	Log.d("Bluetooth","Socket Created.");
-    	    			
-    	    			if(BT_socket.isConnected()==false)
-    	    			{
-    	    				try 
-    	    				{
-    	    					BT_socket.connect();
-    	    					
-//    	        		    	Log.d("Bluetooth","isConnected():"+BT_socket.isConnected());
-    	    					
-    	    					try 
-    	        			    {
-    	        		    		BT_outputStream = BT_socket.getOutputStream();
-    	        		    		BT_inputStream = BT_socket.getInputStream();
-    	        				}
-    	        			    catch (IOException e) 
-    	        			    {
-    	        					e.printStackTrace();
-    	        				}
-    	    				} 
-    	    				catch (IOException e1) 
-    	    				{
-//    	    					e1.printStackTrace();
-    	    				}
-    	    			}
-    	        	}
-    	            else
-    	            {
-//    	            	Log.d("Bluetooth","Socket:Null.");
-    	            }
-    	    		
-    	    		if(BT_spp.ui_handler!=null)
-    	    		{
-    	    			if((BT_socket==null)||(BT_socket.isConnected()==false))
-        	        	{
-        	          	    ui_handler.post(new Runnable(){
-
-    							@Override
-    							public void run() {
-    								Toast.makeText(BlueRemote.getContext(), "Unable To Connect To Device.", Toast.LENGTH_LONG).show();
-    							}
-        	        			
-        	        		});
-        	        	}
-        	        	else
-        	        	{
-        	          	    ui_handler.post(new Runnable(){
-
-    							@Override
-    							public void run() {
-    								Toast.makeText(BlueRemote.getContext(), "Device Connected", Toast.LENGTH_SHORT).show();
-    							}
-        	        			
-        	        		});
-        	        	}
-    	    		}
     			}
+    	    	
+    	    	if(BT_socket!=null)
+    	        {
+//    	           	Log.d("Bluetooth","Socket Created.");
+    	    			
+    	    		if(BT_socket.isConnected()==false)
+    	    		{
+    	    			try 
+    	    			{
+    	    				BT_socket.connect();
+    	    				
+//    	        	    	Log.d("Bluetooth","isConnected():"+BT_socket.isConnected());
+    	    			} 
+    	    			catch (IOException e1) 
+    	    			{
+//    	    				e1.printStackTrace();
+    	    			}
+    	    		}
+    	        }
+    	        else
+    	        {
+//    	           	Log.d("Bluetooth","Socket:Null.");
+    	        }
+    	    	
+    	    	if(BT_socket.isConnected()==true)
+    	    	{
+    	    		if(BT_outputStream==null)
+    	    		{
+    	    			try 
+            		    {
+    	    				BT_outputStream = BT_socket.getOutputStream();
+            			}
+            		    catch (IOException e) 
+            		    {
+            				e.printStackTrace();
+            			}
+    	    		}
+    	    		
+    	    		if(BT_inputStream==null)
+    	    		{
+    	    			try 
+            		    {
+            	    		BT_inputStream = BT_socket.getInputStream();
+            			}
+            		    catch (IOException e) 
+            		    {
+            				e.printStackTrace();
+            			}
+    	    		}
+    	    	}
+    	    	
+       	    	if(BT_spp.ui_handler!=null)
+   	    		{
+   	    			if((BT_socket==null)||(BT_socket.isConnected()==false))
+       	        	{
+   	    				dcsi.on_device_connection_fail();
+   	    				
+   	    				ui_handler.post(new Runnable(){
+    	
+       	          	    	@Override
+    						public void run() {
+    							Toast.makeText(BlueRemote.getContext(), "Unable To Connect To Device.", Toast.LENGTH_LONG).show();
+    						}
+        	        			
+        	        	});
+        	        }
+        	       	else
+        	       	{
+        	       		dcsi.on_device_connection_pass();
+        	       		
+        	       		Thread device_input_reader_thread=new Thread(){
+   	    					
+   	    					public void run()
+   	    					{
+   	    						try 
+	    						{
+   	    							while(BT_socket.isConnected())
+   	   	    						{
+   	   	    							if(BT_inputStream.available()>0)
+   										{
+   											read(new byte[1024]);
+   										}
+   										else
+   										{
+   											Thread.sleep(100);
+   										}
+   	   	    						}
+	    						}
+   	    						catch (IOException e) 
+  	    						{
+									e.printStackTrace();
+								} 
+  	    						catch (InterruptedException e) 
+  	    						{
+									e.printStackTrace();
+								}
+   	    					}
+   	    				};
+   	    				
+//   	    				device_input_reader_thread.start();
+   	    				
+        	       		ui_handler.post(new Runnable(){
+
+        	       	    	@Override
+    						public void run() {
+        	       	    		Toast.makeText(BlueRemote.getContext(), "Device Connected", Toast.LENGTH_SHORT).show();
+    						}
+        	        			
+        	      		});
+        	       	}
+    	   		}
     		}
     	};
     	
     	Connect_thread.start();
     }
     
-    public void write(int input)
+    public byte read()
+    {
+    	byte return_value = 0;
+    	try 
+    	{
+    		return_value=(byte) this.BT_inputStream.read();
+		}
+    	catch (IOException e) 
+    	{
+			e.printStackTrace();
+		}
+    	
+    	dri.on_device_read();
+    	dri.on_device_read(this.BT_Device.getName()+"<:",return_value,"");
+    	
+		return return_value;
+    }
+    
+    public int read(byte[] buffer)
+    {
+    	int return_value=0;
+    	try 
+    	{
+    		return_value=this.BT_inputStream.read(buffer);
+		}
+    	catch (IOException e) 
+    	{
+			e.printStackTrace();
+		}
+		
+    	dri.on_device_read();
+    	dri.on_device_read(this.BT_Device.getName()+"<:",buffer,return_value,"");
+    	
+    	return return_value;
+    }
+    
+    public int read(byte[] buffer, int byteOffset, int byteCount)
+    {
+    	int return_value=0;
+    	try 
+    	{
+    		return_value=this.BT_inputStream.read(buffer, byteOffset, byteCount);
+		}
+    	catch (IOException e) 
+    	{
+			e.printStackTrace();
+		}
+		
+    	dri.on_device_read();
+    	dri.on_device_read(this.BT_Device.getName()+"<:",buffer,return_value,"");
+    	
+    	return return_value;
+    }
+    
+    public void write(byte input)
     {
     	try 
     	{
@@ -139,30 +252,45 @@ public class BT_spp implements Parcelable
     	{
 			e.printStackTrace();
 		}
+    	
+    	dwi.on_device_write();
+    	dwi.on_device_write(this.BT_Device.getName()+">: ",input,"");
     }
     
     public void write(byte[] input)
     {
-    	try 
+    	if(input.length>0)
     	{
-			this.BT_outputStream.write(input);
-		}
-    	catch (IOException e) 
-    	{
-			e.printStackTrace();
-		}
+    		try 
+        	{
+        		this.BT_outputStream.write(input);
+    		}
+        	catch (IOException e) 
+        	{
+    			e.printStackTrace();
+    		}
+    		
+    		dwi.on_device_write();
+    		dwi.on_device_write(this.BT_Device.getName()+">: ",input,"");
+    	}
     }
     
     public void write(byte[] input,int offset,int count)
     {
-    	try 
+    	if(input.length>0)
     	{
-			this.BT_outputStream.write(input,offset,count);
-		}
-    	catch (IOException e) 
-    	{
-			e.printStackTrace();
-		}
+    		try 
+        	{
+    			this.BT_outputStream.write(input,offset,count);
+    		}
+        	catch (IOException e) 
+        	{
+    			e.printStackTrace();
+    		}
+    		
+    		dwi.on_device_write();
+    		dwi.on_device_write(this.BT_Device.getName()+">: ",input,"");
+    	}
     }
     
     public void disconnect()
@@ -213,7 +341,59 @@ public class BT_spp implements Parcelable
 		this.isDiscovered = isDiscovered;
 	}
 
-	public String toString()  
+	void used_by_new_component()
+    {
+    	this.number_of_components_using_this_object++;
+    }
+    
+    void not_used_by_a_component()
+    {
+    	this.number_of_components_using_this_object--;
+    }
+    
+    int get_number_of_components_using_this_object()
+    {
+    	return number_of_components_using_this_object;
+    }
+    
+    public static ArrayList<Integer> get_indices(ArrayList<BT_spp> master_list,ArrayList<BT_spp> component_list)
+    {
+    	ArrayList<Integer> return_value=new ArrayList<Integer>();
+    	
+    	int number_of_iterations=component_list.size();
+    	int number_of_devices_in_master_list=master_list.size();
+    	
+    	for (int count_0=0;count_0<number_of_iterations;count_0++)
+    	{
+    		for(int count_1=0;count_1<number_of_devices_in_master_list;count_1++)
+        	{
+        		if(master_list.get(count_1).equals(component_list.get(count_0)))
+        		{
+        			return_value.add(count_1);
+        		}
+        	}
+    	}
+    	
+    	return return_value;
+    }
+    
+    public static void update_list_based_on_indices(ArrayList<BT_spp> master_list,ArrayList<BT_spp> component_list,ArrayList<Integer> input_indices)
+    {
+    	int number_of_iterations=component_list.size();
+    	for(int count=0;count<number_of_iterations;count++)
+    	{
+    		component_list.remove(0);
+    	}
+    	
+    	Log.e("","number_of_iterations:"+number_of_iterations+"\n input_indices:"+input_indices);
+    	number_of_iterations=input_indices.size();
+    	for(int count=0;count<number_of_iterations;count++)
+    	{
+    		component_list.add(master_list.get(input_indices.get(count).intValue()));
+    	}
+    }
+    
+    public String toString()  
 	 {
          if (BT_Device != null) 
          {
@@ -242,21 +422,43 @@ public class BT_spp implements Parcelable
 		}
 	}
 	
-	public boolean equals(Object o)
+	public boolean equals(BluetoothDevice newDevice)
+	{
+		if (BT_Device == null) 
+        {
+			throw new NullPointerException("No BlueTooth Device Assigned."); 
+        }
+		
+		if((this.BT_Device.getAddress().compareTo(newDevice.getAddress()))==0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	public boolean equals(Object input_object)
     {
-        if (o == null) 
+        if (input_object == null) 
         {
         	return false;
         }
         
-        if (o == this) 
+        if (input_object == this) 
         {
         	return true; //if both pointing towards same object on heap
         }
-
-        BT_spp a = (BT_spp)o;
         
-        return equals(a);
+        if(input_object instanceof BluetoothDevice)
+        {
+        	return equals((BluetoothDevice)input_object);
+        }
+
+//        BT_spp output_object = (BT_spp)input_object;
+        
+        return equals((BT_spp)input_object);
     }
 	
     protected BT_spp(Parcel in) {
@@ -292,5 +494,27 @@ public class BT_spp implements Parcelable
             return new BT_spp[size];
         }
     };
-
+    
+    public interface device_connection_status_interface
+    {
+    	public void on_device_connection_pass();
+    	public void on_device_connection_pass(BT_spp passed_device);
+    	
+    	public void on_device_connection_fail();
+    	public void on_device_connection_fail(BT_spp failed_device);
+    }
+    
+    public interface device_write_interface
+    {
+    	public void on_device_write();
+    	public void on_device_write(String start_text,byte written_byte,String end_text);
+    	public void on_device_write(String start_text,byte[] written_bytes,String end_text);	
+    }
+    
+    public interface device_read_interface
+    {
+    	public void on_device_read();
+    	public void on_device_read(String start_text,byte read_byte,String end_text);
+    	public void on_device_read(String start_text,byte[] read_bytes,int number_of_bytes_read,String end_text);	
+    }
 }

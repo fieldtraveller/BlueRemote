@@ -16,7 +16,7 @@
         android:layout_height="5dp" />
 
     <TextView
-        android:id="@+id/textView_bpa_1"
+        android:id="@+id/textView_1_pa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/enter_button_text"
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content" />
     
     <EditText
-        android:id="@+id/editText_bpa_1"
+        android:id="@+id/editText_1_pa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
@@ -44,7 +44,7 @@
         android:layout_height="10dp" />
     
     <TextView
-        android:id="@+id/textView_bpa_2"
+        android:id="@+id/textView_2_pa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/enter_button_code"
@@ -55,7 +55,7 @@
         android:layout_height="wrap_content" />
     
     <EditText
-        android:id="@+id/editText_bpa_2"
+        android:id="@+id/editText_2_pa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
@@ -75,7 +75,7 @@
 	    >
 
         <CheckBox
-            android:id="@+id/checkBox_bpa_1"
+            android:id="@+id/checkBox_1_pa"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/continuous_touch" 
@@ -92,7 +92,7 @@
         android:layout_height="10dp" />
     
     <TextView
-        android:id="@+id/textView_bpa_3"
+        android:id="@+id/textView_3_pa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/enter_button_on_down_code"
@@ -103,7 +103,7 @@
         android:layout_height="wrap_content" />
     
     <EditText
-        android:id="@+id/editText_bpa_3"
+        android:id="@+id/editText_3_pa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
@@ -117,7 +117,7 @@
         android:layout_height="10dp" />
     
     <TextView
-        android:id="@+id/textView_bpa_4"
+        android:id="@+id/textView_4_pa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/enter_button_on_up_code"
@@ -128,7 +128,7 @@
         android:layout_height="wrap_content" />
     
     <EditText
-        android:id="@+id/editText_bpa_4"
+        android:id="@+id/editText_4_pa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
@@ -142,7 +142,7 @@
         android:layout_height="10dp" />
 
     <Button
-        android:id="@+id/button_bpa_2"
+        android:id="@+id/button_2_pa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -153,7 +153,7 @@
         android:layout_height="10dp" />
     
     <Button
-        android:id="@+id/button_bpa_1"
+        android:id="@+id/button_1_pa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"

@@ -4,13 +4,14 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Switch;
 
-public class bluetooth_switch implements OnCheckedChangeListener,OnLongClickListener
+public class bluetooth_switch<T> implements OnCheckedChangeListener,OnLongClickListener
 {
 	ArrayList<BT_spp> BT_serial_devices;
 	Switch switcher;
@@ -21,34 +22,27 @@ public class bluetooth_switch implements OnCheckedChangeListener,OnLongClickList
 	
 	Intent programming_activity_intent;
 	int programming_activity_request_code;
-	Activity calling_activity;
+	T calling_activity_or_fragment;
 	
 	set_task set_task_on_switch_change=null; 
 	set_task set_task_on_switch_on=null; 
 	set_task set_task_on_switch_off=null; 
-	
-	public void setSet_task_on_switch_on(set_task set_task_on_switch_on) {
-		this.set_task_on_switch_on = set_task_on_switch_on;
-	}
-
-	public set_task getSet_task_on_switch_off() {
-		return set_task_on_switch_off;
-	}
-
-	public void setSet_task_on_switch_off(set_task set_task_on_switch_off) {
-		this.set_task_on_switch_off = set_task_on_switch_off;
-	}
 
 	public static final boolean PROGRAM_MODE=true;
 	public static final boolean NORMAL_MODE=false;
 	
 	public static final String input_type_switch="SWITCH";
 	
-	public bluetooth_switch(Activity calling_activity,ArrayList<BT_spp> BT_serial_devices,Switch switcher) 
+	public bluetooth_switch()
+	{
+		
+	}
+	
+	public bluetooth_switch(T calling_activity_or_fragment,ArrayList<BT_spp> BT_serial_devices,Switch switcher) 
 	{
 		super();
 		
-		this.calling_activity=calling_activity;
+		this.calling_activity_or_fragment=calling_activity_or_fragment;
 
 		if(BT_serial_devices==null)
 		{
@@ -65,11 +59,11 @@ public class bluetooth_switch implements OnCheckedChangeListener,OnLongClickList
 		this.switcher.setOnLongClickListener(this);
 	}
 		
-	public bluetooth_switch(Activity calling_activity,ArrayList<BT_spp> BT_serial_devices,Switch switcher,bluetooth_switch_data switch_data) 
+	public bluetooth_switch(T calling_activity_or_fragment,ArrayList<BT_spp> BT_serial_devices,Switch switcher,bluetooth_switch_data switch_data) 
 	{
 		super();
 		
-		this.calling_activity=calling_activity;
+		this.calling_activity_or_fragment=calling_activity_or_fragment;
 
 		if(BT_serial_devices==null)
 		{
@@ -90,14 +84,14 @@ public class bluetooth_switch implements OnCheckedChangeListener,OnLongClickList
 		this.switcher.setOnLongClickListener(this);
 	}
 
-	public Activity getCalling_activity() 
+	public T getCalling_activity_or_fragment() 
 	{
-		return calling_activity;
+		return calling_activity_or_fragment;
 	}
 
-	public void setCalling_activity(Activity calling_activity) 
+	public void setCalling_activity_or_fragment(T calling_activity_or_fragment) 
 	{
-		this.calling_activity = calling_activity;
+		this.calling_activity_or_fragment =calling_activity_or_fragment;
 	}
 
 	public ArrayList<BT_spp> getBT_serial_devices() 
@@ -220,9 +214,24 @@ public class bluetooth_switch implements OnCheckedChangeListener,OnLongClickList
 			this.programming_activity_intent.putExtra(bluetooth_switch_data.switch_on_code_extra_name,this.getSwitch_data().getSwitch_on_code());
 			this.programming_activity_intent.putExtra(bluetooth_switch_data.switch_off_code_extra_name,this.getSwitch_data().getSwitch_off_code());
 			
-			this.programming_activity_intent.putParcelableArrayListExtra(connected_device_list_activity.selected_devices_list_extra_name,this.getBT_serial_devices());
+			if(calling_activity_or_fragment instanceof Activity)
+			{
+				this.programming_activity_intent.putIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name,BT_spp.get_indices(
+						((BlueRemote)((Activity) calling_activity_or_fragment).getApplicationContext())
+						.getConnected_device_list(), this.getBT_serial_devices()));
+				
+				((Activity)calling_activity_or_fragment).startActivityForResult(this.programming_activity_intent,this.programming_activity_request_code);
+			}
+			else if(calling_activity_or_fragment instanceof Fragment)
+			{
+				this.programming_activity_intent.putIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name,BT_spp.get_indices(
+						((BlueRemote)(((Fragment)calling_activity_or_fragment).getActivity()).getApplicationContext())
+						.getConnected_device_list(), this.getBT_serial_devices())
+						);
+				
+				((Fragment)calling_activity_or_fragment).startActivityForResult(this.programming_activity_intent,this.programming_activity_request_code);
+			}
 			
-			calling_activity.startActivityForResult(this.programming_activity_intent,this.programming_activity_request_code);
 			return true;
 		}
 		else
@@ -242,7 +251,20 @@ public class bluetooth_switch implements OnCheckedChangeListener,OnLongClickList
 			this.switch_data.setSwitch_on_code(data.getByteArrayExtra(bluetooth_switch_data.switch_on_code_extra_name));
 			this.switch_data.setSwitch_off_code(data.getByteArrayExtra(bluetooth_switch_data.switch_off_code_extra_name));
 			
-			this.BT_serial_devices=data.getParcelableArrayListExtra(connected_device_list_activity.selected_devices_list_extra_name);
+			if(calling_activity_or_fragment instanceof Activity)
+			{
+				BT_spp.update_list_based_on_indices(
+						((BlueRemote)((Activity) calling_activity_or_fragment).getApplicationContext())
+						.getConnected_device_list(), this.getBT_serial_devices()
+						,data.getIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name));
+			}
+			else if(calling_activity_or_fragment instanceof Fragment)
+			{
+				BT_spp.update_list_based_on_indices(
+						((BlueRemote)(((Fragment)calling_activity_or_fragment).getActivity()).getApplicationContext())
+						.getConnected_device_list(), this.getBT_serial_devices()
+						,data.getIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name));
+			}
 			
 //			Log.e("What?","Switch_text: "+this.switch_data.getSwitch_text());
 //			Log.e("What?","Switch_code: "+this.switch_data.getSwitch_code().toString());
@@ -264,6 +286,22 @@ public class bluetooth_switch implements OnCheckedChangeListener,OnLongClickList
 		}
 	}
 	
+	public set_task getSet_task_on_switch_on() {
+		return set_task_on_switch_on;
+	}
+	
+	public void setSet_task_on_switch_on(set_task set_task_on_switch_on) {
+		this.set_task_on_switch_on = set_task_on_switch_on;
+	}
+
+	public set_task getSet_task_on_switch_off() {
+		return set_task_on_switch_off;
+	}
+
+	public void setSet_task_on_switch_off(set_task set_task_on_switch_off) {
+		this.set_task_on_switch_off = set_task_on_switch_off;
+	}
+
 	public set_task getSet_task_on_switch_change() {
 		return set_task_on_switch_change;
 	}
@@ -272,7 +310,5 @@ public class bluetooth_switch implements OnCheckedChangeListener,OnLongClickList
 		this.set_task_on_switch_change = set_task_on_switch_change;
 	}
 
-	public set_task getSet_task_on_switch_on() {
-		return set_task_on_switch_on;
-	}
+	
 }

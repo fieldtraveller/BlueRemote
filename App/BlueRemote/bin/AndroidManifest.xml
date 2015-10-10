@@ -46,7 +46,8 @@
 	        android:name=".new_device_list_activity"
 	        android:label="@string/dl_activity"
 	        android:theme="@style/Theme.AppCompat.Light.Dialog"
-	        android:parentActivityName=".MainActivity" >
+	        android:parentActivityName=".MainActivity"
+	        android:windowSoftInputMode="adjustPan|stateVisible|adjustResize" >
         
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"

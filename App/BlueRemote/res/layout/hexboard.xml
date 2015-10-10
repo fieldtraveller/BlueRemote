@@ -4,172 +4,172 @@
     android:layout_height="match_parent" >
 
 <Button
-            android:id="@+id/Button02"
+            android:id="@+id/Button02_hexboard"
             
             android:layout_width="78dp"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/Button01"
-            android:layout_alignBottom="@+id/Button01"
-            android:layout_toRightOf="@+id/Button01"
-            android:text="@string/Button02" />
+            android:layout_alignBaseline="@+id/Button01_hexboard"
+            android:layout_alignBottom="@+id/Button01_hexboard"
+            android:layout_toRightOf="@+id/Button01_hexboard"
+            android:text="@string/Button02_hexboard" />
 
         <Button
-            android:id="@+id/Button03"
+            android:id="@+id/Button03_hexboard"
             
             android:layout_width="78dp"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/Button02"
-            android:layout_alignBottom="@+id/Button02"
-            android:layout_toRightOf="@+id/Button02"
-            android:text="@string/Button03" />
+            android:layout_alignBaseline="@+id/Button02_hexboard"
+            android:layout_alignBottom="@+id/Button02_hexboard"
+            android:layout_toRightOf="@+id/Button02_hexboard"
+            android:text="@string/Button03_hexboard" />
 
         <Button
-            android:id="@+id/Button04"
+            android:id="@+id/Button04_hexboard"
             
             android:layout_width="78dp"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/Button03"
-            android:layout_alignBottom="@+id/Button03"
-            android:layout_toRightOf="@+id/Button03"
-            android:text="@string/Button04" />
+            android:layout_alignBaseline="@+id/Button03_hexboard"
+            android:layout_alignBottom="@+id/Button03_hexboard"
+            android:layout_toRightOf="@+id/Button03_hexboard"
+            android:text="@string/Button04_hexboard" />
 
         <Button
-            android:id="@+id/Button05"
+            android:id="@+id/Button05_hexboard"
             
             android:layout_width="78dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/Button01"
-            android:layout_toLeftOf="@+id/Button02"
-            android:text="@string/Button05" />
+            android:layout_below="@+id/Button01_hexboard"
+            android:layout_toLeftOf="@+id/Button02_hexboard"
+            android:text="@string/Button05_hexboard" />
 
         <Button
-            android:id="@+id/Button06"
+            android:id="@+id/Button06_hexboard"
             
             android:layout_width="78dp"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/Button05"
-            android:layout_alignBottom="@+id/Button05"
-            android:layout_toRightOf="@+id/Button05"
-            android:text="@string/Button06" />
+            android:layout_alignBaseline="@+id/Button05_hexboard"
+            android:layout_alignBottom="@+id/Button05_hexboard"
+            android:layout_toRightOf="@+id/Button05_hexboard"
+            android:text="@string/Button06_hexboard" />
 
         <Button
-            android:id="@+id/Button07"
+            android:id="@+id/Button07_hexboard"
             
             android:layout_width="78dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/Button03"
-            android:layout_toLeftOf="@+id/Button04"
-            android:text="@string/Button07" />
+            android:layout_below="@+id/Button03_hexboard"
+            android:layout_toLeftOf="@+id/Button04_hexboard"
+            android:text="@string/Button07_hexboard" />
 
         <Button
-            android:id="@+id/Button08"
+            android:id="@+id/Button08_hexboard"
             
             android:layout_width="78dp"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/Button07"
-            android:layout_alignBottom="@+id/Button07"
-            android:layout_toRightOf="@+id/Button07"
-            android:text="@string/Button08" />
+            android:layout_alignBaseline="@+id/Button07_hexboard"
+            android:layout_alignBottom="@+id/Button07_hexboard"
+            android:layout_toRightOf="@+id/Button07_hexboard"
+            android:text="@string/Button08_hexboard" />
 
         <Button
-            android:id="@+id/Button10"
+            android:id="@+id/Button10_hexboard"
             
             android:layout_width="78dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/Button05"
-            android:layout_toRightOf="@+id/Button05"
-            android:text="@string/Button10" />
+            android:layout_below="@+id/Button05_hexboard"
+            android:layout_toRightOf="@+id/Button05_hexboard"
+            android:text="@string/Button10_hexboard" />
 
         <Button
-            android:id="@+id/Button11"
+            android:id="@+id/Button11_hexboard"
             
             android:layout_width="78dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/Button07"
-            android:layout_toLeftOf="@+id/Button08"
-            android:text="@string/Button11" />
+            android:layout_below="@+id/Button07_hexboard"
+            android:layout_toLeftOf="@+id/Button08_hexboard"
+            android:text="@string/Button11_hexboard" />
 
         <Button
-            android:id="@+id/Button12"
+            android:id="@+id/Button12_hexboard"
             
             android:layout_width="78dp"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/Button08"
-            android:layout_below="@+id/Button08"
-            android:text="@string/Button12" />
+            android:layout_alignLeft="@+id/Button08_hexboard"
+            android:layout_below="@+id/Button08_hexboard"
+            android:text="@string/Button12_hexboard" />
 
         <Button
-            android:id="@+id/Button13"
+            android:id="@+id/Button13_hexboard"
             
             android:layout_width="78dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/Button09"
-            android:layout_toLeftOf="@+id/Button10"
-            android:text="@string/Button13" />
+            android:layout_below="@+id/Button09_hexboard"
+            android:layout_toLeftOf="@+id/Button10_hexboard"
+            android:text="@string/Button13_hexboard" />
 
         <Button
-            android:id="@+id/Button14"
+            android:id="@+id/Button14_hexboard"
             
             android:layout_width="78dp"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/Button13"
-            android:layout_alignBottom="@+id/Button13"
-            android:layout_toLeftOf="@+id/Button11"
-            android:text="@string/Button14" />
+            android:layout_alignBaseline="@+id/Button13_hexboard"
+            android:layout_alignBottom="@+id/Button13_hexboard"
+            android:layout_toLeftOf="@+id/Button11_hexboard"
+            android:text="@string/Button14_hexboard" />
 
         <Button
-            android:id="@+id/Button15"
+            android:id="@+id/Button15_hexboard"
             
             android:layout_width="78dp"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/Button14"
-            android:layout_alignBottom="@+id/Button14"
-            android:layout_toLeftOf="@+id/Button12"
-            android:text="@string/Button15" />
+            android:layout_alignBaseline="@+id/Button14_hexboard"
+            android:layout_alignBottom="@+id/Button14_hexboard"
+            android:layout_toLeftOf="@+id/Button12_hexboard"
+            android:text="@string/Button15_hexboard" />
 
         <Button
-            android:id="@+id/Button16"
+            android:id="@+id/Button16_hexboard"
             
             android:layout_width="78dp"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/Button12"
-            android:layout_below="@+id/Button12"
-            android:text="@string/Button16" />
+            android:layout_alignLeft="@+id/Button12_hexboard"
+            android:layout_below="@+id/Button12_hexboard"
+            android:text="@string/Button16_hexboard" />
 
         <Button
-            android:id="@+id/Button09"
+            android:id="@+id/Button09_hexboard"
             android:layout_width="78dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/Button05"
-            android:layout_toLeftOf="@+id/Button06"
-            android:text="@string/Button09" />
+            android:layout_below="@+id/Button05_hexboard"
+            android:layout_toLeftOf="@+id/Button06_hexboard"
+            android:text="@string/Button09_hexboard" />
 
         <Button
-            android:id="@+id/Button01"
+            android:id="@+id/Button01_hexboard"
             android:layout_width="78dp"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_marginLeft="4dp"
             android:layout_marginTop="130dp"
-            android:text="@string/Button01" />
+            android:text="@string/Button01_hexboard" />
 
         <Button
-            android:id="@+id/Button17"
+            android:id="@+id/Button17_hexboard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/Button14"
+            android:layout_below="@+id/Button14_hexboard"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="15dp"
-            android:text="@string/Button17" 
+            android:text="@string/Button17_hexboard" 
             />
 
         <EditText
-            android:id="@+id/editText1_preferences"
+            android:id="@+id/editText1_hexboard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/Button02"
-            android:layout_alignLeft="@+id/Button01"
+            android:layout_above="@+id/Button02_hexboard"
+            android:layout_alignLeft="@+id/Button01_hexboard"
             android:layout_marginBottom="40dp"
             android:ems="10"
             android:inputType="textCapCharacters" 
@@ -180,13 +180,13 @@
         </EditText>
 
         <Button
-            android:id="@+id/Button18"
+            android:id="@+id/Button18_hexboard"
             style="?android:attr/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/editText1_preferences"
-            android:layout_alignBottom="@+id/editText1_preferences"
-            android:layout_toRightOf="@+id/editText1_preferences"
-            android:text="@string/Button18" />
+            android:layout_alignBaseline="@+id/editText1_hexboard"
+            android:layout_alignBottom="@+id/editText1_hexboard"
+            android:layout_toRightOf="@+id/editText1_hexboard"
+            android:text="@string/Button18_hexboard" />
 
 </RelativeLayout>

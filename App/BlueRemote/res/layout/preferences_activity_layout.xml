@@ -11,16 +11,69 @@
         <Space
 	        android:layout_width="match_parent"
 	        android:layout_height="5dp" />
+
+        <TextView
+            android:id="@+id/textView6_preferences"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/bluetooth_device"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/textView7_preferences"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/bluetooth_device_assignment"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        
+        <RadioGroup
+            android:id="@+id/radioGroup_preferences"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+        
+        <RadioButton
+            android:id="@+id/radioButton1_preferences"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/assign_all_devices" />
+
+        <RadioButton
+            android:id="@+id/radioButton2_preferences"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/assign_latest_device_if_list_empty" />
+
+        <RadioButton
+            android:id="@+id/radioButton3_preferences"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/do_not_assign" />
+        
+        </RadioGroup>
+        
+        <Space
+	        android:layout_width="match_parent"
+	        android:layout_height="5dp" />
+        
+        <View
+		    android:layout_width="match_parent"
+		    android:layout_height="1dp"
+		    android:background="#FF0000"/>
+        
+        <Space
+	        android:layout_width="match_parent"
+	        android:layout_height="5dp" />
         
         <TextView
-            android:id="@+id/textView1"
+            android:id="@+id/textView1_preferences"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/control_interface"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 		
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/textView2_preferences"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/button_repetition_period"
@@ -33,7 +86,6 @@
             android:ems="10"
             android:inputType="number" >
 
-            <requestFocus />
         </EditText>
 
         <Space
@@ -50,14 +102,14 @@
 	        android:layout_height="5dp" />
         
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/textView3_preferences"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/hexboard"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
-            android:id="@+id/textView4"
+            android:id="@+id/textView4_preferences"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/hex_board_call_time_out_factor"
@@ -71,7 +123,7 @@
             android:inputType="number" />
 
         <TextView
-            android:id="@+id/textView5"
+            android:id="@+id/textView5_preferences"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/hex_board_backspace_repetition_period"
@@ -112,6 +164,5 @@
         </RelativeLayout>
         
     </LinearLayout>
-    
 
 </ScrollView>

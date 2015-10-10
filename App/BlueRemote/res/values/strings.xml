@@ -5,6 +5,7 @@
     <string name="dl_activity">Device List</string>
 	<string name="hexboard">HexBoard</string>
 	<string name="programming_activity">Set Values</string>
+    <string name="terminal">Terminal</string>
     
     <string name="splash_image_description">App Logo</string>
 	
@@ -20,25 +21,25 @@
 	
 	<string name="refresh">Refresh</string>
 	
-	<string name="Button16">F</string>
-    <string name="Button15">E</string>
-    <string name="Button14">D</string>
-    <string name="Button13">C</string>
-    <string name="Button12">B</string>
-    <string name="Button11">A</string>
-    <string name="Button10">0</string>
-    <string name="Button09">9</string>
-    <string name="Button08">8</string>
-    <string name="Button07">7</string>
-    <string name="Button06">6</string>
-    <string name="Button05">5</string>
-    <string name="Button04">4</string>
-    <string name="Button03">3</string>
-    <string name="Button02">2</string>
-    <string name="Button01">1</string>
+	<string name="Button16_hexboard">F</string>
+    <string name="Button15_hexboard">E</string>
+    <string name="Button14_hexboard">D</string>
+    <string name="Button13_hexboard">C</string>
+    <string name="Button12_hexboard">B</string>
+    <string name="Button11_hexboard">A</string>
+    <string name="Button10_hexboard">0</string>
+    <string name="Button09_hexboard">9</string>
+    <string name="Button08_hexboard">8</string>
+    <string name="Button07_hexboard">7</string>
+    <string name="Button06_hexboard">6</string>
+    <string name="Button05_hexboard">5</string>
+    <string name="Button04_hexboard">4</string>
+    <string name="Button03_hexboard">3</string>
+    <string name="Button02_hexboard">2</string>
+    <string name="Button01_hexboard">1</string>
 	
-    <string name="Button17">OK</string>
-    <string name="Button18">&lt;</string>
+    <string name="Button17_hexboard">OK</string>
+    <string name="Button18_hexboard">&lt;</string>
     
     <string name="enter_button_text">Enter Button Text:</string>
     <string name="enter_button_code">Enter Button Code:</string>
@@ -54,6 +55,15 @@
     <string name="select_devices">Select Devices</string>
     <string name="set_component_device_list">Set Component Device List:</string>
     <string name="ok">  OK  </string>
+    
+    <string name="clear">Clear</string>
+    <string name="devices">Devices</string>
+    
+    <string name="bluetooth_device">Bluetooth Device</string>
+    <string name="bluetooth_device_assignment">Bluetooth Device Assignment:</string>
+    <string name="assign_all_devices">All Devices</string>
+    <string name="assign_latest_device_if_list_empty">Latest Device If List Is Empty</string>
+    <string name="do_not_assign">Do Not Assign</string>
     
     <string name="control_interface">Control Interface</string>
     <string name="button_repetition_period">Button Repetition Period(in ms):</string>

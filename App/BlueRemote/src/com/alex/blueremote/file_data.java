@@ -4,7 +4,8 @@ import java.io.Serializable;
 
 public class file_data implements Serializable 
 {
-	private static final long serialVersionUID = -8248812345723365553L;
+	
+	private static final long serialVersionUID = -6914718546392198894L;
 	
 	bluetooth_button_data button_data[]; 
 	bluetooth_switch_data switch_data[];
@@ -12,7 +13,9 @@ public class file_data implements Serializable
 	int button_repetition_period;
 	int hex_board_call_time_out_factor;
 	int hex_board_backspace_repetition_period;
-
+	
+	byte device_assignment;
+	
 	public file_data(bluetooth_button_data[] button_data,bluetooth_switch_data[] switch_data) 
 	{
 		super();
@@ -30,6 +33,21 @@ public class file_data implements Serializable
 		this.button_repetition_period=button_repetition_period;
 		this.hex_board_call_time_out_factor=hex_board_call_time_out_factor;
 		this.hex_board_backspace_repetition_period=hex_board_backspace_repetition_period;
+	}
+	
+	public file_data(bluetooth_button_data[] button_data,bluetooth_switch_data[] switch_data,
+			int button_repetition_period,int hex_board_call_time_out_factor,int hex_board_backspace_repetition_period,
+			byte device_assignment) 
+	{
+		super();
+		this.button_data = button_data;
+		this.switch_data = switch_data;
+		
+		this.button_repetition_period=button_repetition_period;
+		this.hex_board_call_time_out_factor=hex_board_call_time_out_factor;
+		this.hex_board_backspace_repetition_period=hex_board_backspace_repetition_period;
+		
+		this.device_assignment=device_assignment;
 	}
 	
 	public bluetooth_button_data[] getButton_data() 
@@ -75,4 +93,13 @@ public class file_data implements Serializable
 	public void set_hex_board_backspace_repetition_period(int hex_board_backspace_repetition_period) {
 		this.hex_board_backspace_repetition_period = hex_board_backspace_repetition_period;
 	}
+	
+	public byte getDevice_assignment() {
+		return device_assignment;
+	}
+
+	public void setDevice_assignment(byte device_assignment) {
+		this.device_assignment = device_assignment;
+	}
+
 }

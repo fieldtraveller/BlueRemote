@@ -19,7 +19,7 @@ import android.widget.EditText;
 public class HexBoard extends AppCompatActivity {
 
 	Button button[]=new Button[18];
-	EditText ev1;
+	EditText et;
 	String data="";
 	Intent close_intent=new Intent();
 	
@@ -44,28 +44,28 @@ public class HexBoard extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.hexboard);
 		
-        button[0]=(Button)findViewById(R.id.Button01);
-        button[1]=(Button)findViewById(R.id.Button02);
-        button[2]=(Button)findViewById(R.id.Button03);
-        button[3]=(Button)findViewById(R.id.Button04);
-        button[4]=(Button)findViewById(R.id.Button05);
-        button[5]=(Button)findViewById(R.id.Button06);
-        button[6]=(Button)findViewById(R.id.Button07);
-        button[7]=(Button)findViewById(R.id.Button08);
-        button[8]=(Button)findViewById(R.id.Button09);
-        button[9]=(Button)findViewById(R.id.Button10);
-        button[10]=(Button)findViewById(R.id.Button11);
-        button[11]=(Button)findViewById(R.id.Button12);
-        button[12]=(Button)findViewById(R.id.Button13);
-        button[13]=(Button)findViewById(R.id.Button14);
-        button[14]=(Button)findViewById(R.id.Button15);
-        button[15]=(Button)findViewById(R.id.Button16);
-        button[16]=(Button)findViewById(R.id.Button17);
-        button[17]=(Button)findViewById(R.id.Button18);
+        button[0]=(Button)findViewById(R.id.Button01_hexboard);
+        button[1]=(Button)findViewById(R.id.Button02_hexboard);
+        button[2]=(Button)findViewById(R.id.Button03_hexboard);
+        button[3]=(Button)findViewById(R.id.Button04_hexboard);
+        button[4]=(Button)findViewById(R.id.Button05_hexboard);
+        button[5]=(Button)findViewById(R.id.Button06_hexboard);
+        button[6]=(Button)findViewById(R.id.Button07_hexboard);
+        button[7]=(Button)findViewById(R.id.Button08_hexboard);
+        button[8]=(Button)findViewById(R.id.Button09_hexboard);
+        button[9]=(Button)findViewById(R.id.Button10_hexboard);
+        button[10]=(Button)findViewById(R.id.Button11_hexboard);
+        button[11]=(Button)findViewById(R.id.Button12_hexboard);
+        button[12]=(Button)findViewById(R.id.Button13_hexboard);
+        button[13]=(Button)findViewById(R.id.Button14_hexboard);
+        button[14]=(Button)findViewById(R.id.Button15_hexboard);
+        button[15]=(Button)findViewById(R.id.Button16_hexboard);
+        button[16]=(Button)findViewById(R.id.Button17_hexboard);
+        button[17]=(Button)findViewById(R.id.Button18_hexboard);
         
-        ev1=(EditText)findViewById(R.id.editText1_preferences);
-        ev1.setText(string_to_hex(this.getIntent().getStringExtra(HexBoard.initial_text)));
-        ev1.setSelection(ev1.getText().toString().length());
+        et=(EditText)findViewById(R.id.editText1_hexboard);
+        et.setText(string_to_hex(this.getIntent().getStringExtra(HexBoard.initial_text)));
+        et.setSelection(et.getText().toString().length());
         
         ui_Handler=new Handler();
                 
@@ -285,10 +285,10 @@ public class HexBoard extends AppCompatActivity {
 				@Override
 				public void run() {
 					
-					int cursor_start=ev1.getSelectionStart();
-					int cursor_end=ev1.getSelectionEnd();
+					int cursor_start=et.getSelectionStart();
+					int cursor_end=et.getSelectionEnd();
 	        		
-					data=ev1.getText().toString();
+					data=et.getText().toString();
 					
 					if((cursor_start<=0)||(cursor_end<=0))
 	        		{
@@ -329,16 +329,16 @@ public class HexBoard extends AppCompatActivity {
 	
 	void setData(String dataIn)
 	{
-		data=ev1.getText().toString()+dataIn;
-		ev1.setText(data);
-		ev1.setSelection(data.length());
+		data=et.getText().toString()+dataIn;
+		et.setText(data);
+		et.setSelection(data.length());
 	}
 	
 	void setData()
 	{
 //		data=ev1.getText().toString();
-		ev1.setText(data);
-		ev1.setSelection(data.length());
+		et.setText(data);
+		et.setSelection(data.length());
 	}
 	
 	public static String string_to_hex(String input)
@@ -391,8 +391,8 @@ public class HexBoard extends AppCompatActivity {
 	void bye_bye()
 	{
 		close_intent.putExtra(HexBoard.identification_number,this.getIntent().getIntExtra(HexBoard.identification_number,-1));
-		close_intent.putExtra(HexBoard.hex_data,ev1.getText().toString());
-		close_intent.putExtra(HexBoard.stringed_data,hex_to_string(ev1.getText().toString()));
+		close_intent.putExtra(HexBoard.hex_data,et.getText().toString());
+		close_intent.putExtra(HexBoard.stringed_data,hex_to_string(et.getText().toString()));
 		setResult(RESULT_OK, close_intent);        
 		finish();
 	}
