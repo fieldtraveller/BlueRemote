@@ -1,4 +1,4 @@
-package com.alex.blueremote;
+package unused;
 
 public interface set_task {
 	

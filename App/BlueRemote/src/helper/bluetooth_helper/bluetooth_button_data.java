@@ -1,4 +1,4 @@
-package com.alex.blueremote;
+package helper.bluetooth_helper;
 
 import java.io.Serializable;
 
@@ -69,54 +69,53 @@ public class bluetooth_button_data implements Serializable
 		
 	}
 	
-	public String getButton_text() 
+	public String get_button_text() 
 	{
 		return button_text;
 	}
 
-	public void setButton_text(String button_text) 
+	public void set_button_text(String button_text) 
 	{
 		this.button_text = button_text;
 	}
 
-	public byte[] getButton_code() 
+	public byte[] get_button_code() 
 	{
 		return button_code;
 	}
 
-	public void setButton_code(byte[] button_code)
+	public void set_button_code(byte[] button_code)
 	{
 		this.button_code = button_code;
 	}
 
-	public boolean isRespond_on_continuous_touch() 
+	public boolean is_respond_on_continuous_touch() 
 	{
 		return respond_on_continuous_touch;
 	}
 
-	public void setRespond_on_continuous_touch(boolean respond_on_touch) 
+	public void set_respond_on_continuous_touch(boolean respond_on_touch) 
 	{
 		this.respond_on_continuous_touch = respond_on_touch;
 	}
 
-	public byte[] getButton_on_down_code() 
+	public byte[] get_button_on_down_code() 
 	{
 		return button_on_down_code;
 	}
 
-	public void setButton_on_down_code(byte[] button_on_down_code) 
+	public void set_button_on_down_code(byte[] button_on_down_code) 
 	{
 		this.button_on_down_code = button_on_down_code;
 	}
 
-	public byte[] getButton_on_up_code() 
+	public byte[] get_button_on_up_code() 
 	{
 		return button_on_up_code;
 	}
 
-	public void setButton_on_up_code(byte[] button_on_up_code)
+	public void set_button_on_up_code(byte[] button_on_up_code)
 	{
 		this.button_on_up_code = button_on_up_code;
 	}
-	
 }

@@ -1,4 +1,4 @@
-/android/
 /com/
-/.gitignore
-/bluetooth_helper/
+/android/
+/file_operations/
+/helper/

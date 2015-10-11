@@ -2,12 +2,14 @@ package com.alex.blueremote;
 
 import java.nio.charset.Charset;
 
+import helper.bluetooth_helper.bluetooth_button;
+import helper.bluetooth_helper.bluetooth_button_data;
+import helper.bluetooth_helper.bluetooth_compound_button;
+import helper.bluetooth_helper.bluetooth_compound_button_data;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-//import android.util.Log;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
@@ -117,18 +119,18 @@ public class programming_activity extends AppCompatActivity implements OnTouchLi
 					
 				} );
 			}
-			else if(getIntent().getStringExtra(input_type).compareTo(bluetooth_switch.input_type_switch)==0)
+			else if(getIntent().getStringExtra(input_type).compareTo(bluetooth_compound_button.input_type_compound_button)==0)
 			{
 				tv[0].setText(R.string.enter_switch_text);
 				tv[1].setText(R.string.enter_switch_code);
 				tv[2].setText(R.string.enter_switch_on_code);
 				tv[3].setText(R.string.enter_switch_off_code);
 				
-				et[0].setText(getIntent().getStringExtra(bluetooth_switch_data.switch_text_extra_name));
+				et[0].setText(getIntent().getStringExtra(bluetooth_compound_button_data.compound_button_text_extra_name));
 				
-				et[1].setText(new String(getIntent().getByteArrayExtra(bluetooth_switch_data.switch_code_extra_name)));
-				et[2].setText(new String(getIntent().getByteArrayExtra(bluetooth_switch_data.switch_on_code_extra_name)));
-				et[3].setText(new String(getIntent().getByteArrayExtra(bluetooth_switch_data.switch_off_code_extra_name)));
+				et[1].setText(new String(getIntent().getByteArrayExtra(bluetooth_compound_button_data.compound_button_code_extra_name)));
+				et[2].setText(new String(getIntent().getByteArrayExtra(bluetooth_compound_button_data.compound_button_on_code_extra_name)));
+				et[3].setText(new String(getIntent().getByteArrayExtra(bluetooth_compound_button_data.compound_button_off_code_extra_name)));
 				
 				cb.setEnabled(false);
 				cb.setVisibility(View.GONE);
@@ -156,7 +158,7 @@ public class programming_activity extends AppCompatActivity implements OnTouchLi
 				connected_device_list.putIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name,
 						getIntent().getIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name));
 				
-				startActivityForResult(connected_device_list, connected_device_list_activity.connected_device_list_request_code);
+				startActivityForResult(connected_device_list, connected_device_list_activity.connected_device_list_activiy_request_code);
 			}
 		});
 		
@@ -197,7 +199,7 @@ public class programming_activity extends AppCompatActivity implements OnTouchLi
 			et[index].setText(data.getStringExtra(HexBoard.stringed_data));
 			et[index].setSelection(et[index].getText().length());
 		}
-		else if(requestCode==connected_device_list_activity.connected_device_list_request_code)
+		else if(requestCode==connected_device_list_activity.connected_device_list_activiy_request_code)
 		{
 			close_intent.putIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name,
 					data.getIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name));
@@ -312,15 +314,15 @@ public class programming_activity extends AppCompatActivity implements OnTouchLi
 			close_intent.putExtra(bluetooth_button_data.respond_on_continuous_touch_extra_name,cb.isChecked());
 
 		}
-		else if(getIntent().getStringExtra(input_type).compareTo(bluetooth_switch.input_type_switch)==0)
+		else if(getIntent().getStringExtra(input_type).compareTo(bluetooth_compound_button.input_type_compound_button)==0)
 		{
-			close_intent.putExtra(bluetooth_switch_data.switch_text_extra_name,et[0].getText().toString());
+			close_intent.putExtra(bluetooth_compound_button_data.compound_button_text_extra_name,et[0].getText().toString());
 
-			close_intent.putExtra(bluetooth_switch_data.switch_code_extra_name,
+			close_intent.putExtra(bluetooth_compound_button_data.compound_button_code_extra_name,
 								  et[1].getText().toString().getBytes(Charset.forName("ISO-8859-1")));
-			close_intent.putExtra(bluetooth_switch_data.switch_on_code_extra_name,
+			close_intent.putExtra(bluetooth_compound_button_data.compound_button_on_code_extra_name,
 								  et[2].getText().toString().getBytes(Charset.forName("ISO-8859-1")));
-			close_intent.putExtra(bluetooth_switch_data.switch_off_code_extra_name,
+			close_intent.putExtra(bluetooth_compound_button_data.compound_button_off_code_extra_name,
 								  et[3].getText().toString().getBytes(Charset.forName("ISO-8859-1")));
 			
 			close_intent.putExtra(bluetooth_button_data.respond_on_continuous_touch_extra_name,cb.isChecked());

@@ -1,4 +1,4 @@
-package com.alex.blueremote;
+package file_operations;
 
 import java.io.File;
 import java.io.FileInputStream;

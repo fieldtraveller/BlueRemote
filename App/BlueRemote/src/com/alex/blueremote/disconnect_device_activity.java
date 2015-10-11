@@ -4,10 +4,8 @@ import java.util.ArrayList;
 
 import helper.bluetooth_helper.BT_spp;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-//import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,21 +17,18 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListView;
 
-public class connected_device_list_activity extends AppCompatActivity {
+public class disconnect_device_activity extends AppCompatActivity {
 
 	ListView lv;
 	Button ok_b;
 	
-	Intent close_intent=new Intent();
-	
-	public final static int connected_device_list_activiy_request_code=8461;
-	public static final String selected_devices_list_indices_extra_name="SELECTED_DEVICES_LIST_INDICES";
+	public final static int disconnect_device_activity_request_code=8461;
 	
 	ArrayList<BT_spp> connected_device_list;
-	ArrayList<Integer> selected_devices_list_indices;
 	
 	String cb_text[];
-	boolean selected_status[];
+	boolean device_use_status[];
+	boolean device_disconnect_list[];
 	
 	ArrayAdapter<String> lv_adapter;
 	OnCheckedChangeListener cb_OnCheckedChangeListener;
@@ -50,36 +45,34 @@ public class connected_device_list_activity extends AppCompatActivity {
 		ok_b = (Button) findViewById(R.id.button_cdla);
 		
 		connected_device_list=((BlueRemote)getApplicationContext()).get_connected_device_list();
-		selected_devices_list_indices=getIntent().getIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name);
 		
 		Thread getting_cb_state_thread=new Thread(){
 			
 			public void run()
 			{
-				selected_status=new boolean[(connected_device_list.size()+1)];
+				int number_of_iterations=connected_device_list.size();
 				
-				selected_status[0]=false;
+				device_use_status=new boolean[number_of_iterations];
+				device_disconnect_list=new boolean[number_of_iterations];
 				
-				int number_of_iterations=selected_devices_list_indices.size();
 				for(int count=0;count<number_of_iterations;count++)
 				{
-					selected_status[selected_devices_list_indices.get(count).intValue()+1]=true;
+					device_use_status[count]=(connected_device_list.get(count).get_number_of_components_using_this_object()==0);
+					device_disconnect_list[count]=false;
 				}
 			}
 		};
 		getting_cb_state_thread.start();
 		
-		cb_text=new String[(connected_device_list.size()+1)];
+		cb_text=new String[(connected_device_list.size())];
 		
 		Thread getting_cb_text_thread=new Thread(){
 			
 			public void run()
 			{
-				cb_text[0]="ALL";
-				
-				for(int count=1;count<cb_text.length;count++)
+				for(int count=0;count<cb_text.length;count++)
 				{
-					cb_text[count]=connected_device_list.get(count-1).toString();
+					cb_text[count]=connected_device_list.get(count).toString();
 				}
 			}
 		};
@@ -96,13 +89,13 @@ public class connected_device_list_activity extends AppCompatActivity {
 				  
 				  cb.setOnCheckedChangeListener(null);
 				  
-				  if(selected_status[position]==true)
+				  if(device_use_status[position]==true)
 				  {
-					  cb.setChecked(true);
+					  cb.setEnabled(true);
 				  }
 				  else
 				  {
-					  cb.setChecked(false);
+					  cb.setEnabled(false);
 				  }
 				  
 				  cb.setOnCheckedChangeListener(cb_OnCheckedChangeListener);
@@ -120,22 +113,7 @@ public class connected_device_list_activity extends AppCompatActivity {
 			{
 				int position=lv_adapter.getPosition(buttonView.getText().toString());
 				
-				if(position == 0)
-				{
-					int size=lv_adapter.getCount();
-					
-					for(int count=0;count<size;count++)
-					{
-						selected_status[count]=isChecked;
-					}
-				}
-				else
-				{
-					selected_status[0]=false;
-					selected_status[position]=isChecked;
-				}
-
-				lv.invalidateViews();
+				device_disconnect_list[position]=isChecked;
 			}			  
 		  };
 		
@@ -144,20 +122,17 @@ public class connected_device_list_activity extends AppCompatActivity {
 			@Override
 			public void onClick(View v) 
 			{
-				selected_devices_list_indices=null;
-				selected_devices_list_indices=new ArrayList<Integer>();
+				int number_of_iterations=device_disconnect_list.length;
 				
-				int size=lv_adapter.getCount();
-				for(int count=1;count<size;count++)
+				for(int count=0;count<number_of_iterations;count++)
 				{
-					if(selected_status[count]==true)
+					if(device_disconnect_list[count]==true)
 					{
-						selected_devices_list_indices.add(count-1);
+						connected_device_list.get(count).disconnect();
+						connected_device_list.remove(count);
 					}
 				}
 				
-				close_intent.putIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name,selected_devices_list_indices);
-				setResult(RESULT_OK, close_intent);        
 				finish();
 			}
 		});
@@ -171,6 +146,7 @@ public class connected_device_list_activity extends AppCompatActivity {
 		{
 			e.printStackTrace();
 		}
+		
 		lv_adapter.notifyDataSetChanged();
 	}
 		

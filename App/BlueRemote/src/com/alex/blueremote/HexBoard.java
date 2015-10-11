@@ -15,6 +15,7 @@ import android.view.View.OnTouchListener;
 import android.view.ViewConfiguration;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class HexBoard extends AppCompatActivity {
 
@@ -23,11 +24,8 @@ public class HexBoard extends AppCompatActivity {
 	String data="";
 	Intent close_intent=new Intent();
 	
-//	public static int hex_board_call_time_out=ViewConfiguration.getLongPressTimeout()*3;
-//	public static int hex_board_backspace_repetition_period=200;
-	
 	public static int hex_board_call_time_out;
-	public static int hex_board_backspace_repetition_period;
+	public static int hex_board_backspace_repetition_period=200;
 	
 	TimerTask backspace_task;
 	Timer backspace_timer;
@@ -35,8 +33,10 @@ public class HexBoard extends AppCompatActivity {
 	
 	public static final String identification_number="IDENTIFICATION_NUMBER";
 	public static final String initial_text="INITIAL_TEXT";
+	public static final String initial_text_as_hex="INITIAL_TEXT_AS_HEX";
 	public static final String hex_data="HEX_DATA";
 	public static final String stringed_data="STRINGED_DATA";
+	public static final String set_number_of_nibbles_to_return="SET_NUMBER_OF_NIBBLES_TO_RETURN";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
@@ -64,7 +64,16 @@ public class HexBoard extends AppCompatActivity {
         button[17]=(Button)findViewById(R.id.Button18_hexboard);
         
         et=(EditText)findViewById(R.id.editText1_hexboard);
-        et.setText(string_to_hex(this.getIntent().getStringExtra(HexBoard.initial_text)));
+        
+        if(this.getIntent().getBooleanExtra(initial_text_as_hex, false))
+        {
+        	et.setText(this.getIntent().getStringExtra(HexBoard.initial_text));
+        }
+        else
+        {
+        	et.setText(string_to_hex(this.getIntent().getStringExtra(HexBoard.initial_text)));
+        }
+        
         et.setSelection(et.getText().toString().length());
         
         ui_Handler=new Handler();
@@ -74,7 +83,7 @@ public class HexBoard extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				
-				setData("1");
+				set_text("1");
 			}
 		});
         
@@ -83,7 +92,7 @@ public class HexBoard extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				
-				setData("2");
+				set_text("2");
 			}
 		});
         
@@ -92,7 +101,7 @@ public class HexBoard extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				
-				setData("3");
+				set_text("3");
 			}
 		});
         
@@ -101,7 +110,7 @@ public class HexBoard extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 			
-				setData("4");
+				set_text("4");
 			}
 		});
         
@@ -110,7 +119,7 @@ public class HexBoard extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 			
-				setData("5");
+				set_text("5");
 			}
 		});
         
@@ -119,7 +128,7 @@ public class HexBoard extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 			
-				setData("6");
+				set_text("6");
 			}
 		});
         
@@ -128,7 +137,7 @@ public class HexBoard extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 			
-				setData("7");
+				set_text("7");
 			}
 		});
         
@@ -137,7 +146,7 @@ public class HexBoard extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 			
-				setData("8");
+				set_text("8");
 			}
 		});
         
@@ -146,7 +155,7 @@ public class HexBoard extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 			
-				setData("9");
+				set_text("9");
 			}
 		});
         
@@ -155,7 +164,7 @@ public class HexBoard extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 			
-				setData("0");
+				set_text("0");
 			}
 		});
         
@@ -164,7 +173,7 @@ public class HexBoard extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 			
-				setData("A");
+				set_text("A");
 			}
 		});
         
@@ -173,7 +182,7 @@ public class HexBoard extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 			
-				setData("B");
+				set_text("B");
 			}
 		});
         
@@ -182,7 +191,7 @@ public class HexBoard extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 			
-				setData("C");
+				set_text("C");
 			}
 		});
         
@@ -191,7 +200,7 @@ public class HexBoard extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 			
-				setData("D");
+				set_text("D");
 			}
 		});
         
@@ -200,7 +209,7 @@ public class HexBoard extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 			
-				setData("E");
+				set_text("E");
 			}
 		});
         
@@ -209,7 +218,7 @@ public class HexBoard extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 			
-				setData("F");
+				set_text("F");
 			}
 		});
         
@@ -250,32 +259,7 @@ public class HexBoard extends AppCompatActivity {
         });
                 
 	}
-	
-	public static int getHex_board_call_delay() 
-	{
-		return hex_board_call_time_out;
-	}
 
-	public static int getHex_board_call_delay_factor() 
-	{
-		return (int)(hex_board_call_time_out/ViewConfiguration.getLongPressTimeout());
-	}
-	
-	public static void setHex_board_call_delay(float hex_board_call_delay_factor) 
-	{
-		HexBoard.hex_board_call_time_out = (int)hex_board_call_delay_factor*ViewConfiguration.getLongPressTimeout();
-	}
-	
-	public static int getHex_board_backspace_delay() 
-	{
-		return hex_board_backspace_repetition_period;
-	}
-
-	public static void setHex_board_backspace_delay(int hex_board_backspace_delay) 
-	{
-		HexBoard.hex_board_backspace_repetition_period = hex_board_backspace_delay;
-	}
-	
 	void backspace(boolean start_or_stop)
 	{
 		if(start_or_stop==true)
@@ -285,12 +269,12 @@ public class HexBoard extends AppCompatActivity {
 				@Override
 				public void run() {
 					
-					int cursor_start=et.getSelectionStart();
-					int cursor_end=et.getSelectionEnd();
+					final int cursor_start=et.getSelectionStart();
+					final int cursor_end=et.getSelectionEnd();
 	        		
 					data=et.getText().toString();
 					
-					if((cursor_start<=0)||(cursor_end<=0))
+					if((cursor_start<=0)&&(cursor_end<=0))
 	        		{
 //						Log.e("Selection", "Start:"+cursor_start+" End:"+cursor_end);
 	        		}
@@ -302,12 +286,28 @@ public class HexBoard extends AppCompatActivity {
 	        		{
 	        			data=data.substring(0,cursor_start)+data.substring(cursor_end);
 	        		}
+//					Log.e("Selection", "Start:"+cursor_start+" End:"+cursor_end+"\n data:"+data);
 	        		
 					ui_Handler.post(new Runnable()
 					{
 						public void run(){
 					        	
-							setData();	
+							et.setText(data);
+							if(cursor_start==cursor_end)
+							{
+								if(cursor_start!=0)
+								{
+									et.setSelection(cursor_start-1);
+								}
+								else
+								{
+									et.setSelection(0);
+								}
+							}
+							else
+							{
+								et.setSelection(cursor_start);
+							}
 						}
 					});	
 				}
@@ -327,18 +327,50 @@ public class HexBoard extends AppCompatActivity {
 		}
 	}
 	
-	void setData(String dataIn)
+	void set_text(String dataIn)
 	{
-		data=et.getText().toString()+dataIn;
-		et.setText(data);
-		et.setSelection(data.length());
+		int cursor_start=et.getSelectionStart();
+		int cursor_end=et.getSelectionEnd();
+		
+		String editview_text=et.getText().toString();
+		
+		String text_to_set="";
+		if(cursor_start==cursor_end)
+		{
+			text_to_set=editview_text.substring(0, cursor_start)+dataIn+editview_text.substring(cursor_start);
+		}
+		else
+		{
+			text_to_set=editview_text.substring(0, cursor_start)+dataIn+editview_text.substring(cursor_end);
+		}
+		
+		et.setText(text_to_set);
+		et.setSelection(cursor_start+1);
 	}
 	
-	void setData()
+	public static int get_hex_board_call_time_out() 
 	{
-//		data=ev1.getText().toString();
-		et.setText(data);
-		et.setSelection(data.length());
+		return hex_board_call_time_out;
+	}
+
+	public static int get_hex_board_call_delay_factor() 
+	{
+		return (int)(hex_board_call_time_out/ViewConfiguration.getLongPressTimeout());
+	}
+	
+	public static void set_hex_board_call_time_out(float hex_board_call_delay_factor) 
+	{
+		HexBoard.hex_board_call_time_out = (int)hex_board_call_delay_factor*ViewConfiguration.getLongPressTimeout();
+	}
+	
+	public static int get_hex_board_backspace_repetition_period() 
+	{
+		return hex_board_backspace_repetition_period;
+	}
+
+	public static void set_hex_board_backspace_repetition_period(int hex_board_backspace_delay) 
+	{
+		HexBoard.hex_board_backspace_repetition_period = hex_board_backspace_delay;
 	}
 	
 	public static String string_to_hex(String input)
@@ -359,7 +391,6 @@ public class HexBoard extends AppCompatActivity {
 			
 			return output;
 		}
-		
 	}
 	
 	public static String hex_to_string(String input)
@@ -390,6 +421,26 @@ public class HexBoard extends AppCompatActivity {
 	
 	void bye_bye()
 	{
+		int number_of_nibbles=getIntent().getIntExtra(set_number_of_nibbles_to_return, 0);
+		if(number_of_nibbles>0)
+		{
+			if(et.getText().toString().length()==number_of_nibbles)
+			{
+				
+			}
+			else
+			{
+				Toast
+					.makeText(getApplicationContext(), "Number of Required Nibbles to return:"+number_of_nibbles, Toast.LENGTH_SHORT)
+						.show();
+				return;
+			}
+		}
+		else
+		{
+			
+		}
+		
 		close_intent.putExtra(HexBoard.identification_number,this.getIntent().getIntExtra(HexBoard.identification_number,-1));
 		close_intent.putExtra(HexBoard.hex_data,et.getText().toString());
 		close_intent.putExtra(HexBoard.stringed_data,hex_to_string(et.getText().toString()));

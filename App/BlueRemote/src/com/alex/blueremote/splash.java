@@ -2,6 +2,7 @@ package com.alex.blueremote;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -24,19 +25,18 @@ public class splash extends AppCompatActivity {
 //		imageView.setImageResource(R.drawable.logo);
 		
 		global_variables_object = (BlueRemote)getApplicationContext();
-		global_variables_object.setBtAdapter(BluetoothAdapter.getDefaultAdapter());
+		global_variables_object.set_BtAdapter(BluetoothAdapter.getDefaultAdapter());
 		
-		if(global_variables_object.getBtAdapter() == null) 
+		if(global_variables_object.get_BtAdapter() == null) 
 		{
 		    Toast.makeText(getApplicationContext(), "No BlueTooth Hardware Detected.\nApp Exited", Toast.LENGTH_LONG).show();
 		    finish();
 		}
 		
-		//*
 		//Direct Turn On BT by App 
-		if (global_variables_object.getBtAdapter().isEnabled()==false) 
+		if (global_variables_object.get_BtAdapter().isEnabled()==false) 
 		{
-			global_variables_object.getBtAdapter().enable();
+			global_variables_object.get_BtAdapter().enable();
 		}
 
 		new Thread(){
@@ -47,13 +47,17 @@ public class splash extends AppCompatActivity {
 				{
 					sleep(1000);
 					
-					while(global_variables_object.getBtAdapter().getState()==BluetoothAdapter.STATE_TURNING_ON)
+					while(global_variables_object.get_BtAdapter().getState()==BluetoothAdapter.STATE_TURNING_ON)
 					{
 						//Log.d(BLUETOOTH_SERVICE, "Bluetooth turning On.");
 					}
 					Log.d(BLUETOOTH_SERVICE, "Bluetooth turned On.");
 				    
 					startActivity(new Intent(".MainActivity"));
+					
+//					Intent cp=new Intent(".color_picker");
+//					cp.putExtra(color_picker.passed_color,Color.rgb(150, 45, 200));
+//					startActivity(cp);
 //					startActivity(new Intent(".connected_device_list_activity"));
 					
 //					Intent a= new Intent(splash.this,programming_activity.class);
@@ -68,8 +72,6 @@ public class splash extends AppCompatActivity {
 			}
 		}.start();
 			    
-	    //*/
-	    
 	    /*
 		//Request User to turn on BT 
 	    //Can not turned off
@@ -107,9 +109,6 @@ public class splash extends AppCompatActivity {
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		
 		return false;
 	}
 	
@@ -125,5 +124,4 @@ public class splash extends AppCompatActivity {
 		super.onDestroy();
 		Log.e("Splash", "Splashing out");
 	}
-	
 }

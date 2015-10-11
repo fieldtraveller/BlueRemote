@@ -1,4 +1,4 @@
-package com.alex.blueremote;
+package helper.bluetooth_helper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,39 +9,40 @@ import java.util.UUID;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
-import android.widget.Toast;
 
 public class BT_spp implements Parcelable
 {
 	BluetoothDevice BT_Device;
 	boolean isDiscovered=false;
 	
-	device_connection_status_interface dcsi;
-	device_write_interface dwi;
-	device_read_interface dri;
+	private device_connection_status_interface dcsi;
+	private device_write_interface dwi;
+	private device_read_interface dri;
 	
 	//SPP UUID
     final static UUID BT_spp_uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-   
-    BluetoothSocket BT_socket;
+    
+	BluetoothSocket BT_socket;
     OutputStream BT_outputStream;
     InputStream BT_inputStream;
     
-    static Handler ui_handler;
-	
     int number_of_components_using_this_object=0;
     
-    BT_spp(BluetoothDevice BT_Device,boolean isDiscovered)
+    public BT_spp()
+	{
+    	
+	}
+    
+    public BT_spp(BluetoothDevice BT_Device,boolean isDiscovered)
 	{
 		this.BT_Device=BT_Device;
 		this.isDiscovered = isDiscovered;
 	}
     
-    BT_spp(BluetoothAdapter BtAdapter,String BT_mac_address)
+    public BT_spp(BluetoothAdapter BtAdapter,String BT_mac_address)
     {
     	BT_Device = BtAdapter.getRemoteDevice(BT_mac_address);
 
@@ -55,8 +56,22 @@ public class BT_spp implements Parcelable
     	}
     }
 
+    public BluetoothSocket get_BT_socket() {
+		return BT_socket;
+	}
+
+	public void set_BT_socket(BluetoothSocket bT_socket) {
+		BT_socket = bT_socket;
+	}
+
+	public static UUID get_Bt_spp_uuid() {
+		return BT_spp_uuid;
+	}
+
     public void connect() 
     {
+    	final BT_spp this_object=this;
+		
     	Thread Connect_thread = new Thread(){
     		public void run() 
     	    {	
@@ -122,66 +137,53 @@ public class BT_spp implements Parcelable
     	    		}
     	    	}
     	    	
-       	    	if(BT_spp.ui_handler!=null)
-   	    		{
-   	    			if((BT_socket==null)||(BT_socket.isConnected()==false))
-       	        	{
-   	    				dcsi.on_device_connection_fail();
-   	    				
-   	    				ui_handler.post(new Runnable(){
-    	
-       	          	    	@Override
-    						public void run() {
-    							Toast.makeText(BlueRemote.getContext(), "Unable To Connect To Device.", Toast.LENGTH_LONG).show();
-    						}
-        	        			
-        	        	});
-        	        }
-        	       	else
-        	       	{
-        	       		dcsi.on_device_connection_pass();
-        	       		
-        	       		Thread device_input_reader_thread=new Thread(){
-   	    					
-   	    					public void run()
-   	    					{
-   	    						try 
-	    						{
-   	    							while(BT_socket.isConnected())
-   	   	    						{
-   	   	    							if(BT_inputStream.available()>0)
-   										{
-   											read(new byte[1024]);
-   										}
-   										else
-   										{
-   											Thread.sleep(100);
-   										}
-   	   	    						}
-	    						}
-   	    						catch (IOException e) 
-  	    						{
-									e.printStackTrace();
-								} 
-  	    						catch (InterruptedException e) 
-  	    						{
-									e.printStackTrace();
-								}
-   	    					}
-   	    				};
-   	    				
-//   	    				device_input_reader_thread.start();
-   	    				
-        	       		ui_handler.post(new Runnable(){
-
-        	       	    	@Override
-    						public void run() {
-        	       	    		Toast.makeText(BlueRemote.getContext(), "Device Connected", Toast.LENGTH_SHORT).show();
-    						}
-        	        			
-        	      		});
+    	    	if((BT_socket==null)||(BT_socket.isConnected()==false))
+   	        	{
+    	    		if(get_dcsi()!=null)
+    	    		{
+    	    			get_dcsi().on_device_connection_fail();
+    	    			get_dcsi().on_device_connection_fail(this_object);
+    	    		}
+    	        }
+    	       	else
+    	       	{
+    	       		if(get_dcsi()!=null)
+    	    		{
+    	       			get_dcsi().on_device_connection_pass();
+        	       		get_dcsi().on_device_connection_pass(this_object);
         	       	}
-    	   		}
+    	       		
+    	       		Thread device_input_reader_thread=new Thread(){
+	    					
+	    					public void run()
+	    					{
+	    						try 
+	    						{
+	    							while(BT_socket.isConnected())
+	   	    						{
+	   	    							if(BT_inputStream.available()>0)
+										{
+											read(new byte[1024]);
+										}
+										else
+										{
+											Thread.sleep(100);
+										}
+	   	    						}
+	    						}
+	    						catch (IOException e) 
+	    						{
+	    							e.printStackTrace();
+	    						} 
+	    						catch (InterruptedException e) 
+	    						{
+	    							e.printStackTrace();
+	    						}
+	    					}
+	    				};
+	    				
+	    				device_input_reader_thread.start();
+    	       	}
     		}
     	};
     	
@@ -199,10 +201,11 @@ public class BT_spp implements Parcelable
     	{
 			e.printStackTrace();
 		}
-    	
-    	dri.on_device_read();
-    	dri.on_device_read(this.BT_Device.getName()+"<:",return_value,"");
-    	
+    	if(get_dri()!=null)
+		{
+    		get_dri().on_device_read();
+        	get_dri().on_device_read(this.BT_Device.getName()+"<:",return_value,"");
+		}
 		return return_value;
     }
     
@@ -218,9 +221,11 @@ public class BT_spp implements Parcelable
 			e.printStackTrace();
 		}
 		
-    	dri.on_device_read();
-    	dri.on_device_read(this.BT_Device.getName()+"<:",buffer,return_value,"");
-    	
+    	if(get_dri()!=null)
+		{
+    		get_dri().on_device_read();
+        	get_dri().on_device_read(this.BT_Device.getName()+"<:",buffer,return_value,"");
+		}
     	return return_value;
     }
     
@@ -236,8 +241,11 @@ public class BT_spp implements Parcelable
 			e.printStackTrace();
 		}
 		
-    	dri.on_device_read();
-    	dri.on_device_read(this.BT_Device.getName()+"<:",buffer,return_value,"");
+    	if(get_dri()!=null)
+		{
+    		get_dri().on_device_read();
+        	get_dri().on_device_read(this.BT_Device.getName()+"<:",buffer,return_value,"");
+		}
     	
     	return return_value;
     }
@@ -253,8 +261,11 @@ public class BT_spp implements Parcelable
 			e.printStackTrace();
 		}
     	
-    	dwi.on_device_write();
-    	dwi.on_device_write(this.BT_Device.getName()+">: ",input,"");
+    	if(get_dwi()!=null)
+		{
+			get_dwi().on_device_write();
+    		get_dwi().on_device_write(this.BT_Device.getName()+">:",input,"");
+		}
     }
     
     public void write(byte[] input)
@@ -270,8 +281,11 @@ public class BT_spp implements Parcelable
     			e.printStackTrace();
     		}
     		
-    		dwi.on_device_write();
-    		dwi.on_device_write(this.BT_Device.getName()+">: ",input,"");
+    		if(get_dwi()!=null)
+    		{
+    			get_dwi().on_device_write();
+        		get_dwi().on_device_write(this.BT_Device.getName()+">:",input,"");
+    		}
     	}
     }
     
@@ -288,8 +302,11 @@ public class BT_spp implements Parcelable
     			e.printStackTrace();
     		}
     		
-    		dwi.on_device_write();
-    		dwi.on_device_write(this.BT_Device.getName()+">: ",input,"");
+    		if(get_dwi()!=null)
+    		{
+    			get_dwi().on_device_write();
+        		get_dwi().on_device_write(this.BT_Device.getName()+">:",input,"");
+    		}
     	}
     }
     
@@ -341,17 +358,48 @@ public class BT_spp implements Parcelable
 		this.isDiscovered = isDiscovered;
 	}
 
-	void used_by_new_component()
+	public device_connection_status_interface get_dcsi() {
+		return dcsi;
+	}
+
+	public void set_dcsi(device_connection_status_interface dcsi) {
+		this.dcsi = dcsi;
+	}
+
+	public device_write_interface get_dwi() {
+		return dwi;
+	}
+
+	public void set_dwi(device_write_interface dwi) {
+		this.dwi = dwi;
+	}
+
+	public device_read_interface get_dri() {
+		return dri;
+	}
+
+	public void set_dri(device_read_interface dri) {
+		this.dri = dri;
+	}
+
+	public void used_by_new_component()
     {
     	this.number_of_components_using_this_object++;
     }
     
-    void not_used_by_a_component()
+	public void not_used_by_a_component()
     {
     	this.number_of_components_using_this_object--;
     }
     
-    int get_number_of_components_using_this_object()
+	public void set_number_of_components_using_this_object(
+			int number_of_components_using_this_object) 
+	{
+		this.number_of_components_using_this_object = number_of_components_using_this_object;
+	}
+
+	
+	public int get_number_of_components_using_this_object()
     {
     	return number_of_components_using_this_object;
     }
@@ -382,6 +430,7 @@ public class BT_spp implements Parcelable
     	int number_of_iterations=component_list.size();
     	for(int count=0;count<number_of_iterations;count++)
     	{
+    		component_list.get(0).not_used_by_a_component();
     		component_list.remove(0);
     	}
     	
@@ -389,7 +438,11 @@ public class BT_spp implements Parcelable
     	number_of_iterations=input_indices.size();
     	for(int count=0;count<number_of_iterations;count++)
     	{
-    		component_list.add(master_list.get(input_indices.get(count).intValue()));
+    		BT_spp device_to_add=master_list.get(input_indices.get(count).intValue());
+    		component_list.add(device_to_add);
+    		device_to_add.used_by_new_component();
+    		
+    		device_to_add=null;
     	}
     }
     
@@ -448,7 +501,7 @@ public class BT_spp implements Parcelable
         
         if (input_object == this) 
         {
-        	return true; //if both pointing towards same object on heap
+        	return true;	//if both pointing towards same object on heap
         }
         
         if(input_object instanceof BluetoothDevice)
@@ -482,8 +535,8 @@ public class BT_spp implements Parcelable
 //        dest.writeValue(BT_outputStream);
 //        dest.writeValue(BT_inputStream);
     }
-
-    public static final Parcelable.Creator<BT_spp> CREATOR = new Parcelable.Creator<BT_spp>() {
+    
+	public static final Parcelable.Creator<BT_spp> CREATOR = new Parcelable.Creator<BT_spp>() {
         @Override
         public BT_spp createFromParcel(Parcel in) {
             return new BT_spp(in);

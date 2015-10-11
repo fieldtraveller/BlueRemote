@@ -1,4 +1,4 @@
-package bluetooth_helper;
+package unused;
 
 import android.bluetooth.BluetoothDevice;
 

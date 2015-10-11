@@ -2,6 +2,8 @@ package com.alex.blueremote;
 
 import java.util.ArrayList;
 
+import bluetooth_helper.BT_spp;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.app.Fragment;

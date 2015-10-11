@@ -22,7 +22,8 @@
         
         <activity
 	        android:name=".splash"
-	        android:label="@string/app_name">
+	        android:label="@string/app_name"
+	        android:configChanges="orientation|screenSize">
 	    	
 	    	<intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,7 +34,8 @@
     	
     	<activity
             android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:configChanges="orientation|screenSize" >
             
             <intent-filter>
                 <action android:name=".MainActivity" />
@@ -46,6 +48,7 @@
 	        android:name=".new_device_list_activity"
 	        android:label="@string/dl_activity"
 	        android:theme="@style/Theme.AppCompat.Light.Dialog"
+	        android:configChanges="orientation|screenSize"
 	        android:parentActivityName=".MainActivity"
 	        android:windowSoftInputMode="adjustPan|stateVisible|adjustResize" >
         
@@ -62,7 +65,9 @@
         
         <activity
 	        android:name=".HexBoard"
-	        android:label="@string/hexboard" >
+	        android:label="@string/hexboard" 
+	        android:screenOrientation="portrait"
+	        android:configChanges="orientation|screenSize">
 	    	
 	    	<intent-filter>
                 <action android:name=".HexBoard" />
@@ -73,7 +78,8 @@
     	
         <activity
 			android:name=".programming_activity"
-			android:label="@string/programming_activity" >
+			android:label="@string/programming_activity" 
+			android:configChanges="orientation|screenSize">
 	    	
 	    	<intent-filter>
                 <action android:name=".programming_activity" />
@@ -86,6 +92,7 @@
 	        android:name=".connected_device_list_activity"
 	        android:label="@string/dl_activity" 
 	        android:theme="@style/Theme.AppCompat.Light.Dialog"
+	        android:configChanges="orientation|screenSize"
 	        >
 	    
 	    <intent-filter>
@@ -96,9 +103,24 @@
     	</activity>
     	
         <activity
+	        android:name=".disconnect_device_activity"
+	        android:label="@string/devices_to_disconnect" 
+	        android:theme="@style/Theme.AppCompat.Light.Dialog"
+	        android:configChanges="orientation|screenSize"
+	        >
+	    
+	    <intent-filter>
+                <action android:name=".disconnect_device_activity" />
+                <category android:name="android.intent.category.DEFAULT" />
+        </intent-filter>
+    	
+    	</activity>
+    	
+        <activity
 	        android:name=".preferences_activity"
 	        android:label="@string/preferences" 
-	        android:parentActivityName=".MainActivity" >
+	        android:configChanges="orientation|screenSize"
+	        android:parentActivityName=".MainActivity">
         
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
@@ -111,6 +133,20 @@
     	
     	</activity>
         
+        <activity
+	        android:name=".color_picker"
+	        android:label="@string/color_picker"
+	        android:screenOrientation="portrait" 
+	        android:configChanges="orientation|screenSize"
+	        android:theme="@style/Theme.AppCompat.Light.Dialog">
+        
+        <intent-filter>
+                <action android:name=".color_picker" />
+                <category android:name="android.intent.category.DEFAULT" />
+        </intent-filter>
+    	
+    	</activity>
+    	
     </application>
 
 </manifest>

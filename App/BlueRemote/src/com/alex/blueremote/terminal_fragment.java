@@ -3,8 +3,10 @@ package com.alex.blueremote;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
+import helper.bluetooth_helper.BT_spp;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -32,6 +34,8 @@ public class terminal_fragment extends Fragment {
 	
 	Button send,devices,clear;
 	ArrayList<BT_spp> send_device_list;
+	
+	static int colors[];
 	
 	Handler terminal_handler;
 	
@@ -63,6 +67,8 @@ public class terminal_fragment extends Fragment {
   		
   		tv_1.setText("");
   		
+  		set_background_color();
+  		
   		terminal_handler=new Handler();
   		
   		send_device_list=((MainActivity)this.container_activity).terminal_device_list;
@@ -77,7 +83,7 @@ public class terminal_fragment extends Fragment {
 								((MainActivity)container_activity).global_variables_object.connected_device_list
 								,send_device_list));
 				
-				startActivityForResult(connected_device_list, connected_device_list_activity.connected_device_list_request_code);
+				startActivityForResult(connected_device_list, connected_device_list_activity.connected_device_list_activiy_request_code);
 			}
   			
   		});
@@ -148,7 +154,7 @@ public class terminal_fragment extends Fragment {
 			et_1.setText(data.getStringExtra(HexBoard.stringed_data));
 			et_1.setSelection(et_1.getText().length());
 		}
-		else if(requestCode==connected_device_list_activity.connected_device_list_request_code)
+		else if(requestCode==connected_device_list_activity.connected_device_list_activiy_request_code)
 		{
 			BT_spp.update_list_based_on_indices(
 					((MainActivity)container_activity).global_variables_object.connected_device_list
@@ -161,4 +167,27 @@ public class terminal_fragment extends Fragment {
 		}
     }  
 
+	public static int[] get_colors() {
+		return colors;
+	}
+
+	public static void set_colors(int[] colors) {
+		terminal_fragment.colors = colors;
+		
+//		Log.e("", "colors:"+colors+" "+colors[0]+" "+colors[1]+" "+colors[2]);
+	}
+	
+	public void set_background_color() {
+
+		this.sv.setBackgroundColor(colors[0]);
+	}
+	
+	public int get_incoming_foreground_color() {
+		return colors[1];
+	}
+	
+	public int get_outgoing_foreground_color() {
+		return colors[2];
+	}
 }
+

@@ -2,7 +2,13 @@ package com.alex.blueremote;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import helper.call_this_method_interface;
+import helper.bluetooth_helper.BT_spp;
+import helper.bluetooth_helper.bluetooth_button;
+import helper.bluetooth_helper.bluetooth_compound_button;
+import helper.bluetooth_helper.bluetooth_view;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.app.Activity;
@@ -17,8 +23,8 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.View.OnTouchListener;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.Switch;
 import android.widget.TextView;
 
 public class control_interface_fragment extends Fragment {
@@ -29,15 +35,13 @@ public class control_interface_fragment extends Fragment {
 	TextView tv_1;
 	
 	Button send;
-	bluetooth_button<Fragment> buttons[]=new bluetooth_button[5]; 
-	bluetooth_switch<Fragment> switchs[]=new bluetooth_switch[2]; 
+//	bluetooth_button<Fragment> buttons[]=new bluetooth_button[5]; 
+//	bluetooth_compound_button<Fragment> compound_buttons[]=new bluetooth_compound_button[2]; 
+	
+	ArrayList<bluetooth_button<Fragment>> buttons; 
+	ArrayList<bluetooth_compound_button<Fragment>> compound_buttons;
 	
 	ArrayList<BT_spp> send_device_list;
-	
-//	@SuppressWarnings("unchecked")
-//	bluetooth_button<Fragment> buttons[]=(bluetooth_button<Fragment>[]) Array.newInstance((new bluetooth_button<Fragment>()).getClass().getComponentType(),5); 
-//	@SuppressWarnings("unchecked")
-//	bluetooth_switch<Fragment> switchs[]=(bluetooth_switch<Fragment>[]) Array.newInstance((new bluetooth_switch<Fragment>()).getClass().getComponentType(),2); 
 	
 	final int hexboard_activity_request_code=4;
 	Handler hex_board_handler;
@@ -67,41 +71,112 @@ public class control_interface_fragment extends Fragment {
 		this.container_activity=(MainActivity) getActivity();
 		this.container_activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         
+		buttons=new ArrayList<bluetooth_button<Fragment>>(); 
+		compound_buttons=new ArrayList<bluetooth_compound_button<Fragment>>();
+		
 		//channel_up
-  		buttons[0]=new bluetooth_button<Fragment>(this, null, (Button)this.getView().findViewById(R.id.button1_cif),((MainActivity)this.container_activity).button_data[0]);
+  		buttons.add(
+  				new bluetooth_button<Fragment>(this, null, (Button)this.getView().findViewById(R.id.button1_cif),((MainActivity)this.container_activity).button_data[0])
+  				);
   		//channel_down
-  		buttons[1]=new bluetooth_button<Fragment>(this, null, (Button)this.getView().findViewById(R.id.button5_cif),((MainActivity)this.container_activity).button_data[1]);
+  		buttons.add(
+  				new bluetooth_button<Fragment>(this, null, (Button)this.getView().findViewById(R.id.button5_cif),((MainActivity)this.container_activity).button_data[1])
+  				);
   		//volume_up
-  		buttons[2]=new bluetooth_button<Fragment>(this, null, (Button)this.getView().findViewById(R.id.button4_cif),((MainActivity)this.container_activity).button_data[2]);
+  		buttons.add(
+   				new bluetooth_button<Fragment>(this, null, (Button)this.getView().findViewById(R.id.button4_cif),((MainActivity)this.container_activity).button_data[2])
+  				);
   		//volume_down
-  		buttons[3]=new bluetooth_button<Fragment>(this, null, (Button)this.getView().findViewById(R.id.button2_cif),((MainActivity)this.container_activity).button_data[3]);
+  		buttons.add(
+  		    	new bluetooth_button<Fragment>(this, null, (Button)this.getView().findViewById(R.id.button2_cif),((MainActivity)this.container_activity).button_data[3])
+  				);
   		//select
-  		buttons[4]=new bluetooth_button<Fragment>(this, null, (Button)this.getView().findViewById(R.id.button3_cif),((MainActivity)this.container_activity).button_data[4]);
+  		buttons.add(
+   				new bluetooth_button<Fragment>(this, null, (Button)this.getView().findViewById(R.id.button3_cif),((MainActivity)this.container_activity).button_data[4])
+  				);
   		
   		//power
-  		switchs[0]=new bluetooth_switch<Fragment>(this, null, (Switch)this.getView().findViewById(R.id.switch1_cif),((MainActivity)this.container_activity).switch_data[0]);
+  		compound_buttons.add(
+   				new bluetooth_compound_button<Fragment>(this, null, (CompoundButton)this.getView().findViewById(R.id.switch1_cif),((MainActivity)this.container_activity).compound_button_data[0])
+  			);
   		//mute
-  		switchs[1]=new bluetooth_switch<Fragment>(this, null, (Switch)this.getView().findViewById(R.id.switch2_cif),((MainActivity)this.container_activity).switch_data[1]);
+  		compound_buttons.add(
+   				new bluetooth_compound_button<Fragment>(this, null, (CompoundButton)this.getView().findViewById(R.id.switch2_cif),((MainActivity)this.container_activity).compound_button_data[1])
+  			);
   															 
   		Intent programming_activity_intent = new Intent(container_activity,programming_activity.class);
-//  		Intent programming_activity_intent = new Intent(".programming_activity");
-  		
-  		for(int count=0;count<buttons.length;count++)
+
+  		call_this_method_interface put_more_extras=new call_this_method_interface(){
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public void call_this_method(Object object) 
+			{
+				bluetooth_view<Fragment> passed_bluetooth_view=(bluetooth_view<Fragment>)object;
+				
+				if(passed_bluetooth_view instanceof bluetooth_button<?>)
+				{
+					passed_bluetooth_view.get_programming_activity_intent().putExtra(programming_activity.input_type,bluetooth_button.input_type_button);
+				}
+				else if(passed_bluetooth_view instanceof bluetooth_compound_button<?>)
+				{
+					passed_bluetooth_view.get_programming_activity_intent().putExtra(programming_activity.input_type,bluetooth_compound_button.input_type_compound_button);
+				}
+				else
+				{
+					
+				}
+				
+				passed_bluetooth_view.get_programming_activity_intent().putIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name,BT_spp.get_indices(
+							((BlueRemote)(((Fragment)passed_bluetooth_view.get_calling_activity_or_fragment()).getActivity()).getApplicationContext())
+							.get_connected_device_list(),passed_bluetooth_view.get_BT_serial_devices())
+							);
+			}
+  			
+  		}; 
+  		call_this_method_interface get_more_extras=new call_this_method_interface(){
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public void call_this_method(Object object) {
+				
+				HashMap<String, Object> hp=(HashMap<String, Object>)object;
+				bluetooth_view<Fragment> passed_bluetooth_view=(bluetooth_view<Fragment>) hp.get(bluetooth_view.passed_bluetooth_view);
+				Intent passed_intent=(Intent) hp.get(bluetooth_view.passed_intent);
+				
+				
+				BT_spp.update_list_based_on_indices(
+							((BlueRemote)(((Fragment)passed_bluetooth_view.get_calling_activity_or_fragment()).getActivity()).getApplicationContext())
+							.get_connected_device_list()
+							,passed_bluetooth_view.get_BT_serial_devices()
+							,passed_intent.getIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name));
+			}
+  		}; 
+
+  		int number_of_iterations=buttons.size();
+  		for(int count=0;count<number_of_iterations;count++)
   		{
-  			buttons[count].setProgramming_parameters(programming_activity_intent,100+count);
+  			buttons.get(count).set_programming_parameters(programming_activity_intent,100+count);
+  			
+  			buttons.get(count).set_put_more_extras(put_more_extras);
+  			buttons.get(count).set_get_more_extras(get_more_extras);
   			
   			((MainActivity)this.container_activity)
   				.global_variables_object.list_of_devices_assigned_to_components
-  					.add(buttons[count].BT_serial_devices);
+  					.add(buttons.get(count).get_BT_serial_devices());
   		}
   		
-  		for(int count=0;count<switchs.length;count++)
+  		number_of_iterations=compound_buttons.size();
+  		for(int count=0;count<number_of_iterations;count++)
   		{
-  			switchs[count].setProgramming_parameters(programming_activity_intent,200+count);
+  			compound_buttons.get(count).set_programming_parameters(programming_activity_intent,200+count);
+  			
+  			compound_buttons.get(count).set_put_more_extras(put_more_extras);
+  			compound_buttons.get(count).set_get_more_extras(get_more_extras);
   			
   			((MainActivity)this.container_activity)
 				.global_variables_object.list_of_devices_assigned_to_components
-					.add(switchs[count].BT_serial_devices);
+					.add(compound_buttons.get(count).get_BT_serial_devices());
 
   		}
 
@@ -115,15 +190,15 @@ public class control_interface_fragment extends Fragment {
   		
   		send_device_list=((MainActivity)this.container_activity).terminal_device_list;
   		
-  		switchs[0].setSet_task_on_switch_off(new set_task(){
+  		compound_buttons.get(0).set_on_compound_button_off(new call_this_method_interface() {
 
 			@Override
-			public void perform_task() 
-			{
-				switchs[1].switcher.setChecked(false);
+			public void call_this_method(Object object) {
+				((CompoundButton) compound_buttons.get(1).get_view()).setChecked(false);
 			}
-		});
-		
+
+		});		
+  		
 	    send.setOnClickListener(new View.OnClickListener() {
 	    	
 	    	@Override
@@ -133,9 +208,7 @@ public class control_interface_fragment extends Fragment {
 				for(int count=0;count<device_count;count++)
 				{
 					send_device_list.get(count).write(et_1.getText().toString().getBytes(Charset.forName("ISO-8859-1")));
-				}
-	    		
-//	    		BT_serial_device
+				}	    		
 	    	}
 		});
 	    	    
@@ -191,14 +264,16 @@ public class control_interface_fragment extends Fragment {
 		}
 		else
 		{
-			for(int count=0;count<buttons.length;count++)
+			int number_of_iterations=buttons.size();
+			for(int count=0;count<number_of_iterations;count++)
 			{
-				buttons[count].update_button_onActivityResult(requestCode,resultCode,data);
+				buttons.get(count).update_view_onActivityResult(requestCode,resultCode,data);
 			}
 			
-			for(int count=0;count<switchs.length;count++)
+			number_of_iterations=compound_buttons.size();
+			for(int count=0;count<number_of_iterations;count++)
 			{
-				switchs[count].update_switch_onActivityResult(requestCode,resultCode,data);
+				compound_buttons.get(count).update_view_onActivityResult(requestCode,resultCode,data);
 			}
 			
 			Log.e("","InFragment requestCode:"+requestCode+"\n data:"+data);

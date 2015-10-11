@@ -6,7 +6,11 @@
 	<string name="hexboard">HexBoard</string>
 	<string name="programming_activity">Set Values</string>
     <string name="terminal">Terminal</string>
-    
+    <string name="devices_to_disconnect">Devices To Disconnect</string>
+	<string name="color_picker">Color Picker</string>
+	
+	<string name="nothing">     </string>
+	
     <string name="splash_image_description">App Logo</string>
 	
 	<string name="power_switch">Power</string>
@@ -68,12 +72,27 @@
     <string name="control_interface">Control Interface</string>
     <string name="button_repetition_period">Button Repetition Period(in ms):</string>
     
+    <string name="set_background_color">Set Background Color:</string>
+    <string name="set_foreground_color">Set Foreground Color:</string>
+    <string name="for_incoming_data">For Incoming Data:</string>
+    <string name="for_outgoing_data">For Outgoing Data:</string>
+    
     <string name="hex_board_call_time_out_factor">Call Time Out Factor:</string>
     <string name="hex_board_backspace_repetition_period">Backspace Repetition Period(in ms):</string>
     
+    <string name="alpha">Alpha</string>
+    <string name="red">Red</string>
+    <string name="blue">Blue</string>
+    <string name="green">Green</string>
+    <string name="two_five_five">255</string>
+    <string name="FF">FF</string>
+    <string name="hash">#</string>
+    <string name="hashFFFFFFFF">#FFFFFFFF</string>
+    
     <string name="bt_connect_device">Connect New Device</string>
     <string name="bt_disconnect_device">Disconnect a Device</string>
-    <string name="make_device_discoverable">Make Device Discoverable</string>
+    <string name="enable_discoverability">Enable Discoverability</string>
+    <string name="disable_discoverability">Disable Discoverability</string>
     
     <string name="program_mode">Program Mode</string>
     <string name="normal_mode">Normal Mode</string>
