@@ -128,13 +128,23 @@
 		        android:layout_width="3dp"
 		        android:layout_height="match_parent" />
         
-        
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#FF43F839"
+                
+                android:paddingBottom="3dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:paddingTop="3dp" >
+            
         	<Button
                 android:id="@+id/button2_preferences"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/nothing" />
 
+        	</RelativeLayout>
         </LinearLayout>
 
         <TextView
@@ -159,14 +169,23 @@
 		        android:layout_width="3dp"
 		        android:layout_height="match_parent" />
         
-        
+			<RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#FF43F839"
+                
+                android:paddingBottom="3dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:paddingTop="3dp" >
+            
         	<Button
                 android:id="@+id/button3_preferences"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/nothing" />
-
-
+			
+			</RelativeLayout>
         </LinearLayout>
 
         <Space
@@ -188,13 +207,23 @@
 		        android:layout_width="4dp"
 		        android:layout_height="match_parent" />
         
-        
+        	<RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#FF43F839"
+                
+                android:paddingBottom="3dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:paddingTop="3dp" >
+            
         	<Button
                 android:id="@+id/button4_preferences"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/nothing" />
 
+        	</RelativeLayout>
         </LinearLayout>
         
         <Space

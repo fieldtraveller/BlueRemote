@@ -2,7 +2,6 @@ package com.alex.blueremote;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -54,16 +53,6 @@ public class splash extends AppCompatActivity {
 					Log.d(BLUETOOTH_SERVICE, "Bluetooth turned On.");
 				    
 					startActivity(new Intent(".MainActivity"));
-					
-//					Intent cp=new Intent(".color_picker");
-//					cp.putExtra(color_picker.passed_color,Color.rgb(150, 45, 200));
-//					startActivity(cp);
-//					startActivity(new Intent(".connected_device_list_activity"));
-					
-//					Intent a= new Intent(splash.this,programming_activity.class);
-//					a.putExtra(programming_activity.input_type,programming_activity.input_type_just_devices);
-//					startActivity(a);
-					
 				}
 				catch(InterruptedException e)
 				{
@@ -122,6 +111,5 @@ public class splash extends AppCompatActivity {
 	protected void onDestroy ()
 	{
 		super.onDestroy();
-		Log.e("Splash", "Splashing out");
 	}
 }

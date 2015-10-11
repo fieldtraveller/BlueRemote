@@ -21,6 +21,10 @@
 	<string name="channel_down">CH-</string>
 	<string name="send">Send</string>
 	<string name="select">Select</string>
+	<string name="aaa">   A   </string>	
+	<string name="bbb">   B   </string>
+	<string name="ccc">   C   </string>
+	
 	<string name="set_value">Set Value</string>	
 	
 	<string name="refresh">Refresh</string>

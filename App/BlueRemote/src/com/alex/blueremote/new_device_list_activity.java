@@ -336,7 +336,6 @@ public class new_device_list_activity extends AppCompatActivity {
 			
 			public void run()
 			{
-				Log.w("","isDiscovering()"+global_variables_object.get_BtAdapter().isDiscovering());
 				if(global_variables_object.get_BtAdapter().isDiscovering())
 				{
 					Log.w(BLUETOOTH_SERVICE,"BT Discovery Cancelled:"+global_variables_object.get_BtAdapter().cancelDiscovery());

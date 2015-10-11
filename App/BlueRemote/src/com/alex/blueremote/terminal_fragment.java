@@ -6,12 +6,10 @@ import java.util.ArrayList;
 import helper.bluetooth_helper.BT_spp;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -33,7 +31,7 @@ public class terminal_fragment extends Fragment {
 	EditText et_1;
 	
 	Button send,devices,clear;
-	ArrayList<BT_spp> send_device_list;
+	ArrayList<BT_spp> terminal_device_list;
 	
 	static int colors[];
 	
@@ -41,6 +39,10 @@ public class terminal_fragment extends Fragment {
 	
 	final int hexboard_activity_request_code=4;
 	Runnable hex_board_runnable;
+	
+	public static String terminal_background_color_extra_name="TERMINAL_BACKGROUND_COLOR";
+	public static String terminal_incoming_foreground_color_extra_name="TERMINAL_INCOMING_FOREGROUND_COLOR";
+	public static String terminal_outgoing_foreground_color_extra_name="TERMINAL_OUTGOING_FOREGROUND_COLOR";
 	
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -54,7 +56,6 @@ public class terminal_fragment extends Fragment {
 	{
 		super.onActivityCreated(savedInstanceState);
 		
-		Log.e("","Fragment:onActivityCreated");
 		this.container_activity=(MainActivity) getActivity();
 		this.container_activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         
@@ -70,8 +71,9 @@ public class terminal_fragment extends Fragment {
   		set_background_color();
   		
   		terminal_handler=new Handler();
-  		
-  		send_device_list=((MainActivity)this.container_activity).terminal_device_list;
+  		terminal_device_list=new ArrayList<BT_spp>();
+  		((MainActivity)container_activity).global_variables_object.list_of_devices_assigned_to_components
+		.add(terminal_device_list);
   		
   		devices.setOnClickListener(new OnClickListener(){
 
@@ -81,7 +83,7 @@ public class terminal_fragment extends Fragment {
 				connected_device_list.putIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name,
 						BT_spp.get_indices(
 								((MainActivity)container_activity).global_variables_object.connected_device_list
-								,send_device_list));
+								,terminal_device_list));
 				
 				startActivityForResult(connected_device_list, connected_device_list_activity.connected_device_list_activiy_request_code);
 			}
@@ -93,10 +95,10 @@ public class terminal_fragment extends Fragment {
 	    	@Override
 			public void onClick(View v) {
 	    		
-	    		int device_count=send_device_list.size();
+	    		int device_count=terminal_device_list.size();
 				for(int count=0;count<device_count;count++)
 				{
-					send_device_list.get(count).write(et_1.getText().toString().getBytes(Charset.forName("ISO-8859-1")));
+					terminal_device_list.get(count).write(et_1.getText().toString().getBytes(Charset.forName("ISO-8859-1")));
 				}
 	    		
 	    	}
@@ -158,12 +160,11 @@ public class terminal_fragment extends Fragment {
 		{
 			BT_spp.update_list_based_on_indices(
 					((MainActivity)container_activity).global_variables_object.connected_device_list
-					,send_device_list
+					,terminal_device_list
 					,data.getIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name));
 		}
 		else
 		{
-			Log.e("","InFragment2 requestCode:"+requestCode+"\n data:"+data);
 		}
     }  
 
@@ -173,12 +174,9 @@ public class terminal_fragment extends Fragment {
 
 	public static void set_colors(int[] colors) {
 		terminal_fragment.colors = colors;
-		
-//		Log.e("", "colors:"+colors+" "+colors[0]+" "+colors[1]+" "+colors[2]);
 	}
 	
 	public void set_background_color() {
-
 		this.sv.setBackgroundColor(colors[0]);
 	}
 	

@@ -1,46 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent" >
 
     <ScrollView
         android:id="@+id/scrollView1_terminal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/linearLayout1_terminal"
-        >
+        android:layout_above="@+id/linearLayout1_terminal" >
 
         <TextView
-                android:id="@+id/textView1_terminal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:singleLine="false"
-                android:text="@string/terminal" />
-      
+            android:id="@+id/textView1_terminal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="false"
+            android:text="@string/terminal" />
     </ScrollView>
-    
-    <Button
-        android:id="@+id/button3_terminal"
-        style="?android:attr/buttonStyleSmall"
+
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:alpha="100"
-        android:text="@string/clear" />
-    
+        android:background="#FAFAFA"
+        tools:ignore="RtlHardcoded" >
+
+        <Button
+            android:id="@+id/button3_terminal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/clear" />
+    </RelativeLayout>
+
     <LinearLayout
         android:id="@+id/linearLayout1_terminal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_alignParentBottom="true"
-        >
+        android:orientation="horizontal" >
 
         <Button
             android:id="@+id/button1_terminal"
-            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/devices" />
@@ -61,7 +62,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/send" />
-
     </LinearLayout>
-    
+
 </RelativeLayout>

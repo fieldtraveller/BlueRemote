@@ -7,7 +7,6 @@ import helper.bluetooth_helper.BT_spp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-//import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;

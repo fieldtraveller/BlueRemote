@@ -26,10 +26,6 @@ public class preferences_activity extends AppCompatActivity {
 	public static String hex_board_call_time_out_factor_extra_name="HEXBOARD_CALL_TIME_OUT_FACTOR";
 	public static String hex_board_backspace_repetition_period_extra_name="HEXBOARD_BACKSPACE_REPETITION_PERIOD";
 	
-	public static String terminal_background_color_extra_name="TERMINAL_BACKGROUND_COLOR";
-	public static String terminal_incoming_foreground_color_extra_name="TERMINAL_INCOMING_FOREGROUND_COLOR";
-	public static String terminal_outgoing_foreground_color_extra_name="TERMINAL_OUTGOING_FOREGROUND_COLOR";
-	
 	public static int preferences_activity_request_code=4896;
 	
 	@Override
@@ -73,9 +69,9 @@ public class preferences_activity extends AppCompatActivity {
 		et[1].setSelection(et[1].getText().toString().length());
 		et[2].setSelection(et[2].getText().toString().length());
         
-		colors[0]=getIntent().getIntExtra(terminal_background_color_extra_name, 0);
-		colors[1]=getIntent().getIntExtra(terminal_incoming_foreground_color_extra_name, 0);
-		colors[2]=getIntent().getIntExtra(terminal_outgoing_foreground_color_extra_name, 0);
+		colors[0]=getIntent().getIntExtra(terminal_fragment.terminal_background_color_extra_name, 0);
+		colors[1]=getIntent().getIntExtra(terminal_fragment.terminal_incoming_foreground_color_extra_name, 0);
+		colors[2]=getIntent().getIntExtra(terminal_fragment.terminal_outgoing_foreground_color_extra_name, 0);
 		
 		color_button_background.setBackgroundColor(colors[0]);
 		color_button_incoming_foreground.setBackgroundColor(colors[1]);
@@ -98,7 +94,6 @@ public class preferences_activity extends AppCompatActivity {
 				color_picker_intent.putExtra(color_picker.passed_color,colors[0]);
 				startActivityForResult(color_picker_intent, 1);
 			}
-			
 		});
 		
 		color_button_incoming_foreground.setOnClickListener(new OnClickListener(){
@@ -110,7 +105,6 @@ public class preferences_activity extends AppCompatActivity {
 				color_picker_intent.putExtra(color_picker.passed_color,colors[1]);
 				startActivityForResult(color_picker_intent, 2);
 			}
-			
 		});
 
 		color_button_outgoing_foreground.setOnClickListener(new OnClickListener(){
@@ -122,7 +116,6 @@ public class preferences_activity extends AppCompatActivity {
 				color_picker_intent.putExtra(color_picker.passed_color,colors[2]);
 				startActivityForResult(color_picker_intent, 3);
 			}
-			
 		});
 	}
 	
@@ -186,9 +179,9 @@ public class preferences_activity extends AppCompatActivity {
 		close_intent.putExtra(hex_board_call_time_out_factor_extra_name, hex_board_call_time_out_factor);
 		close_intent.putExtra(hex_board_backspace_repetition_period_extra_name, hex_board_backspace_repetition_period);
 		
-		close_intent.putExtra(preferences_activity.terminal_background_color_extra_name,colors[0]);
-		close_intent.putExtra(preferences_activity.terminal_incoming_foreground_color_extra_name,colors[1]);
-		close_intent.putExtra(preferences_activity.terminal_outgoing_foreground_color_extra_name,colors[2]);
+		close_intent.putExtra(terminal_fragment.terminal_background_color_extra_name,colors[0]);
+		close_intent.putExtra(terminal_fragment.terminal_incoming_foreground_color_extra_name,colors[1]);
+		close_intent.putExtra(terminal_fragment.terminal_outgoing_foreground_color_extra_name,colors[2]);
 		
 		setResult(RESULT_OK, close_intent);        
 		finish();

@@ -1,6 +1,7 @@
 package com.alex.blueremote;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import helper.bluetooth_helper.bluetooth_button_data;
 import helper.bluetooth_helper.bluetooth_compound_button_data;
@@ -9,8 +10,8 @@ public class file_data implements Serializable
 {
 	private static final long serialVersionUID = 5092387345793559107L;
 	
-	bluetooth_button_data button_data[]; 
-	bluetooth_compound_button_data compound_button_data[];
+	ArrayList<bluetooth_button_data> button_data; 
+	ArrayList<bluetooth_compound_button_data> compound_button_data;
 	
 	int button_repetition_period;
 	int hex_board_call_time_out_factor;
@@ -20,14 +21,14 @@ public class file_data implements Serializable
 	
 	byte device_assignment;
 	
-	public file_data(bluetooth_button_data[] button_data,bluetooth_compound_button_data[] compound_button_data) 
+	public file_data(ArrayList<bluetooth_button_data> button_data,ArrayList<bluetooth_compound_button_data> compound_button_data) 
 	{
 		super();
 		this.button_data = button_data;
 		this.compound_button_data = compound_button_data;
 	}
 	
-	public file_data(bluetooth_button_data[] button_data,bluetooth_compound_button_data[] compound_button_data,
+	public file_data(ArrayList<bluetooth_button_data> button_data,ArrayList<bluetooth_compound_button_data> compound_button_data,
 			int button_repetition_period,int hex_board_call_time_out_factor,int hex_board_backspace_repetition_period) 
 	{
 		super();
@@ -39,7 +40,7 @@ public class file_data implements Serializable
 		this.hex_board_backspace_repetition_period=hex_board_backspace_repetition_period;
 	}
 	
-	public file_data(bluetooth_button_data[] button_data,bluetooth_compound_button_data[] compound_button_data,
+	public file_data(ArrayList<bluetooth_button_data> button_data,ArrayList<bluetooth_compound_button_data> compound_button_data,
 			int button_repetition_period,int hex_board_call_time_out_factor,int hex_board_backspace_repetition_period,
 			byte device_assignment) 
 	{
@@ -54,7 +55,7 @@ public class file_data implements Serializable
 		this.device_assignment=device_assignment;
 	}
 	
-	public file_data(bluetooth_button_data[] button_data,bluetooth_compound_button_data[] compound_button_data,
+	public file_data(ArrayList<bluetooth_button_data> button_data,ArrayList<bluetooth_compound_button_data> compound_button_data,
 			int button_repetition_period,int hex_board_call_time_out_factor,int hex_board_backspace_repetition_period,
 			byte device_assignment,int colors[]) 
 	{
@@ -71,22 +72,22 @@ public class file_data implements Serializable
 		this.colors=colors;
 	}
 	
-	public bluetooth_button_data[] get_button_data() 
+	public ArrayList<bluetooth_button_data> get_button_data() 
 	{
 		return button_data;
 	}
 
-	public void set_button_data(bluetooth_button_data[] button_data) 
+	public void set_button_data(ArrayList<bluetooth_button_data> button_data) 
 	{
 		this.button_data = button_data;
 	}
 
-	public bluetooth_compound_button_data[] get_compound_button_data() 
+	public ArrayList<bluetooth_compound_button_data> get_compound_button_data() 
 	{
 		return compound_button_data;
 	}
 
-	public void set_compound_button_data(bluetooth_compound_button_data[] compound_button_data) 
+	public void set_compound_button_data(ArrayList<bluetooth_compound_button_data> compound_button_data) 
 	{
 		this.compound_button_data = compound_button_data;
 	}

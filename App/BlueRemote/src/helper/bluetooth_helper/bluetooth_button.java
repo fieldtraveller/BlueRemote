@@ -9,6 +9,7 @@ import helper.bluetooth_helper.BT_spp;
 import helper.bluetooth_helper.bluetooth_button_data;
 import helper.bluetooth_helper.bluetooth_view;
 import android.content.Intent;
+//import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -171,7 +172,8 @@ public class bluetooth_button<T> extends bluetooth_view<T> implements OnClickLis
 						}
 						
 						break;
-							
+					
+					case MotionEvent.ACTION_CANCEL:
 					case MotionEvent.ACTION_UP:
 						v.setPressed(false);
 						button_pressed_response(false);
@@ -189,6 +191,9 @@ public class bluetooth_button<T> extends bluetooth_view<T> implements OnClickLis
 						
 						v.performClick();
 						break;
+						
+						default:
+//							Log.e("", ""+event);
 				}
 				
 				return true;

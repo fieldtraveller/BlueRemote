@@ -15,17 +15,17 @@ import com.google.samples.apps.iosched.ui.widget.SlidingTabLayout;
 import file_operations.file_operations;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
+//import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.bluetooth.BluetoothDevice;
+//import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+//import android.content.BroadcastReceiver;
+//import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+//import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 															  ,BT_spp.device_read_interface{
 	
 	BlueRemote global_variables_object;
-	BroadcastReceiver bt_device_connection_status;
+//	BroadcastReceiver bt_device_connection_status;
 
 	ViewPager v_pager;
     view_pager_adapter vpa;
@@ -54,11 +54,12 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 	file_data data_from_file;
 	boolean file_data_changed=false;
 	
-	public bluetooth_button_data button_data[]=new bluetooth_button_data[5];
-	public bluetooth_compound_button_data compound_button_data[]=new bluetooth_compound_button_data[2];
-	
-	ArrayList<BT_spp> terminal_device_list;
-	
+//	public bluetooth_button_data button_data[]=new bluetooth_button_data[8];
+//	public bluetooth_compound_button_data compound_button_data[]=new bluetooth_compound_button_data[2];
+
+	public ArrayList<bluetooth_button_data> button_data=new ArrayList<bluetooth_button_data>();
+	public ArrayList<bluetooth_compound_button_data> compound_button_data=new ArrayList<bluetooth_compound_button_data>();
+
 	boolean in_program_mode=false;
 	
 	final String filename="preferences.br";
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		Log.e("","Activity:onCreate");
+//		Log.e("","Activity:onCreate "+this);
 		
 		if(file_operations.file_exists(getApplicationContext(),filename))
 		{
@@ -89,20 +90,24 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 		}
 		else
 		{
-			button_data[0]=new bluetooth_button_data(getResources().getString(R.string.channel_up),new byte[]{0x01},true,new byte[]{0x02},new byte[]{0x03});
-			button_data[1]=new bluetooth_button_data(getResources().getString(R.string.channel_down),new byte[]{0x11},true,new byte[]{0x12},new byte[]{0x13});
-			button_data[2]=new bluetooth_button_data(getResources().getString(R.string.volume_up),new byte[]{0x21},true,new byte[]{0x22},new byte[]{0x23});
-			button_data[3]=new bluetooth_button_data(getResources().getString(R.string.volume_down),new byte[]{0x31},true,new byte[]{0x32},new byte[]{0x33});
-			button_data[4]=new bluetooth_button_data(getResources().getString(R.string.select),new byte[]{0x41},true,new byte[]{0x42},new byte[]{0x43});
+			button_data.add(new bluetooth_button_data(getResources().getString(R.string.channel_up),	new byte[]{0x01},true,new byte[]{0x02},new byte[]{0x03}));
+			button_data.add(new bluetooth_button_data(getResources().getString(R.string.channel_down),	new byte[]{0x11},true,new byte[]{0x12},new byte[]{0x13}));
+			button_data.add(new bluetooth_button_data(getResources().getString(R.string.volume_up),		new byte[]{0x21},true,new byte[]{0x22},new byte[]{0x23}));
+			button_data.add(new bluetooth_button_data(getResources().getString(R.string.volume_down),	new byte[]{0x31},true,new byte[]{0x32},new byte[]{0x33}));
+			button_data.add(new bluetooth_button_data(getResources().getString(R.string.select),		new byte[]{0x41},true,new byte[]{0x42},new byte[]{0x43}));
 			
-			compound_button_data[0]=new bluetooth_compound_button_data(getResources().getString(R.string.power_switch),new byte[]{(byte)0xA1},new byte[]{(byte)0xA2},new byte[]{(byte)0xA3});
-			compound_button_data[1]=new bluetooth_compound_button_data(getResources().getString(R.string.mute_switch),new byte[]{(byte) 0xB1},new byte[]{(byte)0xB2},new byte[]{(byte)0xB3});
+			button_data.add(new bluetooth_button_data(getResources().getString(R.string.aaa),			new byte[]{0x51},true,new byte[]{0x52},new byte[]{0x53}));
+			button_data.add(new bluetooth_button_data(getResources().getString(R.string.bbb),			new byte[]{0x61},true,new byte[]{0x62},new byte[]{0x63}));
+			button_data.add(new bluetooth_button_data(getResources().getString(R.string.ccc),			new byte[]{0x71},true,new byte[]{0x72},new byte[]{0x73}));
+			
+			compound_button_data.add(new bluetooth_compound_button_data(getResources().getString(R.string.power_switch),	new byte[]{(byte)0xA1},new byte[]{(byte)0xA2},new byte[]{(byte)0xA3}));
+			compound_button_data.add(new bluetooth_compound_button_data(getResources().getString(R.string.mute_switch),		new byte[]{(byte)0xB1},new byte[]{(byte)0xB2},new byte[]{(byte)0xB3}));
 			
 			bluetooth_button.set_button_repetition_period(200);
 			HexBoard.set_hex_board_call_time_out(3);
 			HexBoard.set_hex_board_backspace_repetition_period(200);
 			
-			int colors[]={	 Color.rgb(255,255,255)
+			int colors[]={	 Color.rgb(250,250,250)
 							,Color.rgb(0x00, 0x00, 0x00)
 							,Color.rgb(0x00, 0x00, 0x00)
 						 };
@@ -135,84 +140,76 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
         fragment_1=(control_interface_fragment) vpa.getItem(0);
 		fragment_2=(terminal_fragment) vpa.getItem(1);
 		
-		v_pager.addOnPageChangeListener(new OnPageChangeListener(){
-
-			@Override
-			public void onPageScrollStateChanged(int arg0) {
+//		v_pager.addOnPageChangeListener(new OnPageChangeListener(){
+//
+//			@Override
+//			public void onPageScrollStateChanged(int arg0) {
+//				
+//				switch(arg0)
+//				{
+//				case 0:
+//					break;
+//					
+//				case 1:
+//					
+//					int number_of_iterations=fragment_1.buttons.size();
+//					for(int count=0;count<number_of_iterations;count++)
+//					{
+//						if(fragment_1.buttons.get(count).get_view().isPressed())
+//						{
+//							fragment_1.buttons.get(count).button_pressed_response(false);
+//							fragment_1.buttons.get(count).get_view().setPressed(false);
+//						}
+//					}
+//					break;
+//					
+//				case 2:
+//					break;
+//				}
+//			}
+//
+//			@Override
+//			public void onPageScrolled(int arg0, float arg1, int arg2) {
+//			}
+//
+//			@Override
+//			public void onPageSelected(int arg0) {
+//			}
+//			
+//		});
 				
-				switch(arg0)
-				{
-				case 0:
-					break;
-					
-				case 1:
-					
-					int number_of_iterations=fragment_1.buttons.size();
-					for(int count=0;count<number_of_iterations;count++)
-					{
-						if(fragment_1.buttons.get(count).get_view().isPressed())
-						{
-							fragment_1.buttons.get(count).button_pressed_response(false);
-							fragment_1.buttons.get(count).get_view().setPressed(false);
-						}
-					}
-					break;
-					
-				case 2:
-					break;
-				}
-			}
-
-			@Override
-			public void onPageScrolled(int arg0, float arg1, int arg2) {
-			}
-
-			@Override
-			public void onPageSelected(int arg0) {
-			}
-			
-		});
-		
-		if(terminal_device_list==null)
-		{
-			terminal_device_list=new ArrayList<BT_spp>();
-			
-			this.global_variables_object.list_of_devices_assigned_to_components
-				.add(terminal_device_list);
-		}
-		
-		bt_device_connection_status=new BroadcastReceiver() {
- 	        
- 	    	@Override
- 	        public void onReceive(Context context, final Intent intent) {
- 	            
- 	    		String action = intent.getAction();
- 	            
- 	    		if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) 
- 	    		{
- 	    			Log.e(BLUETOOTH_SERVICE, "BT Device Connected");
- 	            }
- 	            else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) 
- 	            {
- 	            	Log.e(BLUETOOTH_SERVICE, "BT Device about to Disconnect");
- 	            }
- 	            else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) 
- 	            {
- 	            	Log.e(BLUETOOTH_SERVICE, "BT Device Disconnected");
- 	            }           
- 	        }
- 	    };
- 	    
- 	    registerReceiver(bt_device_connection_status,new IntentFilter(android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECTED));
- 	    registerReceiver(bt_device_connection_status,new IntentFilter(android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED));
- 	    registerReceiver(bt_device_connection_status,new IntentFilter(android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED));   
+//		bt_device_connection_status=new BroadcastReceiver() {
+// 	        
+// 	    	@Override
+// 	        public void onReceive(Context context, final Intent intent) {
+// 	            
+// 	    		String action = intent.getAction();
+// 	            
+// 	    		if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) 
+// 	    		{
+//// 	    			Log.e(BLUETOOTH_SERVICE, "BT Device Connected");
+// 	            }
+// 	            else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) 
+// 	            {
+//// 	            	Log.e(BLUETOOTH_SERVICE, "BT Device about to Disconnect");
+// 	            }
+// 	            else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) 
+// 	            {
+//// 	            	Log.e(BLUETOOTH_SERVICE, "BT Device Disconnected");
+// 	            }           
+// 	        }
+// 	    };
+// 	    
+// 	    registerReceiver(bt_device_connection_status,new IntentFilter(android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECTED));
+// 	    registerReceiver(bt_device_connection_status,new IntentFilter(android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED));
+// 	    registerReceiver(bt_device_connection_status,new IntentFilter(android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED));   
 	}
 	
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
-		Log.e("","Activity:onResume");
+//		Log.e("","Activity:onResume "+this);
 	}
 	
 	@Override  
@@ -244,12 +241,11 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 			HexBoard.set_hex_board_backspace_repetition_period(hex_board_backspace_repetition_period);
 			
 			int colors[]=new int[]{
-					data.getIntExtra(preferences_activity.terminal_background_color_extra_name,0)
-					,data.getIntExtra(preferences_activity.terminal_incoming_foreground_color_extra_name,0)
-					,data.getIntExtra(preferences_activity.terminal_outgoing_foreground_color_extra_name,0)
+					 data.getIntExtra(terminal_fragment.terminal_background_color_extra_name,0)
+					,data.getIntExtra(terminal_fragment.terminal_incoming_foreground_color_extra_name,0)
+					,data.getIntExtra(terminal_fragment.terminal_outgoing_foreground_color_extra_name,0)
 			};
 			
-			Log.e("", "colors:"+colors+" "+colors[0]+" "+colors[1]+" "+colors[2]);
 			terminal_fragment.set_colors(colors);
 			fragment_2.set_background_color();
 			
@@ -263,7 +259,6 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 		}
 		else
 		{
-			Log.e("","requestCode:"+requestCode+"\n data:"+data);
 		}
     }  
 	
@@ -365,12 +360,10 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 										new_device.connect();
 									}
 								}
-								
-								Log.e("", "discoverability_thread:Exiting_thread");
 							}
 							catch (IOException e) 
 							{
-								Log.e("",""+e.toString());
+//								Log.e("",""+e.toString());
 //								e.printStackTrace();
 							}
 						}
@@ -403,10 +396,6 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 					in_program_mode=false;
 					
 					fragment_1.tv_1.setVisibility(View.GONE);
-					fragment_1.send.setVisibility(View.VISIBLE);
-					fragment_1.send.invalidate();
-					fragment_1.et_1.setVisibility(View.VISIBLE);
-					fragment_1.et_1.invalidate();
 					
 					int number_of_iterations=fragment_1.buttons.size();
 					for(int count=0;count<number_of_iterations;count++)
@@ -427,10 +416,6 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 					in_program_mode=true;
 					
 					fragment_1.tv_1.setVisibility(View.VISIBLE);
-					fragment_1.send.setVisibility(View.GONE);
-					fragment_1.send.invalidate();
-					fragment_1.et_1.setVisibility(View.GONE);
-					fragment_1.et_1.invalidate();
 					
 					int number_of_iterations=fragment_1.buttons.size();
 					for(int count=0;count<number_of_iterations;count++)
@@ -448,16 +433,14 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 				
 			case R.id.menu_item_5:
 				Intent preferences_intent=new Intent(this,preferences_activity.class);
-				preferences_intent.putExtra(preferences_activity.device_assignment_extra_name,global_variables_object.get_device_assignment());
-				preferences_intent.putExtra(preferences_activity.button_repetition_period_extra_name,bluetooth_button.get_button_repetition_period());
-				preferences_intent.putExtra(preferences_activity.hex_board_call_time_out_factor_extra_name,HexBoard.get_hex_board_call_delay_factor());
-				preferences_intent.putExtra(preferences_activity.hex_board_backspace_repetition_period_extra_name,HexBoard.get_hex_board_backspace_repetition_period());
+				preferences_intent.putExtra(preferences_activity.device_assignment_extra_name,						global_variables_object.get_device_assignment());
+				preferences_intent.putExtra(preferences_activity.button_repetition_period_extra_name,				bluetooth_button.get_button_repetition_period());
+				preferences_intent.putExtra(preferences_activity.hex_board_call_time_out_factor_extra_name,			HexBoard.get_hex_board_call_delay_factor());
+				preferences_intent.putExtra(preferences_activity.hex_board_backspace_repetition_period_extra_name,	HexBoard.get_hex_board_backspace_repetition_period());
 				
-				Log.e("",""+terminal_fragment.get_colors()[0]);
-				
-				preferences_intent.putExtra(preferences_activity.terminal_background_color_extra_name,terminal_fragment.get_colors()[0]);
-				preferences_intent.putExtra(preferences_activity.terminal_incoming_foreground_color_extra_name,terminal_fragment.get_colors()[1]);
-				preferences_intent.putExtra(preferences_activity.terminal_outgoing_foreground_color_extra_name,terminal_fragment.get_colors()[2]);
+				preferences_intent.putExtra(terminal_fragment.terminal_background_color_extra_name,			terminal_fragment.get_colors()[0]);
+				preferences_intent.putExtra(terminal_fragment.terminal_incoming_foreground_color_extra_name,terminal_fragment.get_colors()[1]);
+				preferences_intent.putExtra(terminal_fragment.terminal_outgoing_foreground_color_extra_name,terminal_fragment.get_colors()[2]);
 				
 				startActivityForResult(preferences_intent, preferences_activity.preferences_activity_request_code);
 				
@@ -534,7 +517,7 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 			data_saving_thread.start();
 		}
 		
-		unregisterReceiver(bt_device_connection_status);
+//		unregisterReceiver(bt_device_connection_status);
 		super.onDestroy();
 	}
 
@@ -629,7 +612,6 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 						0, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 				fragment_2.tv_1.append(text);
-
 				fragment_2.sv.fullScroll(View.FOCUS_DOWN);
 			}
 		});
@@ -673,7 +655,6 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 				text.setSpan(new ForegroundColorSpan(fragment_2.get_incoming_foreground_color()),
 						0, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-
 				fragment_2.tv_1.append(text);
 				fragment_2.sv.fullScroll(View.FOCUS_DOWN);
 			}
@@ -693,7 +674,6 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 				text.setSpan(new ForegroundColorSpan(fragment_2.get_incoming_foreground_color()),
 						0, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-
 				fragment_2.tv_1.append(text);
 				fragment_2.sv.fullScroll(View.FOCUS_DOWN);
 			}
@@ -703,7 +683,6 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 	@Override
 	public Fragment initialize_fragment(int order_of_fragment_in_view_pager) 
 	{
-		Log.e("","initialize_fragment()");
 		switch(order_of_fragment_in_view_pager)
 		{
 		case 0:

@@ -35,6 +35,8 @@ public class color_picker extends AppCompatActivity implements OnSeekBarChangeLi
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.color_picker);
 		
+		setFinishOnTouchOutside(false);
+		
 		color_view=(View)findViewById(R.id.view_color_picker);
 		
 		tv[0]=(TextView)findViewById(R.id.textView_4_color_picker);

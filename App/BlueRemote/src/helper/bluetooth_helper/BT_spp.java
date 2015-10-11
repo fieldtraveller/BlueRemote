@@ -11,7 +11,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 public class BT_spp implements Parcelable
 {
@@ -89,15 +88,11 @@ public class BT_spp implements Parcelable
     	    	
     	    	if(BT_socket!=null)
     	        {
-//    	           	Log.d("Bluetooth","Socket Created.");
-    	    			
     	    		if(BT_socket.isConnected()==false)
     	    		{
     	    			try 
     	    			{
     	    				BT_socket.connect();
-    	    				
-//    	        	    	Log.d("Bluetooth","isConnected():"+BT_socket.isConnected());
     	    			} 
     	    			catch (IOException e1) 
     	    			{
@@ -107,7 +102,6 @@ public class BT_spp implements Parcelable
     	        }
     	        else
     	        {
-//    	           	Log.d("Bluetooth","Socket:Null.");
     	        }
     	    	
     	    	if(BT_socket.isConnected()==true)
@@ -329,9 +323,7 @@ public class BT_spp implements Parcelable
     			catch (IOException e) 
 				{
 					e.printStackTrace();
-				}
-    			
-    			Log.w("","Device Disconnected");
+				}    			
     		}
     	};
     	
@@ -434,7 +426,6 @@ public class BT_spp implements Parcelable
     		component_list.remove(0);
     	}
     	
-    	Log.e("","number_of_iterations:"+number_of_iterations+"\n input_indices:"+input_indices);
     	number_of_iterations=input_indices.size();
     	for(int count=0;count<number_of_iterations;count++)
     	{

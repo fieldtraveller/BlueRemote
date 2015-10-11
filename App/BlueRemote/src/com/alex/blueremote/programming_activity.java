@@ -6,6 +6,7 @@ import helper.bluetooth_helper.bluetooth_button;
 import helper.bluetooth_helper.bluetooth_button_data;
 import helper.bluetooth_helper.bluetooth_compound_button;
 import helper.bluetooth_helper.bluetooth_compound_button_data;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -116,7 +117,6 @@ public class programming_activity extends AppCompatActivity implements OnTouchLi
 							et[3].setEnabled(false);
 						}
 					}
-					
 				} );
 			}
 			else if(getIntent().getStringExtra(input_type).compareTo(bluetooth_compound_button.input_type_compound_button)==0)
@@ -234,8 +234,6 @@ public class programming_activity extends AppCompatActivity implements OnTouchLi
 	@Override
 	public boolean onTouch(View v, MotionEvent event) 
 	{
-//		Log.e("","onTouch:"+event);
-		
 		switch(event.getAction())
 		{
 			case MotionEvent.ACTION_DOWN:
@@ -334,9 +332,7 @@ public class programming_activity extends AppCompatActivity implements OnTouchLi
 					getIntent().getIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name));
 		}
 		
-		
 		setResult(RESULT_OK, close_intent);        
 		finish();
 	}
-	
 }
