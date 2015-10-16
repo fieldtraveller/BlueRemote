@@ -10,8 +10,6 @@ import android.widget.Toast;
 
 public class splash extends AppCompatActivity {
 	
-	BlueRemote global_variables_object;
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
 	{
@@ -23,19 +21,18 @@ public class splash extends AppCompatActivity {
 //		ImageView imageView = (ImageView) findViewById(R.id.iv);
 //		imageView.setImageResource(R.drawable.logo);
 		
-		global_variables_object = (BlueRemote)getApplicationContext();
-		global_variables_object.set_BtAdapter(BluetoothAdapter.getDefaultAdapter());
+		BlueRemote.set_BtAdapter(BluetoothAdapter.getDefaultAdapter());
 		
-		if(global_variables_object.get_BtAdapter() == null) 
+		if(BlueRemote.get_BtAdapter() == null) 
 		{
 		    Toast.makeText(getApplicationContext(), "No BlueTooth Hardware Detected.\nApp Exited", Toast.LENGTH_LONG).show();
 		    finish();
 		}
 		
 		//Direct Turn On BT by App 
-		if (global_variables_object.get_BtAdapter().isEnabled()==false) 
+		if (BlueRemote.get_BtAdapter().isEnabled()==false) 
 		{
-			global_variables_object.get_BtAdapter().enable();
+			BlueRemote.get_BtAdapter().enable();
 		}
 
 		new Thread(){
@@ -46,7 +43,7 @@ public class splash extends AppCompatActivity {
 				{
 					sleep(1000);
 					
-					while(global_variables_object.get_BtAdapter().getState()==BluetoothAdapter.STATE_TURNING_ON)
+					while(BlueRemote.get_BtAdapter().getState()==BluetoothAdapter.STATE_TURNING_ON)
 					{
 						//Log.d(BLUETOOTH_SERVICE, "Bluetooth turning On.");
 					}
@@ -64,7 +61,7 @@ public class splash extends AppCompatActivity {
 	    /*
 		//Request User to turn on BT 
 	    //Can not turned off
-	    if (!global_variables_object.getBtAdapter().isEnabled()) 
+	    if (!BlueRemote.getBtAdapter().isEnabled()) 
 		{
 			Log.d(BLUETOOTH_SERVICE, "Bluetooth is Off.");
 			Log.d(BLUETOOTH_SERVICE, "Turning on Bluetoooth.");
@@ -72,7 +69,7 @@ public class splash extends AppCompatActivity {
 		    startActivityForResult(enableBtIntent, BT_turn_on_fragment_request_code);
 		    //startActivity(enableBtIntent);
 		    
-		    while(global_variables_object.getBtAdapter().getState()==BluetoothAdapter.STATE_TURNING_ON)
+		    while(BlueRemote.getBtAdapter().getState()==BluetoothAdapter.STATE_TURNING_ON)
 			{
 				//Log.d(BLUETOOTH_SERVICE, "Bluetooth turning On.");
 			}		

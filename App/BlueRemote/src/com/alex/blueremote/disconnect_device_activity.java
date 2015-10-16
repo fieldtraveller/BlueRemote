@@ -44,7 +44,7 @@ public class disconnect_device_activity extends AppCompatActivity {
 		lv = (ListView) findViewById(R.id.list_cdla);
 		ok_b = (Button) findViewById(R.id.button_cdla);
 		
-		connected_device_list=((BlueRemote)getApplicationContext()).get_connected_device_list();
+		connected_device_list=BlueRemote.get_connected_device_list();
 		
 		Thread getting_cb_state_thread=new Thread(){
 			

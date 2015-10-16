@@ -3,6 +3,7 @@ package com.alex.blueremote;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import helper.call_this_method_interface;
 import helper.view_pager_helper.*;
 import helper.bluetooth_helper.BT_spp;
 import helper.bluetooth_helper.bluetooth_button;
@@ -39,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 															  ,BT_spp.device_write_interface
 															  ,BT_spp.device_read_interface{
 	
-	BlueRemote global_variables_object;
 //	BroadcastReceiver bt_device_connection_status;
 
 	ViewPager v_pager;
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 	final int program_mode_menu_option_position=3;
 	final int discoverability_menu_option_position=2;
 	final int new_device_list_activity_request_code=3;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -87,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 			HexBoard.set_hex_board_backspace_repetition_period(data_from_file.get_hex_board_backspace_repetition_period());
 			
 			terminal_fragment.set_colors(data_from_file.get_colors());
+			terminal_fragment.set_clear_input_on_send(data_from_file.is_clear_input_on_send());
+			
 		}
 		else
 		{
@@ -113,19 +115,22 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 						 };
 			
 			terminal_fragment.set_colors(colors);
+			terminal_fragment.set_clear_input_on_send(true);
 			
 			data_from_file=new file_data(button_data,compound_button_data,
 					bluetooth_button.get_button_repetition_period(),
 					HexBoard.get_hex_board_call_delay_factor(),
 					HexBoard.get_hex_board_backspace_repetition_period(),
-					BlueRemote.assign_latest_device_if_list_is_empty,colors);
+					BlueRemote.assign_latest_device_if_list_is_empty,colors,1,true);
 			
 			file_data_changed=true;
 		}
 		
-		global_variables_object = (BlueRemote)getApplicationContext();
-		global_variables_object.set_connected_device_list(new ArrayList<BT_spp>());
-		global_variables_object.set_device_assignment(data_from_file.get_device_assignment());
+		BlueRemote.set_connected_device_list(new ArrayList<BT_spp>());
+		BlueRemote.set_foreground_colors(new ArrayList<int[]>());
+		BlueRemote.list_of_devices_assigned_to_components=new ArrayList<ArrayList<BT_spp>>(); 
+        
+		BlueRemote.set_device_assignment(data_from_file.get_device_assignment());
 		
 		vpa = new view_pager_adapter(getSupportFragmentManager(),fragment_titles,this);
 		 
@@ -139,6 +144,8 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
         
         fragment_1=(control_interface_fragment) vpa.getItem(0);
 		fragment_2=(terminal_fragment) vpa.getItem(1);
+		
+		fragment_2.set_number_of_active_terminals(data_from_file.get_number_of_active_terminals());
 		
 //		v_pager.addOnPageChangeListener(new OnPageChangeListener(){
 //
@@ -231,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 		}
 		else if(requestCode==preferences_activity.preferences_activity_request_code)
 		{
-			global_variables_object.set_device_assignment(data.getByteExtra(preferences_activity.device_assignment_extra_name,BlueRemote.do_not_assign));
+			BlueRemote.set_device_assignment(data.getByteExtra(preferences_activity.device_assignment_extra_name,BlueRemote.do_not_assign));
 			int button_repetition_period=data.getIntExtra(preferences_activity.button_repetition_period_extra_name, 200);
 			int hex_board_call_time_out_factor=data.getIntExtra(preferences_activity.hex_board_call_time_out_factor_extra_name, 3);
 			int hex_board_backspace_repetition_period=data.getIntExtra(preferences_activity.hex_board_backspace_repetition_period_extra_name, 200);
@@ -242,18 +249,25 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 			
 			int colors[]=new int[]{
 					 data.getIntExtra(terminal_fragment.terminal_background_color_extra_name,0)
-					,data.getIntExtra(terminal_fragment.terminal_incoming_foreground_color_extra_name,0)
-					,data.getIntExtra(terminal_fragment.terminal_outgoing_foreground_color_extra_name,0)
+					,data.getIntExtra(terminal_fragment.terminal_default_incoming_foreground_color_extra_name,0)
+					,data.getIntExtra(terminal_fragment.terminal_default_outgoing_foreground_color_extra_name,0)
 			};
 			
 			terminal_fragment.set_colors(colors);
 			fragment_2.set_background_color();
 			
-			data_from_file.set_device_assignment(global_variables_object.get_device_assignment());
+			terminal_fragment.set_clear_input_on_send(data.getBooleanExtra(terminal_fragment.terminal_clear_input_on_send_extra_name,false));
+			fragment_2.set_number_of_active_terminals(data.getIntExtra(terminal_fragment.terminal_number_of_active_terminals_extra_name,0));
+			
+			fragment_2.update_terminal_view();
+			
+			data_from_file.set_device_assignment(BlueRemote.get_device_assignment());
 			data_from_file.set_button_repetition_period(button_repetition_period);
 			data_from_file.set_hex_board_call_time_out_factor(hex_board_call_time_out_factor);
 			data_from_file.set_hex_board_backspace_repetition_period(hex_board_backspace_repetition_period);
 			data_from_file.set_colors(colors);
+			data_from_file.set_clear_input_on_send(terminal_fragment.is_clear_input_on_send());
+			data_from_file.set_number_of_active_terminals(fragment_2.get_number_of_active_terminals());
 			
 			file_data_changed=true;
 		}
@@ -287,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 			}			
 		}
 		
-		if(global_variables_object.is_discoverability_status()==true)
+		if(BlueRemote.is_discoverability_status()==true)
 		{
 			menu.getItem(discoverability_menu_option_position).setTitle(R.string.disable_discoverability);
 		}
@@ -321,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 				return true;
 			
 			case R.id.menu_item_2:
-				if(global_variables_object.get_connected_device_list().size()>0)
+				if(BlueRemote.get_connected_device_list().size()>0)
 				{
 					Intent disconnect_device_activity_intent=new Intent(this,disconnect_device_activity.class);
 					this.startActivity(disconnect_device_activity_intent);
@@ -333,9 +347,9 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 				return true;
 				
 			case R.id.menu_item_3:
-				if(global_variables_object.is_discoverability_status()==false)
+				if(BlueRemote.is_discoverability_status()==false)
 				{
-					global_variables_object.set_discoverability_status(true);
+					BlueRemote.set_discoverability_status(true);
 					invalidateOptionsMenu();
 					
 					Thread discoverability_thread=new Thread(){
@@ -344,13 +358,13 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 						{
 							try 
 							{
-								global_variables_object.set_Bt_server_socket(global_variables_object.get_BtAdapter()
+								BlueRemote.set_Bt_server_socket(BlueRemote.get_BtAdapter()
 										.listenUsingRfcommWithServiceRecord("BlueRemote",BT_spp.get_Bt_spp_uuid())
 										);
 								
-								while(global_variables_object.is_discoverability_status()==true)
+								while(BlueRemote.is_discoverability_status()==true)
 								{
-									BluetoothSocket socket= global_variables_object.get_Bt_server_socket().accept();
+									BluetoothSocket socket= BlueRemote.get_Bt_server_socket().accept();
 									
 									if (socket != null)
 									{
@@ -373,10 +387,10 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 				}
 				else
 				{
-					global_variables_object.set_discoverability_status(false);
+					BlueRemote.set_discoverability_status(false);
 					try 
 					{
-						global_variables_object.get_Bt_server_socket().close();
+						BlueRemote.get_Bt_server_socket().close();
 					}
 					catch (IOException e) 
 					{
@@ -433,14 +447,17 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 				
 			case R.id.menu_item_5:
 				Intent preferences_intent=new Intent(this,preferences_activity.class);
-				preferences_intent.putExtra(preferences_activity.device_assignment_extra_name,						global_variables_object.get_device_assignment());
+				preferences_intent.putExtra(preferences_activity.device_assignment_extra_name,						BlueRemote.get_device_assignment());
 				preferences_intent.putExtra(preferences_activity.button_repetition_period_extra_name,				bluetooth_button.get_button_repetition_period());
 				preferences_intent.putExtra(preferences_activity.hex_board_call_time_out_factor_extra_name,			HexBoard.get_hex_board_call_delay_factor());
 				preferences_intent.putExtra(preferences_activity.hex_board_backspace_repetition_period_extra_name,	HexBoard.get_hex_board_backspace_repetition_period());
 				
 				preferences_intent.putExtra(terminal_fragment.terminal_background_color_extra_name,			terminal_fragment.get_colors()[0]);
-				preferences_intent.putExtra(terminal_fragment.terminal_incoming_foreground_color_extra_name,terminal_fragment.get_colors()[1]);
-				preferences_intent.putExtra(terminal_fragment.terminal_outgoing_foreground_color_extra_name,terminal_fragment.get_colors()[2]);
+				preferences_intent.putExtra(terminal_fragment.terminal_default_incoming_foreground_color_extra_name,terminal_fragment.get_colors()[1]);
+				preferences_intent.putExtra(terminal_fragment.terminal_default_outgoing_foreground_color_extra_name,terminal_fragment.get_colors()[2]);
+				
+				preferences_intent.putExtra(terminal_fragment.terminal_clear_input_on_send_extra_name,terminal_fragment.is_clear_input_on_send());
+				preferences_intent.putExtra(terminal_fragment.terminal_number_of_active_terminals_extra_name,fragment_2.get_number_of_active_terminals());
 				
 				startActivityForResult(preferences_intent, preferences_activity.preferences_activity_request_code);
 				
@@ -473,11 +490,13 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 			
 			public void run()
 			{
-				if(global_variables_object.is_discoverability_status()==true)
+				if(BlueRemote.is_discoverability_status()==true)
 				{
 					try 
 					{
-						global_variables_object.get_Bt_server_socket().close();
+						BlueRemote.get_Bt_server_socket().close();
+						BlueRemote.set_Bt_server_socket(null);
+						BlueRemote.set_discoverability_status(false);
 					} 
 					catch (IOException e) 
 					{
@@ -485,18 +504,21 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 					}
 				}
 				
-				int number_of_connected_devices=global_variables_object.get_connected_device_list().size();
+				int number_of_connected_devices=BlueRemote.get_connected_device_list().size();
 				
 				for(int count=0;count<number_of_connected_devices;count++)
 				{
-					global_variables_object.get_connected_device(count).disconnect();	
+					BlueRemote.get_connected_device(count).disconnect();	
 				}
+				BlueRemote.set_connected_device_list(null);
+				BlueRemote.list_of_devices_assigned_to_components=null;
 				
 				//Direct Turn Off BT by App 
-				if (global_variables_object.get_BtAdapter().isEnabled()) 
+				if (BlueRemote.get_BtAdapter().isEnabled()) 
 				{
-					global_variables_object.get_BtAdapter().disable();
+					BlueRemote.get_BtAdapter().disable();
 				}
+				BlueRemote.set_BtAdapter(null);
 					
 				Log.d(BLUETOOTH_SERVICE, "Bluetooth turned Off.");
 			}
@@ -540,35 +562,71 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 			
 			public void run()
 			{
-				global_variables_object.add_to_connected_device_list(passed_device);
-   					
-   				int list_size=global_variables_object.list_of_devices_assigned_to_components.size();
-				if(global_variables_object.get_device_assignment()==BlueRemote.assign_all_devices)
+				BlueRemote.add_to_connected_device_list(passed_device);
+				BlueRemote.get_foreground_colors().add(new int[]{
+						 terminal_fragment.get_default_incoming_foreground_color()
+						,terminal_fragment.get_default_outgoing_foreground_color()
+				});
+				
+   				int list_size=BlueRemote.list_of_devices_assigned_to_components.size();
+   				
+				if(BlueRemote.get_device_assignment()==BlueRemote.assign_all_devices)
     			{
     				for(int count_1=0;count_1<list_size;count_1++)
     				{
-    					global_variables_object.list_of_devices_assigned_to_components.get(count_1)
+    					BlueRemote.list_of_devices_assigned_to_components.get(count_1)
    							.add(passed_device);
     					
     					passed_device.used_by_new_component();
 					}
    				}
-   				else if(global_variables_object.get_device_assignment()==BlueRemote.assign_latest_device_if_list_is_empty)
+   				else if(BlueRemote.get_device_assignment()==BlueRemote.assign_latest_device_if_list_is_empty)
    				{
     				for(int count_1=0;count_1<list_size;count_1++)
    					{
-   						if(global_variables_object.list_of_devices_assigned_to_components.get(count_1).size()==0)
+   						if(BlueRemote.list_of_devices_assigned_to_components.get(count_1).size()==0)
    						{
-   							global_variables_object.list_of_devices_assigned_to_components.get(count_1)
+   							BlueRemote.list_of_devices_assigned_to_components.get(count_1)
     							.add(passed_device);
    							
    							passed_device.used_by_new_component();
-   						}	
+   						}
    					}
    				}
-   				else if(global_variables_object.get_device_assignment()==BlueRemote.do_not_assign)
+   				else if(BlueRemote.get_device_assignment()==BlueRemote.do_not_assign)
    				{				
     			}
+				
+				Thread device_input_reader_thread=new Thread(){
+					
+					public void run()
+					{
+						try 
+						{
+							while(passed_device.get_BT_socket().isConnected())
+	    						{
+	    							if(passed_device.get_BT_inputStream().available()>0)
+								{
+	    								passed_device.read(new byte[1024]);
+								}
+								else
+								{
+									Thread.sleep(100);
+								}
+	    						}
+						}
+						catch (IOException e) 
+						{
+							e.printStackTrace();
+						} 
+						catch (InterruptedException e) 
+						{
+							e.printStackTrace();
+						}
+					}
+				};
+				
+				device_input_reader_thread.start();
 			}
 		};
 			
@@ -599,16 +657,17 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 	}
 
 	@Override
-	public void on_device_write(final String start_text, final byte written_byte,
-			String end_text) {
+	public void on_device_write(final BT_spp device_written_to, final byte written_byte) {
 		
 		fragment_2.terminal_handler.post(new Runnable(){
 
 			@Override
 			public void run() {
-				Spannable text = new SpannableString(start_text+written_byte+"\n");        
+				Spannable text = new SpannableString(device_written_to.get_BT_Device().getName()+">:"+written_byte+"\n");        
 
-				text.setSpan(new ForegroundColorSpan(fragment_2.get_outgoing_foreground_color()),
+				int position_of_device=BlueRemote.get_connected_device_list().indexOf(device_written_to);
+				
+				text.setSpan(new ForegroundColorSpan(BlueRemote.get_foreground_colors().get(position_of_device)[1]),
 						0, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 				fragment_2.tv_1.append(text);
@@ -618,17 +677,18 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 	}
 
 	@Override
-	public void on_device_write(final String start_text, final byte[] written_bytes,
-			String end_text) {
+	public void on_device_write(final BT_spp device_written_to, final byte[] written_bytes) {
 		
 		fragment_2.terminal_handler.post(new Runnable(){
 
 			@Override
 			public void run() {
 				
-				Spannable text = new SpannableString(start_text+(new String(written_bytes))+"\n");        
-
-				text.setSpan(new ForegroundColorSpan(fragment_2.get_outgoing_foreground_color()),
+				Spannable text = new SpannableString(device_written_to.get_BT_Device().getName()+">:"+(new String(written_bytes))+"\n");        
+				
+				int position_of_device=BlueRemote.get_connected_device_list().indexOf(device_written_to);
+				
+				text.setSpan(new ForegroundColorSpan(BlueRemote.get_foreground_colors().get(position_of_device)[1]),
 						0, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 				fragment_2.tv_1.append(text);
@@ -643,16 +703,18 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 	}
 
 	@Override
-	public void on_device_read(final String start_text, final byte read_byte,
-			String end_text) {
+	public void on_device_read(final BT_spp device_read_from, final byte read_byte) {
 		
 		fragment_2.terminal_handler.post(new Runnable(){
 
 			@Override
 			public void run() {
-				Spannable text = new SpannableString(start_text+read_byte+"\n");        
-
-				text.setSpan(new ForegroundColorSpan(fragment_2.get_incoming_foreground_color()),
+				
+				Spannable text = new SpannableString(device_read_from.get_BT_Device().getName()+"<:"+(read_byte)+"\n");        
+				
+				int position_of_device=BlueRemote.get_connected_device_list().indexOf(device_read_from);
+				
+				text.setSpan(new ForegroundColorSpan(BlueRemote.get_foreground_colors().get(position_of_device)[0]),
 						0, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 				fragment_2.tv_1.append(text);
@@ -662,16 +724,18 @@ public class MainActivity extends AppCompatActivity implements view_pager_adapte
 	}
 
 	@Override
-	public void on_device_read(final String start_text, final byte[] read_bytes,
-			int number_of_bytes_read, String end_text) {
+	public void on_device_read(final BT_spp device_read_from, final byte[] read_bytes,
+			int number_of_bytes_read) {
 		
 		fragment_2.terminal_handler.post(new Runnable(){
 
 			@Override
 			public void run() {
-				Spannable text = new SpannableString(start_text+(new String(read_bytes))+"\n");        
-
-				text.setSpan(new ForegroundColorSpan(fragment_2.get_incoming_foreground_color()),
+				Spannable text = new SpannableString(device_read_from.get_BT_Device().getName()+"<:"+(new String(read_bytes))+"\n");
+				
+				int position_of_device=BlueRemote.get_connected_device_list().indexOf(device_read_from);
+				
+				text.setSpan(new ForegroundColorSpan(BlueRemote.get_foreground_colors().get(position_of_device)[0]),
 						0, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 				fragment_2.tv_1.append(text);

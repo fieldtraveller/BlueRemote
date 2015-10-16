@@ -30,7 +30,6 @@ import android.view.ViewGroup;
 
 public class new_device_list_activity extends AppCompatActivity {
 
-	BlueRemote global_variables_object;
 	BroadcastReceiver bt_discovery_status;
 	Set<BluetoothDevice> pairedDevices;
 	    
@@ -68,8 +67,6 @@ public class new_device_list_activity extends AppCompatActivity {
 		
 //		elv_1.setSelector(R.color.list_selector);
 		refresh_button.setEnabled(false);
-		
-		global_variables_object = (BlueRemote)getApplicationContext();
 		
 		bt_discovery_status = new BroadcastReceiver() {
 	        
@@ -136,9 +133,9 @@ public class new_device_list_activity extends AppCompatActivity {
 	    registerReceiver(bt_discovery_status, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED));
 	    registerReceiver(bt_discovery_status, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
 	    
-	    global_variables_object.get_BtAdapter().startDiscovery();
+	    BlueRemote.get_BtAdapter().startDiscovery();
 
-	    pairedDevices = global_variables_object.get_BtAdapter().getBondedDevices();
+	    pairedDevices = BlueRemote.get_BtAdapter().getBondedDevices();
 	    
 //	    Log.d(BLUETOOTH_SERVICE,"Paired Devices: "+pairedDevices.size());
 	    	    
@@ -283,8 +280,8 @@ public class new_device_list_activity extends AppCompatActivity {
 					unpaired_device_list.remove(count_0);
             	}
 				
-//				Log.e("What?", "discovery?"+global_variables_object.getBtAdapter().isDiscovering());
-				global_variables_object.get_BtAdapter().startDiscovery();
+//				Log.e("What?", "discovery?"+BlueRemote.getBtAdapter().isDiscovering());
+				BlueRemote.get_BtAdapter().startDiscovery();
 				
 				elv_adapter.notifyDataSetChanged();	
 			}
@@ -336,9 +333,9 @@ public class new_device_list_activity extends AppCompatActivity {
 			
 			public void run()
 			{
-				if(global_variables_object.get_BtAdapter().isDiscovering())
+				if(BlueRemote.get_BtAdapter().isDiscovering())
 				{
-					Log.w(BLUETOOTH_SERVICE,"BT Discovery Cancelled:"+global_variables_object.get_BtAdapter().cancelDiscovery());
+					Log.w(BLUETOOTH_SERVICE,"BT Discovery Cancelled:"+BlueRemote.get_BtAdapter().cancelDiscovery());
 				}
 			}
 		};

@@ -179,9 +179,19 @@ public class bluetooth_button<T> extends bluetooth_view<T> implements OnClickLis
 						button_pressed_response(false);
 						
 						int device_count=this.get_BT_serial_devices().size();
-						for(int count=0;count<device_count;count++)
+						if(device_count==0)
 						{
-							get_BT_serial_devices().get(count).write(button_data.get_button_on_up_code());
+							if(this.get_on_trying_to_tx_when_device_list_empty()!=null)
+							{
+								this.get_on_trying_to_tx_when_device_list_empty().call_this_method(null);
+							}
+						}
+						else
+						{
+							for(int count=0;count<device_count;count++)
+							{
+								get_BT_serial_devices().get(count).write(button_data.get_button_on_up_code());
+							}
 						}
 						
 						if(on_button_up!=null)
@@ -211,10 +221,20 @@ public class bluetooth_button<T> extends bluetooth_view<T> implements OnClickLis
 				public void run() {
 					
 					int device_count=get_BT_serial_devices().size();
-					for(int count=0;count<device_count;count++)
+					if(device_count==0)
 					{
-						get_BT_serial_devices().get(count).write(button_data.get_button_on_down_code());
-					}	
+						if(get_on_trying_to_tx_when_device_list_empty()!=null)
+						{
+							get_on_trying_to_tx_when_device_list_empty().call_this_method(null);
+						}
+					}
+					else
+					{
+						for(int count=0;count<device_count;count++)
+						{
+							get_BT_serial_devices().get(count).write(button_data.get_button_on_down_code());
+						}
+					}
 				}
 			};
 			
@@ -236,9 +256,19 @@ public class bluetooth_button<T> extends bluetooth_view<T> implements OnClickLis
 	public void onClick(View v) 
 	{	
 		int device_count=this.get_BT_serial_devices().size();
-		for(int count=0;count<device_count;count++)
+		if(device_count==0)
 		{
-			get_BT_serial_devices().get(count).write(button_data.get_button_code());
+			if(this.get_on_trying_to_tx_when_device_list_empty()!=null)
+			{
+				this.get_on_trying_to_tx_when_device_list_empty().call_this_method(null);
+			}
+		}
+		else
+		{
+			for(int count=0;count<device_count;count++)
+			{
+				get_BT_serial_devices().get(count).write(button_data.get_button_code());
+			}
 		}
 		
 		if(on_button_click!=null)

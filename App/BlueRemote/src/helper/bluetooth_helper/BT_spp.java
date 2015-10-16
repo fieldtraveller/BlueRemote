@@ -27,8 +27,8 @@ public class BT_spp implements Parcelable
 	BluetoothSocket BT_socket;
     OutputStream BT_outputStream;
     InputStream BT_inputStream;
-    
-    int number_of_components_using_this_object=0;
+
+	int number_of_components_using_this_object=0;
     
     public BT_spp()
 	{
@@ -55,7 +55,15 @@ public class BT_spp implements Parcelable
     	}
     }
 
-    public BluetoothSocket get_BT_socket() {
+    public BluetoothDevice get_BT_Device() {
+		return BT_Device;
+	}
+
+	public void set_BT_Device(BluetoothDevice bT_Device) {
+		BT_Device = bT_Device;
+	}
+
+	public BluetoothSocket get_BT_socket() {
 		return BT_socket;
 	}
 
@@ -65,6 +73,22 @@ public class BT_spp implements Parcelable
 
 	public static UUID get_Bt_spp_uuid() {
 		return BT_spp_uuid;
+	}
+	
+    public OutputStream get_BT_outputStream() {
+		return BT_outputStream;
+	}
+
+	public void set_BT_outputStream(OutputStream bT_outputStream) {
+		BT_outputStream = bT_outputStream;
+	}
+
+	public InputStream get_BT_inputStream() {
+		return BT_inputStream;
+	}
+
+	public void setBT_input_Stream(InputStream bT_inputStream) {
+		BT_inputStream = bT_inputStream;
 	}
 
     public void connect() 
@@ -146,37 +170,6 @@ public class BT_spp implements Parcelable
     	       			get_dcsi().on_device_connection_pass();
         	       		get_dcsi().on_device_connection_pass(this_object);
         	       	}
-    	       		
-    	       		Thread device_input_reader_thread=new Thread(){
-	    					
-	    					public void run()
-	    					{
-	    						try 
-	    						{
-	    							while(BT_socket.isConnected())
-	   	    						{
-	   	    							if(BT_inputStream.available()>0)
-										{
-											read(new byte[1024]);
-										}
-										else
-										{
-											Thread.sleep(100);
-										}
-	   	    						}
-	    						}
-	    						catch (IOException e) 
-	    						{
-	    							e.printStackTrace();
-	    						} 
-	    						catch (InterruptedException e) 
-	    						{
-	    							e.printStackTrace();
-	    						}
-	    					}
-	    				};
-	    				
-	    				device_input_reader_thread.start();
     	       	}
     		}
     	};
@@ -198,7 +191,7 @@ public class BT_spp implements Parcelable
     	if(get_dri()!=null)
 		{
     		get_dri().on_device_read();
-        	get_dri().on_device_read(this.BT_Device.getName()+"<:",return_value,"");
+        	get_dri().on_device_read(this,return_value);
 		}
 		return return_value;
     }
@@ -218,7 +211,7 @@ public class BT_spp implements Parcelable
     	if(get_dri()!=null)
 		{
     		get_dri().on_device_read();
-        	get_dri().on_device_read(this.BT_Device.getName()+"<:",buffer,return_value,"");
+        	get_dri().on_device_read(this,buffer,return_value);
 		}
     	return return_value;
     }
@@ -238,7 +231,7 @@ public class BT_spp implements Parcelable
     	if(get_dri()!=null)
 		{
     		get_dri().on_device_read();
-        	get_dri().on_device_read(this.BT_Device.getName()+"<:",buffer,return_value,"");
+        	get_dri().on_device_read(this,buffer,return_value);
 		}
     	
     	return return_value;
@@ -258,7 +251,7 @@ public class BT_spp implements Parcelable
     	if(get_dwi()!=null)
 		{
 			get_dwi().on_device_write();
-    		get_dwi().on_device_write(this.BT_Device.getName()+">:",input,"");
+    		get_dwi().on_device_write(this,input);
 		}
     }
     
@@ -278,7 +271,7 @@ public class BT_spp implements Parcelable
     		if(get_dwi()!=null)
     		{
     			get_dwi().on_device_write();
-        		get_dwi().on_device_write(this.BT_Device.getName()+">:",input,"");
+        		get_dwi().on_device_write(this,input);
     		}
     	}
     }
@@ -299,7 +292,7 @@ public class BT_spp implements Parcelable
     		if(get_dwi()!=null)
     		{
     			get_dwi().on_device_write();
-        		get_dwi().on_device_write(this.BT_Device.getName()+">:",input,"");
+        		get_dwi().on_device_write(this,input);
     		}
     	}
     }
@@ -551,14 +544,14 @@ public class BT_spp implements Parcelable
     public interface device_write_interface
     {
     	public void on_device_write();
-    	public void on_device_write(String start_text,byte written_byte,String end_text);
-    	public void on_device_write(String start_text,byte[] written_bytes,String end_text);	
+    	public void on_device_write(BT_spp device_written_to,byte written_byte);
+    	public void on_device_write(BT_spp device_written_to,byte[] written_bytes);	
     }
     
     public interface device_read_interface
     {
     	public void on_device_read();
-    	public void on_device_read(String start_text,byte read_byte,String end_text);
-    	public void on_device_read(String start_text,byte[] read_bytes,int number_of_bytes_read,String end_text);	
+    	public void on_device_read(BT_spp device_read_from,byte read_byte);
+    	public void on_device_read(BT_spp device_read_from,byte[] read_bytes,int number_of_bytes_read);	
     }
 }

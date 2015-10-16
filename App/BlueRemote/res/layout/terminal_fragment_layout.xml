@@ -8,7 +8,7 @@
         android:id="@+id/scrollView1_terminal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/linearLayout1_terminal" >
+        android:layout_above="@+id/linearLayout_container_terminal" >
 
         <TextView
             android:id="@+id/textView1_terminal"
@@ -34,20 +34,26 @@
     </RelativeLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout1_terminal"
+        	android:id="@+id/linearLayout_container_terminal" 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" 
+            android:layout_alignParentBottom="true">
+        
+    <LinearLayout
+        android:id="@+id/linearLayout_1_terminal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:orientation="horizontal" >
 
         <Button
-            android:id="@+id/button1_terminal"
+            android:id="@+id/button_devices_1_terminal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/devices" />
 
         <EditText
-            android:id="@+id/editText1_terminal"
+            android:id="@+id/editText_1_terminal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.71"
@@ -58,10 +64,128 @@
         </EditText>
 
         <Button
-            android:id="@+id/button2_terminal"
+            android:id="@+id/button_send_1_terminal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/send" />
     </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/linearLayout_2_terminal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
 
+        <Button
+            android:id="@+id/button_devices_2_terminal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/devices" />
+
+        <EditText
+            android:id="@+id/editText_2_terminal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.71"
+            android:ems="10"
+            android:inputType="text" >
+
+        </EditText>
+
+        <Button
+            android:id="@+id/button_send_2_terminal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/send" />
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/linearLayout_3_terminal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/button_devices_3_terminal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/devices" />
+
+        <EditText
+            android:id="@+id/editText_3_terminal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.71"
+            android:ems="10"
+            android:inputType="text" >
+
+        </EditText>
+
+        <Button
+            android:id="@+id/button_send_3_terminal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/send" />
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/linearLayout_4_terminal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/button_devices_4_terminal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/devices" />
+
+        <EditText
+            android:id="@+id/editText_4_terminal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.71"
+            android:ems="10"
+            android:inputType="text" >
+
+        </EditText>
+
+        <Button
+            android:id="@+id/button_send_4_terminal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/send" />
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/linearLayout_5_terminal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/button_devices_5_terminal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/devices" />
+
+        <EditText
+            android:id="@+id/editText_5_terminal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.71"
+            android:ems="10"
+            android:inputType="text" >
+
+        </EditText>
+
+        <Button
+            android:id="@+id/button_send_5_terminal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/send" />
+    </LinearLayout>
+    
+	</LinearLayout>
+	
 </RelativeLayout>

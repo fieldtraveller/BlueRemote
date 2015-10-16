@@ -24,10 +24,7 @@ public class connected_device_list_activity extends AppCompatActivity {
 	Button ok_b;
 	
 	Intent close_intent=new Intent();
-	
-	public final static int connected_device_list_activiy_request_code=8461;
-	public static final String selected_devices_list_indices_extra_name="SELECTED_DEVICES_LIST_INDICES";
-	
+
 	ArrayList<BT_spp> connected_device_list;
 	ArrayList<Integer> selected_devices_list_indices;
 	
@@ -37,6 +34,9 @@ public class connected_device_list_activity extends AppCompatActivity {
 	ArrayAdapter<String> lv_adapter;
 	OnCheckedChangeListener cb_OnCheckedChangeListener;
 	
+	public final static int connected_device_list_activiy_request_code=8461;
+	public static final String selected_devices_list_indices_extra_name="SELECTED_DEVICES_LIST_INDICES";
+		
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
 	{
@@ -48,7 +48,7 @@ public class connected_device_list_activity extends AppCompatActivity {
 		lv = (ListView) findViewById(R.id.list_cdla);
 		ok_b = (Button) findViewById(R.id.button_cdla);
 		
-		connected_device_list=((BlueRemote)getApplicationContext()).get_connected_device_list();
+		connected_device_list=BlueRemote.get_connected_device_list();
 		selected_devices_list_indices=getIntent().getIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name);
 		
 		Thread getting_cb_state_thread=new Thread(){

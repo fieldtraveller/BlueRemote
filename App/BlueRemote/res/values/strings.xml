@@ -76,8 +76,24 @@
     <string name="control_interface">Control Interface</string>
     <string name="button_repetition_period">Button Repetition Period(in ms):</string>
     
+    <string name="clear_input_on_send">Clear Input On Send</string>
+    <string name="set_number_of_terminals">Set Number Of Terminal:</string>
+    
+    <string-array name="spinner_items">
+    	<item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+    
+    <string name="spinner_item">Spinner Item</string>
+    
+    <string name="set_color">Set Color:</string>
     <string name="set_background_color">Set Background Color:</string>
+    
     <string name="set_foreground_color">Set Foreground Color:</string>
+    <string name="select_device">Select Device:</string>
     <string name="for_incoming_data">For Incoming Data:</string>
     <string name="for_outgoing_data">For Outgoing Data:</string>
     

@@ -31,6 +31,8 @@ public class bluetooth_view<T> implements OnLongClickListener
 	call_this_method_interface put_more_extras=null; 
 	call_this_method_interface get_more_extras=null; 
 	
+	call_this_method_interface on_trying_to_tx_when_device_list_empty=null; 
+
 	public static final boolean PROGRAM_MODE=true;
 	public static final boolean NORMAL_MODE=false;
 	
@@ -184,6 +186,15 @@ public class bluetooth_view<T> implements OnLongClickListener
 
 	public void set_get_more_extras(call_this_method_interface get_more_extras) {
 		this.get_more_extras = get_more_extras;
+	}
+	
+	public call_this_method_interface get_on_trying_to_tx_when_device_list_empty() {
+		return on_trying_to_tx_when_device_list_empty;
+	}
+
+	public void set_on_trying_to_tx_when_device_list_empty(
+			call_this_method_interface on_trying_to_tx_when_device_list_empty) {
+		this.on_trying_to_tx_when_device_list_empty = on_trying_to_tx_when_device_list_empty;
 	}
 	
 	@Override

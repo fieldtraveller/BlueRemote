@@ -121,9 +121,19 @@ public class bluetooth_compound_button<T> extends bluetooth_view<T> implements O
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 		
 		int device_count=get_BT_serial_devices().size();
-		for(int count=0;count<device_count;count++)
+		if(device_count==0)
 		{
-			this.get_BT_serial_devices().get(count).write(this.compound_button_data.get_compound_button_code());
+			if(this.get_on_trying_to_tx_when_device_list_empty()!=null)
+			{
+				this.get_on_trying_to_tx_when_device_list_empty().call_this_method(null);
+			}
+		}
+		else
+		{
+			for(int count=0;count<device_count;count++)
+			{
+				this.get_BT_serial_devices().get(count).write(this.compound_button_data.get_compound_button_code());
+			}
 		}
 		
 		if(on_compound_button_change!=null)

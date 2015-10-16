@@ -8,7 +8,6 @@ import helper.bluetooth_helper.BT_spp;
 import helper.bluetooth_helper.bluetooth_button;
 import helper.bluetooth_helper.bluetooth_compound_button;
 import helper.bluetooth_helper.bluetooth_view;
-
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.app.Activity;
@@ -22,6 +21,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class control_interface_fragment extends Fragment {
  
@@ -31,6 +31,22 @@ public class control_interface_fragment extends Fragment {
 	
 	ArrayList<bluetooth_button<Fragment>> buttons; 
 	ArrayList<bluetooth_compound_button<Fragment>> compound_buttons;
+	
+	call_this_method_interface on_trying_to_tx_when_device_list_empty =new call_this_method_interface(){
+
+		@Override
+		public void call_this_method(Object object) {
+			
+			getActivity().runOnUiThread(new Runnable(){
+
+				@Override
+				public void run() {
+				
+					Toast.makeText(getActivity().getApplicationContext(), "No Device Assigned", Toast.LENGTH_SHORT).show();
+				}
+			});
+		}
+	};
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -125,8 +141,7 @@ public class control_interface_fragment extends Fragment {
 					
 				}
 				passed_bluetooth_view.get_programming_activity_intent().putIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name,BT_spp.get_indices(
-							((BlueRemote)(((Fragment)passed_bluetooth_view.get_calling_activity_or_fragment()).getActivity()).getApplicationContext())
-							.get_connected_device_list(),passed_bluetooth_view.get_BT_serial_devices())
+							BlueRemote.get_connected_device_list(),passed_bluetooth_view.get_BT_serial_devices())
 							);
 			}
   			
@@ -143,8 +158,7 @@ public class control_interface_fragment extends Fragment {
 				
 				
 				BT_spp.update_list_based_on_indices(
-							((BlueRemote)(((Fragment)passed_bluetooth_view.get_calling_activity_or_fragment()).getActivity()).getApplicationContext())
-							.get_connected_device_list()
+							BlueRemote.get_connected_device_list()
 							,passed_bluetooth_view.get_BT_serial_devices()
 							,passed_intent.getIntegerArrayListExtra(connected_device_list_activity.selected_devices_list_indices_extra_name));
 			}
@@ -158,8 +172,9 @@ public class control_interface_fragment extends Fragment {
   			buttons.get(count).set_put_more_extras(put_more_extras);
   			buttons.get(count).set_get_more_extras(get_more_extras);
   			
-  			((MainActivity)this.container_activity)
-  				.global_variables_object.list_of_devices_assigned_to_components
+  			buttons.get(count).set_on_trying_to_tx_when_device_list_empty(on_trying_to_tx_when_device_list_empty);
+  			
+  			BlueRemote.list_of_devices_assigned_to_components
   					.add(buttons.get(count).get_BT_serial_devices());
   		}
   		
@@ -171,10 +186,10 @@ public class control_interface_fragment extends Fragment {
   			compound_buttons.get(count).set_put_more_extras(put_more_extras);
   			compound_buttons.get(count).set_get_more_extras(get_more_extras);
   			
-  			((MainActivity)this.container_activity)
-				.global_variables_object.list_of_devices_assigned_to_components
+  			compound_buttons.get(count).set_on_trying_to_tx_when_device_list_empty(on_trying_to_tx_when_device_list_empty);
+  			
+  			BlueRemote.list_of_devices_assigned_to_components
 					.add(compound_buttons.get(count).get_BT_serial_devices());
-
   		}
 
   		tv_1=(TextView)this.getView().findViewById(R.id.textView1_cif);

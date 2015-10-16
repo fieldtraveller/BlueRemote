@@ -3,87 +3,88 @@ package com.alex.blueremote;
 import java.util.ArrayList;
 
 import helper.bluetooth_helper.BT_spp;
-import android.app.Application;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 
-public class BlueRemote extends Application{
+public class BlueRemote {
 	
-	BluetoothAdapter BtAdapter;
-	BluetoothServerSocket Bt_server_socket;
-	boolean discoverability_status;
+	static BluetoothAdapter BtAdapter;
+	static BluetoothServerSocket Bt_server_socket;
+	static boolean discoverability_status=false;
 
-	byte device_assignment;
+	static byte device_assignment;
 	
-	ArrayList<BT_spp> connected_device_list;
-	ArrayList<ArrayList<BT_spp>> list_of_devices_assigned_to_components;
+	static ArrayList<BT_spp> connected_device_list;
+	static ArrayList<int[]> foreground_colors;
+
+	static ArrayList<ArrayList<BT_spp>> list_of_devices_assigned_to_components;
 
 	public static final byte assign_all_devices=1;
 	public static final byte assign_latest_device_if_list_is_empty=2;
 	public static final byte do_not_assign=3;
     
-    @Override
-    public void onCreate() 
-    {
-        super.onCreate();
-        
-        list_of_devices_assigned_to_components=new ArrayList<ArrayList<BT_spp>>(); 
-        set_discoverability_status(false);
-    }
-    
-	public BluetoothAdapter get_BtAdapter() 
+    public static BluetoothAdapter get_BtAdapter() 
 	{
 		return BtAdapter;
 	}
 
-	public void set_BtAdapter(BluetoothAdapter btAdapter) 
+	public static void set_BtAdapter(BluetoothAdapter BtAdapter) 
 	{
-		BtAdapter = btAdapter;
+		BlueRemote.BtAdapter = BtAdapter;
 	}
 	
-	public BluetoothServerSocket get_Bt_server_socket() {
+	public static BluetoothServerSocket get_Bt_server_socket() {
 		return Bt_server_socket;
 	}
 
-	public void set_Bt_server_socket(BluetoothServerSocket bt_server_socket) {
+	public static void set_Bt_server_socket(BluetoothServerSocket bt_server_socket) {
 		Bt_server_socket = bt_server_socket;
 	}
 	
-	public boolean is_discoverability_status() {
+	public static boolean is_discoverability_status() {
 		return discoverability_status;
 	}
 
-	public void set_discoverability_status(boolean discoverability_status) {
-		this.discoverability_status = discoverability_status;
+	public static void set_discoverability_status(boolean discoverability_status) {
+		BlueRemote.discoverability_status = discoverability_status;
 	}
 	
-	public byte get_device_assignment() 
+	public static byte get_device_assignment() 
 	{
 		return device_assignment;
 	}
 
-	public void set_device_assignment(byte device_assignment) 
+	public static void set_device_assignment(byte device_assignment) 
 	{
-		this.device_assignment = device_assignment;
+		BlueRemote.device_assignment = device_assignment;
 	}
 
-	public ArrayList<BT_spp> get_connected_device_list() 
+	public static ArrayList<BT_spp> get_connected_device_list() 
 	{
 		return connected_device_list;
 	}
 	
-	public BT_spp get_connected_device(int index) 
+	public static BT_spp get_connected_device(int index) 
 	{
 		return connected_device_list.get(index);
 	}
 	
-	public void set_connected_device_list(ArrayList<BT_spp> connected_device_list) 
+	public static void set_connected_device_list(ArrayList<BT_spp> connected_device_list) 
 	{
-		this.connected_device_list = connected_device_list;
+		BlueRemote.connected_device_list = connected_device_list;
 	}
 	
-	public void add_to_connected_device_list(BT_spp connected_device) 
+	public static void add_to_connected_device_list(BT_spp connected_device) 
 	{
-		this.connected_device_list.add(connected_device);
+		BlueRemote.connected_device_list.add(connected_device);
 	}
+	
+	public static ArrayList<int[]> get_foreground_colors() {
+		return foreground_colors;
+	}
+
+	public static void set_foreground_colors(ArrayList<int[]> foreground_colors) {
+		BlueRemote.foreground_colors = foreground_colors;
+	}
+
 }

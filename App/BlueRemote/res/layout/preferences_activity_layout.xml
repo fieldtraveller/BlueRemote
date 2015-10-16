@@ -8,11 +8,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#FF0000" />
-	
         <Space
 	        android:layout_width="match_parent"
 	        android:layout_height="5dp" />
@@ -113,6 +108,51 @@
             android:text="@string/terminal"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
+        <Space
+	        android:layout_width="match_parent"
+	        android:layout_height="3dp" />
+        
+        <CheckBox
+            android:id="@+id/checkBox1_preferences"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/clear_input_on_send"
+            android:textSize="18sp" />
+
+        <Space
+	        android:layout_width="match_parent"
+	        android:layout_height="3dp" />
+        
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/set_number_of_terminals"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <Space
+	        android:layout_width="match_parent"
+	        android:layout_height="3dp" />
+        
+        <Spinner
+            android:id="@+id/spinner1_preferences"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FF43F839"
+            android:entries="@array/spinner_items"
+            android:padding="5dp" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/set_color"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+		
+        <Space
+	        android:layout_width="match_parent"
+	        android:layout_height="4dp" />
+        
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
@@ -153,6 +193,40 @@
             android:layout_height="wrap_content"
             android:text="@string/set_foreground_color"
             android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/layout_border"
+            android:orientation="vertical"
+             
+            android:paddingBottom="4dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:paddingTop="4dp" >
+        
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_device"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        
+        <Space
+	        android:layout_width="match_parent"
+	        android:layout_height="3dp" />
+        
+        <Spinner
+            android:id="@+id/spinner2_preferences"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FF43F839"
+            android:padding="5dp"
+            />
+		
+		<Space
+	        android:layout_width="match_parent"
+	        android:layout_height="4dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -225,7 +299,9 @@
 
         	</RelativeLayout>
         </LinearLayout>
-        
+            
+        </LinearLayout>
+		
         <Space
 	        android:layout_width="match_parent"
 	        android:layout_height="5dp" />
